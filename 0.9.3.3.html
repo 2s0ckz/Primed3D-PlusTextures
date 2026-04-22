@@ -1,0 +1,2541 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Primed3D: Full Spectrum STL Painter</title>
+<meta property="og:title" content="Primed3D: Full Spectrum STL Painter">
+<meta property="og:description" content="3D print in any colour, just using Cyan, Magenta, and Yellow filaments. Paint your model, process, and export ready for slicing. Free, open-source, and runs locally.">
+<meta property="og:image" content="https://primed3d.3drevolution.net/social-preview.png">
+<meta property="og:url" content="https://primed3d.3drevolution.net">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Primed3D: Full Spectrum STL Painter">
+<meta name="twitter:description" content="3D print in any colour, just using Cyan, Magenta, and Yellow filaments. Paint your model, process, and export ready for slicing. Free, open-source, and runs locally.">
+<meta name="twitter:image" content="https://primed3d.3drevolution.net/social-preview.png">
+<meta name="description" content="3D print in any colour, just using Cyan, Magenta, and Yellow filaments. Paint your model, process, and export ready for slicing. Free, open-source, and runs locally.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{--bg:#0f1117;--sf:#1a1d27;--sf2:#252936;--sf3:#2f3344;--bd:#363a4a;--tx:#e4e6ef;--txd:#8b8fa3;--cy:#00d4ff;--mg:#ff2d95;--yl:#ffd600;--ac:#6c5ce7;--ag:rgba(108,92,231,.25);--ok:#2ecc71}
+body.light{--bg:#e8eaf0;--sf:#f4f5f8;--sf2:#eaecf2;--sf3:#dde0ea;--bd:#c4c8d8;--tx:#1a1d27;--txd:#4a5068;--cy:#0088bb;--mg:#c4005e;--yl:#8a7200;--ac:#6c5ce7;--ag:rgba(108,92,231,.15);--ok:#167a3e}
+/* Header always stays dark — text colours identical to dark mode */
+body.light .thdr{background:#1a1d27;border-bottom-color:#363a4a}
+body.light .thdr *{color:#8b8fa3!important}
+body.light .thdr .rev-orange{color:#ffd600!important}
+body.light .thdr a:hover,body.light .thdr button:hover{color:#e4e6ef!important;opacity:1!important}
+body.light #vp{background:var(--bg)}
+/* Viewport overlay buttons: white bg, dark readable text */
+body.light .vb{background:rgba(255,255,255,.9);color:#252d44;border-color:#b0b6cc}
+body.light .vb:hover{color:#1a1d27;border-color:var(--ac)}
+body.light .vb.a{color:#1a1d27;background:var(--ag);border-color:var(--ac)}
+body.light .vnav{background:rgba(248,249,252,.97);border-color:#c4c8d8}
+body.light .vnav-title{color:#4a5068}
+body.light .vnav-btn{background:#eaecf2;border-color:#c4c8d8;color:#252d44}
+body.light .vnav-btn:hover{color:#1a1d27;border-color:var(--ac);background:var(--ag)}
+body.light #sb2{background:rgba(248,249,252,.96);border-top-color:#c4c8d8;color:#4a5068}
+body.light .hh{background:rgba(248,249,252,.94);border-color:#c4c8d8;color:#4a5068}
+body.light .hh kbd{background:#dde0ea;color:#252d44}
+body.light .vp-undo .sb{background:rgba(255,255,255,.9);border-color:#c4c8d8;color:#252d44}
+body.light .vp-undo .sb:hover{color:#1a1d27;border-color:var(--ac)}
+body.light .pb.pr{color:#fff}
+body.light #dl-overlay button{color:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);overflow:hidden;height:100vh;width:100vw}
+#app{display:flex;height:100vh;width:100vw}
+#toolbar{width:284px;min-width:284px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;z-index:10}
+.thdr{padding:14px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center}.logo img{height:46px}
+.thdr-right{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.socials{display:flex;gap:8px;align-items:center}
+.socials a,.socials button{color:var(--txd);text-decoration:none;opacity:.7;transition:opacity .15s;background:none;border:none;cursor:pointer;padding:0;font-size:14px;display:flex;align-items:center}
+.socials a:hover,.socials button:hover{opacity:1}
+.socials svg{width:16px;height:16px;fill:currentColor}
+.sec{padding:14px 20px;border-bottom:1px solid var(--bd)}
+.stl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--txd);margin-bottom:10px}
+#ua{border:2px dashed var(--bd);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all .2s}
+#ua:hover{border-color:var(--ac);background:var(--ag)}
+#ua.hf{border-color:var(--ok);border-style:solid;padding:10px}
+#ua p{font-size:12px;color:var(--txd);margin-top:4px}
+#fi{display:none}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.tb{background:var(--sf2);border:2px solid transparent;border-radius:7px;padding:8px 6px;color:var(--tx);cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .12s}
+.tb:hover{background:var(--sf3)}.tb.a{border-color:var(--ac);background:var(--ag)}
+.tb .ti{font-size:18px}
+.cr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.cr label{font-size:12px;font-weight:500;color:var(--txd)}
+.cr .v{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);background:var(--sf2);padding:2px 6px;border-radius:4px;min-width:30px;text-align:center}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--sf3);border-radius:2px;outline:none;margin:6px 0 2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--ac);border-radius:50%;cursor:pointer}
+#hs{background:linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%));height:10px;border-radius:5px}
+#cpc{width:100%;height:140px;border-radius:6px;cursor:crosshair;display:block}
+.clr{display:flex;gap:8px;margin-top:8px;align-items:center}
+#cc,.bsw{width:32px;height:32px;border-radius:5px;border:2px solid var(--bd);flex-shrink:0}
+.bsw{cursor:pointer}
+.hf2{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:6px 10px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none}
+.hf2:focus{border-color:var(--ac)}
+.fmg{display:flex;gap:4px;margin-top:6px}
+.fmb{flex:1;background:var(--sf2);border:1px solid transparent;border-radius:5px;padding:5px 4px;color:var(--txd);cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;text-align:center;transition:all .12s}
+.fmb:hover{background:var(--sf3)}.fmb.a{border-color:var(--ac);color:var(--tx);background:var(--ag)}
+.pb{width:100%;padding:12px;border:none;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.pb.pr{background:linear-gradient(135deg,var(--cy),var(--mg),var(--yl));color:#000}
+.pb.pr:hover{opacity:.9;transform:translateY(-1px)}
+.db{width:100%;padding:9px 10px;border:1px solid var(--bd);border-radius:5px;background:var(--sf2);color:var(--tx);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;margin-top:5px;transition:all .12s;display:flex;align-items:center;gap:8px}
+.db:hover{background:var(--sf3);border-color:var(--ac)}
+.db .cd{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.ur{display:flex;gap:4px;margin-top:8px}
+.sb{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px;color:var(--txd);cursor:pointer;font-family:inherit;font-size:11px;transition:all .12s;text-align:center}
+.sb:hover{color:var(--tx);border-color:var(--ac)}.sb:disabled{opacity:.3;cursor:not-allowed}
+.sb.fw{width:100%}
+.ur .sb{flex:1}
+#vp{flex:1;position:relative;background:var(--bg)}
+#tc{display:block;width:100%;height:100%}
+#sb2{position:absolute;bottom:0;left:0;right:0;padding:7px 16px;background:rgba(26,29,39,.92);backdrop-filter:blur(10px);border-top:1px solid var(--bd);display:flex;justify-content:space-between;font-size:11px;color:var(--txd);font-family:'JetBrains Mono',monospace}
+.vc{position:absolute;top:12px;right:12px;display:flex;gap:4px;flex-wrap:wrap}
+.vb{background:rgba(26,29,39,.8);backdrop-filter:blur(10px);border:1px solid var(--bd);border-radius:5px;padding:5px 10px;color:var(--txd);cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;transition:all .12s}
+.vb:hover{color:var(--tx);border-color:var(--ac)}.vb.a{color:var(--tx);background:var(--ag);border-color:var(--ac)}
+.vnav{position:absolute;top:12px;left:12px;background:rgba(26,29,39,.92);backdrop-filter:blur(10px);border:1px solid var(--bd);border-radius:8px;padding:8px;display:none;z-index:5}
+.vnav.vis{display:block}
+.vnav-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--txd);margin-bottom:6px;padding:0 4px}
+.vnav-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px}
+.vnav-btn{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;color:var(--txd);cursor:pointer;font-family:inherit;font-size:10px;font-weight:500;text-align:center;transition:all .12s;white-space:nowrap}
+.vnav-btn:hover{color:var(--tx);border-color:var(--ac);background:var(--ag)}
+.vnav-btn kbd{font-family:'JetBrains Mono',monospace;font-size:9px;opacity:.5;margin-left:2px}
+.hh{position:absolute;bottom:40px;left:12px;background:rgba(26,29,39,.85);backdrop-filter:blur(10px);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;font-size:10px;color:var(--txd);line-height:1.6;pointer-events:none}
+.hh kbd{background:var(--sf3);padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px}
+#do{position:fixed;inset:0;background:rgba(108,92,231,.15);border:3px dashed var(--ac);display:none;align-items:center;justify-content:center;z-index:100;font-size:18px;font-weight:600}
+#po{position:fixed;inset:0;background:rgba(15,17,23,.88);display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:14px}
+#po.vis{display:flex}
+@keyframes cubeRotate{0%{transform:rotateX(-20deg) rotateY(25deg)}100%{transform:rotateX(-20deg) rotateY(385deg)}}
+.print-anim{width:56px;height:56px;position:relative;margin:0 auto 14px;perspective:200px}
+.print-cube{width:48px;height:48px;margin:4px auto;transform-style:preserve-3d;animation:cubeRotate 4s linear infinite}
+.print-cube .face{position:absolute;width:48px;height:48px;backface-visibility:visible}
+.print-cube .face.fr{transform:translateZ(24px);background:rgba(108,92,231,.18);border:1.5px solid rgba(108,92,231,.35)}
+.print-cube .face.bk{transform:translateZ(-24px) rotateY(180deg);background:rgba(108,92,231,.1);border:1.5px solid rgba(108,92,231,.25)}
+.print-cube .face.lt{transform:rotateY(-90deg) translateZ(24px);background:rgba(0,212,255,.15);border:1.5px solid rgba(0,212,255,.3)}
+.print-cube .face.rt{transform:rotateY(90deg) translateZ(24px);background:rgba(255,45,149,.15);border:1.5px solid rgba(255,45,149,.3)}
+.print-cube .face.tp{height:48px;transform:rotateX(90deg) translateZ(24px);background:rgba(255,214,0,.12);border:1.5px solid rgba(255,214,0,.3)}
+.print-cube .face.bt{height:48px;transform:rotateX(-90deg) translateZ(24px);background:rgba(108,92,231,.08);border:1.5px solid rgba(108,92,231,.2)}
+.print-cube .txt3d{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:800;line-height:1;letter-spacing:-.5px;background:linear-gradient(180deg,var(--cy),var(--mg) 50%,var(--yl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.4)) drop-shadow(2px 2px 0 rgba(0,0,0,.2))}
+.print-cube .txt3d .t1{font-size:11px}
+.print-cube .txt3d .t2{font-size:20px}
+.pbar{width:280px;height:5px;background:var(--sf3);border-radius:3px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--cy),var(--mg),var(--yl));border-radius:3px;transition:width .2s;width:0%}
+#pt{font-size:13px;color:var(--txd)}
+#bc{position:fixed;pointer-events:none;z-index:50;border:2px solid rgba(108,92,231,.7);border-radius:50%;display:none;transform:translate(-50%,-50%)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--sf2);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:8px;padding:11px 16px 11px 14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--tx);box-shadow:0 4px 24px rgba(0,0,0,.4);z-index:400;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;max-width:360px;line-height:1.4}
+.toast.vis{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.toast .toast-icon{font-size:16px;flex-shrink:0}
+.toast .toast-close{margin-left:auto;background:none;border:none;color:var(--txd);font-size:16px;cursor:pointer;padding:0 0 0 8px;line-height:1;flex-shrink:0;transition:color .12s}
+.toast .toast-close:hover{color:var(--tx)}
+.ht{font-size:11px;color:var(--txd);margin-bottom:8px;line-height:1.5}
+.li{font-size:11px;color:var(--txd);margin-top:8px;font-family:'JetBrains Mono',monospace;line-height:1.6}
+.li span{color:var(--tx)}
+.fsel{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:8px 10px;color:var(--tx);font-family:inherit;font-size:12px;font-weight:500;outline:none;cursor:pointer;margin-bottom:8px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b8fa3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.fsel:focus{border-color:var(--ac)}
+.fsel option{background:var(--sf);color:var(--tx)}
+#cpc-wrap{position:relative;display:block}
+#cpMarker{position:absolute;width:12px;height:12px;border:2px solid #fff;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+#hsMarker{position:absolute;width:4px;height:16px;border:2px solid #fff;border-radius:2px;pointer-events:none;transform:translate(-50%,-3px);box-shadow:0 0 0 1px rgba(0,0,0,.4);top:0}
+#hs-wrap{position:relative}
+.vp-undo{position:absolute;top:12px;left:12px;display:flex;gap:4px;z-index:4}
+.vp-undo .sb{background:rgba(26,29,39,.8);backdrop-filter:blur(10px);border:1px solid var(--bd);padding:6px 12px;font-size:12px}
+.orient-sec{padding:10px 20px;border-bottom:1px solid var(--bd);display:flex;gap:5px}
+.orient-btn{flex:1;padding:8px 10px;background:var(--sf2);border:2px solid transparent;border-radius:7px;color:var(--tx);cursor:pointer;font-family:inherit;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s}
+.orient-btn:hover{background:var(--sf3)}.orient-btn.a{border-color:var(--ac);background:var(--ag)}
+#scalePanel{display:none;padding:10px 20px;border-bottom:1px solid var(--bd)}
+#scalePanel .stl{margin-bottom:8px}
+.dim-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.dim-row label{font-size:11px;font-weight:600;color:var(--txd);width:14px;text-align:center}
+.dim-row input{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;text-align:right}
+.dim-row input:focus{border-color:var(--ac)}
+.dim-row span{font-size:10px;color:var(--txd);width:24px}
+.scale-pct{display:flex;align-items:center;gap:6px;margin-top:8px}
+.scale-pct label{font-size:11px;color:var(--txd)}
+.scale-pct input{flex:1}
+.scale-pct .v{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);background:var(--sf2);padding:2px 6px;border-radius:4px;min-width:40px;text-align:center}
+#dl-overlay{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);z-index:15;display:none}
+#dl-overlay button{padding:14px 32px;background:linear-gradient(135deg,var(--cy),var(--mg),var(--yl));color:#000;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(108,92,231,.4);transition:all .2s;display:flex;align-items:center;gap:10px}
+#dl-overlay button:hover{transform:scale(1.03);box-shadow:0 6px 28px rgba(108,92,231,.5)}
+#reprocess-overlay{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);z-index:15;display:none}
+#reprocess-overlay button{padding:10px 22px;background:var(--sf2);border:2px solid var(--ac);border-radius:8px;color:var(--tx);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+#reprocess-overlay button:hover{background:var(--ag);border-color:var(--cy)}
+#filColModal{position:fixed;inset:0;background:rgba(15,17,23,.88);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center}
+#filColModal.vis{display:flex}
+.fcm-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;width:340px;max-width:90vw;padding:24px 28px;position:relative}
+.fcm-box h2{font-size:15px;font-weight:700;margin-bottom:4px}
+.fcm-box p{font-size:11px;color:var(--txd);margin-bottom:14px;line-height:1.5}
+.fcm-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fcm-row label{font-size:12px;font-weight:600;color:var(--txd);width:64px;flex-shrink:0}
+.fcm-swatch{width:28px;height:28px;border-radius:5px;border:2px solid var(--bd);flex-shrink:0;cursor:pointer}
+.fcm-hex{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none}
+.fcm-hex:focus{border-color:var(--ac)}
+.fcm-reset{font-size:11px;color:var(--txd);background:none;border:none;cursor:pointer;text-decoration:underline;margin-top:2px;padding:0;transition:color .12s}
+.fcm-reset:hover{color:var(--tx)}
+.fcm-actions{display:flex;gap:8px;margin-top:16px}
+.fcm-apply{flex:1;padding:10px;background:linear-gradient(135deg,var(--cy),var(--mg),var(--yl));color:#000;border:none;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.fcm-close-btn{padding:10px 16px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer}
+.fcm-close-btn:hover{border-color:var(--ac)}
+.help-btn{width:calc(100% - 40px);margin:14px 20px 12px;padding:9px;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;color:var(--txd);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;flex-shrink:0}
+.help-btn:hover{color:var(--tx);border-color:var(--ac);background:var(--ag)}
+.coffee-btn:hover{border-color:#ffaa40!important;background:rgba(255,128,0,.12)!important;color:var(--tx)}
+#helpModal{position:fixed;inset:0;background:rgba(15,17,23,.85);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center}
+#helpModal.vis{display:flex}
+.get-started{display:none;margin:16px auto 0;padding:12px 32px;background:linear-gradient(135deg,var(--cy),var(--mg),var(--yl));color:#000;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.get-started:hover{opacity:.9;transform:translateY(-1px)}
+#helpModal.first-visit .get-started{display:block}
+#thankModal{position:fixed;inset:0;background:rgba(15,17,23,.85);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center}
+#thankModal.vis{display:flex}
+#termsModal{position:fixed;inset:0;background:rgba(15,17,23,.85);backdrop-filter:blur(6px);z-index:300;display:none;align-items:center;justify-content:center}
+#termsModal.vis{display:flex}
+.thk-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;width:420px;max-width:90vw;padding:28px 32px;position:relative;text-align:center}
+.thk-box h2{font-size:17px;font-weight:700;margin-bottom:12px}
+.thk-box p{font-size:13px;color:var(--txd);line-height:1.7;margin-bottom:10px}
+.thk-box a.thk-link{display:inline-flex;align-items:center;gap:6px;color:#ff8000;text-decoration:none;font-weight:600;font-size:13px;transition:color .15s}
+.thk-box a.thk-link:hover{color:#ffaa40}
+.thk-box .thk-btns{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.thk-box .thk-btn{padding:10px 18px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s;border:1px solid var(--bd)}
+.thk-btn-member{background:linear-gradient(135deg,#ff0000,#cc0000);color:#fff;border-color:transparent!important}
+.thk-btn-member:hover{opacity:.9}
+.thk-btn-coffee{background:var(--sf2);color:var(--tx);border-color:#ff8000!important}
+.thk-btn-coffee:hover{background:rgba(255,128,0,.12)}
+.thk-close{margin-top:16px;background:none;border:none;color:var(--txd);font-family:inherit;font-size:12px;cursor:pointer;padding:6px 12px;transition:color .15s}
+.thk-close:hover{color:var(--tx)}
+.hm-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;width:520px;max-width:90vw;max-height:85vh;overflow-y:auto;padding:28px 32px;position:relative}
+.hm-box::-webkit-scrollbar{width:4px}.hm-box::-webkit-scrollbar-thumb{background:var(--sf3);border-radius:2px}
+.hm-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--txd);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:4px;transition:color .15s}.hm-close:hover{color:var(--tx)}
+.hm-box h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.hm-box h3{font-size:13px;font-weight:600;color:var(--cy);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.hm-box p{font-size:13px;color:var(--txd);line-height:1.7;margin-bottom:8px}
+.hm-box ol{font-size:13px;color:var(--txd);line-height:1.8;padding-left:20px;margin-bottom:8px}
+.hm-box li{margin-bottom:4px}
+.hm-box code{background:var(--sf2);padding:2px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx)}
+.hm-box .setting{display:flex;align-items:center;gap:8px;background:var(--sf2);border-radius:6px;padding:8px 12px;margin:6px 0;font-size:12px;color:var(--tx);font-family:'JetBrains Mono',monospace}
+.hm-box .setting label{color:var(--txd);font-family:'DM Sans',sans-serif;min-width:120px}
+.hm-vid{display:block;margin:12px 0;border-radius:8px;border:2px solid var(--bd);overflow:hidden;text-decoration:none;transition:border-color .2s;position:relative;background:var(--sf2);padding:30px;text-align:center}
+.hm-vid:hover{border-color:var(--ac)}
+.hm-vid .vid-soon{font-size:13px;color:var(--txd)}
+.acc-item{border-bottom:1px solid var(--bd)}
+.acc-item:last-child{border-bottom:none}
+.acc-btn{width:100%;text-align:left;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;color:var(--tx);padding:10px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;font-family:inherit;transition:all .15s;margin:3px 0}
+.acc-btn:hover{border-color:var(--ac);color:var(--cy)}
+.acc-item.open>.acc-btn{background:var(--ag);border-color:var(--ac);color:var(--cy)}
+.acc-chevron{font-size:10px;color:var(--txd);transition:transform .2s;flex-shrink:0}
+.acc-item.open>.acc-btn>.acc-chevron{transform:rotate(90deg);color:var(--ac)}
+.acc-body{display:none;padding:4px 0 10px 2px}
+.acc-item.open>.acc-body{display:block}
+.acc-tag{display:inline-block;font-size:10px;background:var(--ag);color:var(--ac);border-radius:3px;padding:1px 5px;margin-left:6px;font-weight:500;vertical-align:middle}
+#photoOverlay{position:absolute;display:none;cursor:move;border:2px solid var(--ac);box-shadow:0 0 0 1px rgba(0,0,0,.5);transform-origin:top left;user-select:none;z-index:6;pointer-events:all}
+#photoOverlay img{display:block;width:100%;height:100%;pointer-events:none}
+#photoOverlay .ph{position:absolute;bottom:0;right:0;width:18px;height:18px;background:var(--ac);cursor:se-resize;border-radius:3px 0 0 0;opacity:.85}
+.photo-upload-area{border:2px dashed var(--bd);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.photo-upload-area:hover{border-color:var(--ac);background:var(--ag)}
+.photo-upload-area p{font-size:12px;color:var(--txd);margin-top:4px}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="toolbar">
+  <div class="thdr"><div class="logo"><img src="https://primed3d.3drevolution.net/primed3d_text.png" alt="Primed3D" style="height:46px"></div><div class="thdr-right"><a href="https://www.YouTube.com/3DRevolution" target="_blank" style="font-size:11px;color:var(--txd);text-decoration:none;letter-spacing:.3px;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">A <span class="rev-orange" style="color:var(--yl)">3D Revolution</span> Tool</a><div class="socials"><a href="https://youtube.com/3DRevolution" target="_blank" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.3 31.3 0 000 12a31.3 31.3 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.3 31.3 0 0024 12a31.3 31.3 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a><a href="https://www.facebook.com/the3drev" target="_blank" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a><a href="https://x.com/The3DRev" target="_blank" title="X / Twitter"><svg viewBox="0 0 24 24"><path d="M18.2 2.25h3.5l-7.7 8.8L23 21.75h-7.1l-5.5-7.2-6.3 7.2H.6l8.2-9.4L.4 2.25h7.3l5 6.6 5.5-6.6zm-1.2 17.5h2L7.1 4.3H5L17 19.75z"/></svg></a><a href="https://www.instagram.com/the3drevolution/" target="_blank" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1.1.4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1.1.3-2.2.4-1.3.1-1.6.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4a3.9 3.9 0 01-1.4-.9 3.9 3.9 0 01-.9-1.4c-.2-.4-.3-1.1-.4-2.2-.1-1.3-.1-1.6-.1-4.9s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1.1-.3 2.2-.4 1.3-.1 1.6-.1 4.9-.1M12 0C8.7 0 8.3 0 7.1.1 5.8.1 4.9.3 4.1.6c-.8.3-1.5.7-2.2 1.4A6 6 0 00.6 4.1C.3 4.9.1 5.8.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c0 1.3.2 2.2.5 3 .3.8.7 1.5 1.4 2.2.7.7 1.4 1.1 2.2 1.4.8.3 1.7.5 3 .5 1.2.1 1.6.1 4.8.1s3.7 0 4.9-.1c1.3 0 2.2-.2 3-.5.8-.3 1.5-.7 2.2-1.4.7-.7 1.1-1.4 1.4-2.2.3-.8.5-1.7.5-3 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c0-1.3-.2-2.2-.5-3a6 6 0 00-1.4-2.2A6 6 0 0019.9.6c-.8-.3-1.7-.5-3-.5C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.9 1.4 1.4 0 000-2.9z"/></svg></a><button onclick="if(navigator.share)navigator.share({title:'Primed3D',text:'3D print in any colour with CMY filament dithering',url:'https://primed3d.3drevolution.net'}).catch(()=>{});else{navigator.clipboard.writeText('https://primed3d.3drevolution.net');this.innerHTML='✓';setTimeout(()=>{this.innerHTML='<svg viewBox=&quot;0 0 24 24&quot; style=&quot;width:16px;height:16px;fill:currentColor&quot;><path d=&quot;M18 16.1a2.9 2.9 0 00-1.9.7l-7-4.1a3.2 3.2 0 000-1.4l7-4.1a2.9 2.9 0 001.9.7 3 3 0 10-3-3c0 .2 0 .5.1.7l-7 4.1a3 3 0 100 4.6l7 4.1a2.6 2.6 0 00-.1.7 3 3 0 103-3z&quot;/></svg>';},1500)}" title="Share"><svg viewBox="0 0 24 24"><path d="M18 16.1a2.9 2.9 0 00-1.9.7l-7-4.1a3.2 3.2 0 000-1.4l7-4.1a2.9 2.9 0 001.9.7 3 3 0 10-3-3c0 .2 0 .5.1.7l-7 4.1a3 3 0 100 4.6l7 4.1a2.6 2.6 0 00-.1.7 3 3 0 103-3z"/></svg></button></div></div></div>
+  <div class="sec"><div class="stl">Model</div><div id="ua" onclick="document.getElementById('fi').click()"><div style="font-size:24px;opacity:.6">📦</div><p>Drop STL or 3MF here or click to browse</p></div><input type="file" id="fi" accept=".stl,.3mf"></div>
+  <div class="orient-sec" id="orientSec" style="display:none"><button class="orient-btn" id="orientBtn" onclick="if(S.tool==='orient'){S.tool='brush';this.classList.remove('a');document.querySelector('.tb[data-tool=brush]').classList.add('a');$('st').textContent='Tool: Brush';return;}document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));S.tool='orient';this.classList.add('a');$('scaleBtn').classList.remove('a');hideScaleUI();$('st').textContent='Tool: Orient'">⬇️ Orient</button><button class="orient-btn" id="scaleBtn" onclick="if(S.tool==='scale'){S.tool='brush';this.classList.remove('a');hideScaleUI();document.querySelector('.tb[data-tool=brush]').classList.add('a');$('st').textContent='Tool: Brush';return;}document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));S.tool='scale';this.classList.add('a');$('orientBtn').classList.remove('a');showScaleUI();$('st').textContent='Tool: Scale'">📐 Scale</button></div>
+  <div id="scalePanel"><div class="stl">Dimensions (mm)</div><div class="dim-row"><label>X</label><input type="number" id="dimX" step="0.1" min="0.1" onchange="onDimChange('x',this.value)"><span>mm</span></div><div class="dim-row"><label>Y</label><input type="number" id="dimY" step="0.1" min="0.1" onchange="onDimChange('y',this.value)"><span>mm</span></div><div class="dim-row"><label>Z</label><input type="number" id="dimZ" step="0.1" min="0.1" onchange="onDimChange('z',this.value)"><span>mm</span></div><div class="scale-pct"><label>Scale</label><input type="range" id="scaleSlider" min="10" max="500" value="100" oninput="onScaleSlider(this.value)"><input type="number" class="v" id="scalePct" value="100" min="1" max="10000" style="width:52px;border:1px solid var(--bd);cursor:text" onchange="onScalePctType(this.value)">%</div></div>
+  <div class="sec" id="bcs" style="display:none"><div class="stl">Base Colour</div><p class="ht">Default colour for unpainted surfaces.</p><div class="clr" style="margin-top:0"><div class="bsw" id="bsw" style="background:#c7c7c7" onclick="document.getElementById('bnp').click()"></div><input type="text" class="hf2" id="bhx" value="#c7c7c7" onchange="setBH(this.value)"><input type="color" id="bnp" value="#c7c7c7" style="width:0;height:0;opacity:0;position:absolute" oninput="setBH(this.value)"></div><button class="sb fw" style="margin-top:8px" onclick="resetBase()">Reset all to base</button></div>
+  <div class="sec" id="ts" style="display:none"><div class="stl">Paint Tools</div><div class="tg"><button class="tb a" data-tool="brush"><span class="ti">🖌️</span>Brush</button><button class="tb" data-tool="sphere-brush"><span class="ti">⚪</span>Sphere</button><button class="tb" data-tool="fill"><span class="ti">🪣</span>Fill</button><button class="tb" data-tool="eyedropper"><span class="ti">💧</span>Colour Picker</button><button class="tb" data-tool="gradient"><span class="ti">🌈</span>Gradient</button><button class="tb" data-tool="photo"><span class="ti">📷</span>Photo</button></div></div>
+  <div class="sec" id="bs" style="display:none"><div class="stl">Brush Settings</div><div id="br-wrap"><div class="cr"><label>Radius</label><span class="v" id="rv">5.0</span></div><input type="range" id="br" min="0.5" max="50" value="5" step="0.5" oninput="S.brushR=+this.value;$('rv').textContent=(+this.value).toFixed(1);if(S.mesh){syncCam();const sz=getBrushPxAt(O.t);bcu.style.width=bcu.style.height=Math.max(6,sz*2)+'px';bcu.style.display='block';bcu.style.left=lastMx+'px';bcu.style.top=lastMy+'px';}"></div><div id="fo" style="display:none;margin-top:10px"><div class="cr"><label>Fill Mode</label></div><div class="fmg"><button class="fmb a" onclick="S.fillMode='connected';this.parentNode.querySelectorAll('.fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');$('alw').style.display='none'">Connected</button><button class="fmb" onclick="S.fillMode='angle';this.parentNode.querySelectorAll('.fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');$('alw').style.display=''">Angle Limit</button></div><div id="alw" style="display:none;margin-top:8px"><div class="cr"><label>Max Angle</label><span class="v" id="fav">45°</span></div><input type="range" id="fa" min="1" max="180" value="45" oninput="$('fav').textContent=this.value+'°';clearFillHover()"></div></div></div>
+  <div id="gradPanel" style="display:none;margin-top:10px;border-top:1px solid var(--bd);padding:10px 20px 0"><div class="cr"><label>Gradient Colours</label></div><div style="display:flex;gap:8px;align-items:center;margin:8px 0"><label style="font-size:11px;color:var(--txd)">From</label><div style="position:relative"><div class="bsw" id="gradA" style="background:#ff0000;flex:0 0 28px;height:28px" onclick="S.gradPick='A';this.parentNode.querySelector('input').click()"></div><input type="color" value="#ff0000" style="position:absolute;left:0;top:100%;width:0;height:0;opacity:0" oninput="S.gradA=this.value;$('gradA').style.background=this.value"></div><label style="font-size:11px;color:var(--txd)">To</label><div style="position:relative"><div class="bsw" id="gradB" style="background:#0000ff;flex:0 0 28px;height:28px" onclick="this.parentNode.querySelector('input').click()"></div><input type="color" value="#0000ff" style="position:absolute;left:0;top:100%;width:0;height:0;opacity:0" oninput="S.gradB=this.value;$('gradB').style.background=this.value"></div></div><div class="cr" style="margin:8px 0"><label>Steps</label><span class="v" id="gradStepsV">64</span></div><input type="range" id="gradSteps" min="2" max="256" value="64" oninput="$('gradStepsV').textContent=this.value"><div class="cr" style="margin:10px 0 6px"><label>Apply To</label></div><div class="fmg" id="gradModeGrp"><button class="fmb a" onclick="setGradMode('all')">Whole Model</button><button class="fmb" onclick="setGradMode('sel')">Selection</button></div><div id="gradSelPanel" style="display:none;margin-top:8px"><div class="cr" style="margin:6px 0"><label>1. Select faces</label></div><div class="fmg"><button class="fmb a" id="gSelBrush" onclick="S.gradSubTool='brush';document.querySelectorAll('#gradSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updGradSubTools()">🖌️ Brush</button><button class="fmb" id="gSelFill" onclick="S.gradSubTool='fill';document.querySelectorAll('#gradSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updGradSubTools()">🪣 Fill</button><button class="fmb" onclick="S.gradSubTool='points';document.querySelectorAll('#gradSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updGradSubTools()">📍 Points</button><button class="fmb" onclick="clearGradSel()">✕ Clear</button></div><p class="ht" id="gradSelCount" style="margin:6px 0">0 faces selected</p><div class="cr" style="margin:6px 0"><label>2. Click start & end points</label></div><p class="ht" id="gradPtStatus" style="margin:4px 0">Click on model to set start point</p></div><div id="gradAxisPanel"><div class="cr" style="margin:6px 0"><label>Direction</label></div><div class="cr" style="margin:6px 0"><label style="font-size:11px">Rotation</label><span class="v" id="gradYawV">0°</span></div><input type="range" id="gradYaw" min="-180" max="180" value="0" step="1" oninput="S.gradYaw=+this.value;$('gradYawV').textContent=this.value+'°';updGradArrow()"><div class="cr" style="margin:6px 0"><label style="font-size:11px">Pitch</label><span class="v" id="gradPitchV">0°</span></div><input type="range" id="gradPitch" min="-90" max="90" value="0" step="1" oninput="S.gradPitch=+this.value;$('gradPitchV').textContent=this.value+'°';updGradArrow()"><button class="sb fw" style="margin-top:6px" onclick="S.gradYaw=0;S.gradPitch=0;$('gradYaw').value=0;$('gradPitch').value=0;$('gradYawV').textContent='0°';$('gradPitchV').textContent='0°';updGradArrow()">Reset Direction</button><div class="cr" style="margin:8px 0"><label>Centre</label><span class="v" id="gradCenterV">50%</span></div><input type="range" id="gradCenter" min="0" max="100" value="50" step="1" oninput="onGradCenterChange(this.value)"></div><button class="sb fw" style="margin-top:10px" onclick="applyGradient()">Apply Gradient</button></div>
+  <div id="photoPanel" style="display:none;padding:14px 20px;border-bottom:1px solid var(--bd)">
+    <div class="stl" style="margin-bottom:8px">Photo Projection</div>
+    <p class="ht">Load a photo, position it over the model in the viewport, then apply to paint those colours onto the faces.</p>
+    <div class="photo-upload-area" id="photoUploadArea" onclick="$('photoFileIn').click()">
+      <div style="font-size:22px;opacity:.6">📷</div>
+      <p id="photoUploadLabel">Click to load a JPG or PNG</p>
+    </div>
+    <input type="file" id="photoFileIn" accept="image/jpeg,image/png,image/webp" style="display:none">
+    <div id="photoControls" style="display:none">
+      <div class="cr" style="margin-bottom:4px"><label>Overlay Opacity</label><span class="v" id="photoOpacityV">70%</span></div>
+      <input type="range" id="photoOpacity" min="10" max="100" value="70" oninput="$('photoOpacityV').textContent=this.value+'%';if($('photoOverlay').style.display!=='none')$('photoOverlay').style.opacity=this.value/100">
+      <div class="cr" style="margin-top:8px;margin-bottom:4px"><label>Scale</label><span class="v" id="photoScaleV">100%</span></div>
+      <input type="range" id="photoScale" min="10" max="500" value="100" oninput="onPhotoScale(+this.value)">
+      <div class="cr" style="margin-top:8px;margin-bottom:4px"><label>Rotate</label><span class="v" id="photoRotV">0°</span></div>
+      <input type="range" id="photoRot" min="-180" max="180" value="0" oninput="onPhotoRot(+this.value)">
+      <div class="cr" style="margin:10px 0 6px"><label>Apply To</label></div>
+      <div class="fmg" id="photoModeGrp">
+        <button class="fmb a" id="photoModeAll" onclick="setPhotoMode('all',event)">Whole Model</button>
+        <button class="fmb" id="photoModeSel" onclick="setPhotoMode('sel',event)">Selection</button>
+      </div>
+      <div id="photoSelPanel" style="display:none;margin-top:8px">
+        <div class="fmg" style="margin-bottom:6px">
+          <button class="fmb a" id="pSelBrush" onclick="S.photoSubTool='brush';document.querySelectorAll('#photoSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updPhotoSubTools()">🖌️ Brush</button>
+          <button class="fmb" id="pSelFill" onclick="S.photoSubTool='fill';document.querySelectorAll('#photoSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updPhotoSubTools()">🪣 Fill</button>
+          <button class="fmb" onclick="clearPhotoSel()">✕ Clear</button>
+        </div>
+        <p class="ht" id="photoSelCount" style="margin-bottom:6px">0 faces selected</p>
+      </div>
+      <p class="ht" style="margin:8px 0 4px">Drag image in viewport to reposition · Use sliders above to scale and rotate.</p>
+      <button class="sb fw" onclick="resetPhotoOverlay()">↺ Reset Position</button>
+      <button class="pb pr" style="margin-top:8px" onclick="applyPhotoProjection()">🎨 Apply Photo</button>
+    </div>
+  </div>
+  <div class="sec" id="cs" style="display:none"><div class="stl">Paint Colour</div><div id="cpc-wrap"><canvas id="cpc" width="244" height="140"></canvas><div id="cpMarker" style="left:244px;top:0px"></div></div><div class="cr" style="margin-top:8px"><label>Hue</label></div><div id="hs-wrap"><input type="range" id="hs" min="0" max="360" value="0" oninput="uHue(+this.value)"><div id="hsMarker" style="left:0%"></div></div><div class="clr"><div id="cc" style="background:#ff0000"></div><input type="text" class="hf2" id="hi" value="#ff0000" onchange="sCH(this.value)"></div></div>
+  <div class="sec" id="ps" style="display:none"><div class="stl">Process & Export</div><div class="cr"><label>Filament Mode</label></div><select id="fmode" class="fsel"><option value="cmy" selected>CMY — 3 filaments</option><option value="wcmy">WCMY — 4 filaments</option><option value="kcmy">KCMY — 4 filaments</option><option value="wkcmy">WKCMY — 5 filaments</option><option value="2c">2 Filaments / Dual Nozzle</option><option value="solid">Solid Colours — No Dithering ✦</option></select><p class="ht" id="fmDesc">Standard subtractive colour mixing. Best for vibrant colours with a white base filament in the printer.</p><div id="twoColorPanel" style="display:none;margin:8px 0"><div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:var(--txd)">Filament A</label><div class="bsw" id="tc2A" style="background:#ffffff;flex:0 0 28px;height:28px" onclick="$('tc2ANP').click()"></div><input type="text" class="hf2" id="tc2AH" value="#FFFFFF" style="flex:1" onchange="S.fil2A=this.value;$('tc2A').style.background=this.value"><input type="color" id="tc2ANP" value="#ffffff" style="width:0;height:0;opacity:0;position:absolute" oninput="S.fil2A=this.value;$('tc2A').style.background=this.value;$('tc2AH').value=this.value"></div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><label style="font-size:11px;color:var(--txd)">Filament B</label><div class="bsw" id="tc2B" style="background:#000000;flex:0 0 28px;height:28px" onclick="$('tc2BNP').click()"></div><input type="text" class="hf2" id="tc2BH" value="#000000" style="flex:1" onchange="S.fil2B=this.value;$('tc2B').style.background=this.value"><input type="color" id="tc2BNP" value="#000000" style="width:0;height:0;opacity:0;position:absolute" oninput="S.fil2B=this.value;$('tc2B').style.background=this.value;$('tc2BH').value=this.value"></div></div><div id="solidColPanel" style="display:none;margin:8px 0"><div class="cr" style="margin-bottom:4px"><label style="font-size:12px;font-weight:500;color:var(--txd)">Palette Size</label></div><select id="solidColCount" class="fsel" style="margin-bottom:4px"><option value="4">4 colours</option><option value="8">8 colours</option><option value="12">12 colours</option><option value="16">16 colours</option><option value="20">20 colours</option><option value="24">24 colours</option><option value="0" selected>Full Spectrum</option></select><p class="ht" style="margin:0">Reduces colours to this palette using clustering. Set to match the number of filament slots in your slicer. Full Spectrum uses all painted colours.</p></div><button class="db" style="margin-top:8px;justify-content:center;gap:6px" onclick="openFilColModal()">🎨 Filament Colours</button><button class="pb pr" style="margin-top:8px" onclick="processModel()">⚙️ Process</button><div id="linf" class="li" style="display:none"></div></div>  <button class="help-btn" onclick="$('helpModal').classList.add('vis')">💡 Help & Tips</button>
+  <a class="help-btn coffee-btn" href="https://buymeacoffee.com/3drevolution" target="_blank" style="text-decoration:none;border-color:#ff8000;margin-top:0;position:static">☕ Buy me a coffee</a>
+</div>
+<div id="helpModal" onclick="if(event.target===this)this.classList.remove('vis')"><div class="hm-box">
+  <button class="hm-close" onclick="$('helpModal').classList.remove('vis')">✕</button>
+  <img src="https://primed3d.3drevolution.net/primed3d_text.png" alt="Primed3D" style="height:52px;display:block;margin:0 auto 10px">
+  <p style="text-align:center;margin-bottom:14px">Paint any colour onto a 3D model and export as a dithered multi-material 3MF for FDM printing — or as solid colours for normal multi-colour printing.</p>
+
+  <a class="hm-vid" href="https://youtu.be/J3Yh_4csIzk" target="_blank">
+    <img src="https://img.youtube.com/vi/J3Yh_4csIzk/maxresdefault.jpg" alt="Video Tutorial" style="width:100%;display:block;border-radius:6px">
+  </a>
+
+  <div style="margin-top:14px">
+
+    <div class="acc-item open">
+      <button class="acc-btn" onclick="this.parentElement.classList.toggle('open')">🚀 Quick Start — Basic Workflow <span class="acc-chevron">▶</span></button>
+      <div class="acc-body">
+        <h3>📐 Step 1 — Load & Orient</h3>
+        <ol><li>Drag an STL or 3MF file onto the viewport, or click the upload area.</li><li>Use the <strong>Orient</strong> button to click a face that should sit flat on the build plate.</li><li>Use <strong>Scale</strong> to resize the model if needed. <em>Apply photo projection before scaling</em> for best results.</li></ol>
+        <h3>🎨 Step 2 — Paint</h3>
+        <ol><li>Pick a colour from the colour picker.</li><li>Use <strong>Brush</strong>, <strong>Sphere</strong>, <strong>Fill</strong>, <strong>Gradient</strong>, or <strong>Photo</strong> to paint your model.</li><li><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> to undo/redo. Set a <strong>Base Colour</strong> for unpainted faces.</li></ol>
+        <h3>⚙️ Step 3 — Process & Export</h3>
+        <ol><li>Choose a <strong>Filament Mode</strong> — <strong>WKCMY</strong> gives the best colour range (5 filaments).</li><li>Click <strong>Process</strong> to generate the 3MF.</li><li>Click the <strong>Download</strong> button in the viewport.</li></ol>
+        <h3>🖨️ Step 4 — Slicer Settings (for dithered export)</h3>
+        <p>Import into Bambu Studio or OrcaSlicer. Use these settings:</p>
+        <div class="setting"><label>Layer height</label><code>0.08 mm</code></div>
+        <div class="setting"><label>Initial layer height</label><code>0.20 mm</code><span style="color:var(--txd);font-family:'DM Sans';font-size:11px;margin-left:6px">(or 0.16mm if issues)</span></div>
+        <p>Assign filament slots to match your export mode (Cyan, Magenta, Yellow, White, Black).</p>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-btn" onclick="this.parentElement.classList.toggle('open')">🖌️ Paint Tools <span class="acc-chevron">▶</span></button>
+      <div class="acc-body">
+        <h3>Brush</h3>
+        <p>Left-click and drag to paint visible faces. The BFS brush spreads along the surface within the radius, staying on the same surface (won't bleed around corners). Adjust radius with the slider.</p>
+        <h3>Sphere Brush</h3>
+        <p>Paints all faces within a 3D sphere radius, including through the model. Useful for painting hollow or complex geometry. Adjust radius with the slider.</p>
+        <h3>Fill</h3>
+        <p><strong>Connected mode:</strong> flood-fills all connected faces of the same colour. <strong>Angle Limit mode:</strong> fills faces within an angle threshold — great for painting a single flat surface.</p>
+        <h3>Colour Picker (Eyedropper)</h3>
+        <p>Click any face to sample its colour into the active paint colour.</p>
+        <h3>Base Colour</h3>
+        <p>Sets the colour for all unpainted faces. "Reset all to base" clears all painting.</p>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-btn" onclick="this.parentElement.classList.toggle('open')">🌈 Gradient Tool <span class="acc-chevron">▶</span></button>
+      <div class="acc-body">
+        <h3>Whole Model mode</h3>
+        <ol><li>Select gradient colours (From / To) using the colour swatches.</li><li>Set <strong>Direction</strong> using the Rotation and Pitch sliders. The purple arrow in the viewport shows the direction.</li><li>Use the <strong>Centre</strong> slider to shift where the mid-point of the gradient sits.</li><li>Adjust <strong>Steps</strong> to control how many discrete colour bands the gradient uses.</li><li>Click <strong>Apply Gradient</strong>.</li></ol>
+        <h3>Selection mode</h3>
+        <ol><li>Switch to <strong>Selection</strong> mode in the gradient panel.</li><li>Use the Brush or Fill sub-tool to select the faces you want to gradient.</li><li>Click on the model to set your <strong>Start point</strong>, then click again for the <strong>End point</strong>.</li><li>Click <strong>Apply Gradient</strong>.</li></ol>
+        <p>The gradient tool automatically switches back to the Brush tool after applying.</p>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-btn" onclick="this.parentElement.classList.toggle('open')">📷 Photo Tool <span class="acc-chevron">▶</span></button>
+      <div class="acc-body">
+        <h3>How to use</h3>
+        <ol><li>Select the <strong>Photo</strong> tool from the tool panel.</li><li>Click <strong>Load Photo</strong> and choose a JPG or PNG. Transparent PNG backgrounds are respected.</li><li>Position, resize, and rotate the photo overlay in the viewport so it covers the area you want to paint.</li><li>Choose <strong>Whole Model</strong> (paints all visible faces) or <strong>Selection</strong> mode (only selected faces).</li><li>In Selection mode, use the Brush or Fill sub-tool to select the hull faces you want to paint first.</li><li>Click <strong>Apply</strong>. Filament mode auto-switches to <strong>WKCMY</strong> for best results with photos.</li></ol>
+        <h3>⚠️ Limitations</h3>
+        <p><strong>Curved surfaces work best.</strong> The photo tool maps colours onto individual triangles using a camera projection. On a model with many small triangles (like a curved hull), the result looks excellent. On a perfectly flat surface with very few triangles — like a basic cube face with only 2 triangles — the resolution is limited to a few samples per face.</p>
+        <p><strong>Apply photo before scaling.</strong> If you scale the model after applying the photo, the per-layer export colours will fall back to the face average colour (still correct, but without the fine per-layer variation).</p>
+        <p><strong>Use WKCMY.</strong> Photos contain neutral greys, whites, and blacks that CMY alone can't reproduce well. WKCMY uses white and black filaments to handle these tones accurately.</p>
+        <p><strong>Bright, high-contrast photos print best.</strong> The dithering works on colour differences — a washed-out or grey photo will print as grey.</p>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-btn" onclick="this.parentElement.classList.toggle('open')">⚙️ Export Modes <span class="acc-chevron">▶</span></button>
+      <div class="acc-body">
+        <h3>Dithered export (CMY / WCMY / KCMY / WKCMY / 2-Filament)</h3>
+        <p>The model is sliced into 0.08mm layers and each layer slice is assigned a filament (Cyan, Magenta, Yellow, White, Black). The alternating filament lines optically mix to produce your painted colours. <strong>Requires specific slicer settings</strong> — 0.08mm layer height, filaments assigned in the correct order.</p>
+        <p><strong>CMY</strong> — 3 filaments, best for vibrant colours with a white printer base.<br>
+        <strong>WCMY</strong> — 4 filaments, adds white for cleaner pastels and highlights.<br>
+        <strong>KCMY</strong> — 4 filaments, adds black for richer darks.<br>
+        <strong>WKCMY</strong> — 5 filaments, best overall accuracy.<br>
+        <strong>2 Filaments</strong> — dual nozzle, dithers between two chosen colours.</p>
+        <h3>Solid Colours — No Dithering ✦</h3>
+        <p>Exports each painted face as a solid flat colour. <strong>This is NOT the dithered colour-blending export</strong> — it's for use with normal multi-colour FDM printing. Use this if you want to paint your model and print it on a multi-filament printer (like a Bambu AMS) using standard solid filament colours, without any CMY dithering. No special slicer settings required.</p>
+        <p>The <strong>Palette Size</strong> option reduces all painted colours to a fixed number using colour clustering (k-means). Set this to match the number of filament slots in your slicer — e.g. choose 8 colours for an 8-slot AMS. Colours are automatically merged toward their nearest neighbours so the most visually distinct colours are preserved.</p>
+        <p><strong>Re-importing into Primed3D:</strong> The Solid Colours export also works as a project save format. Export as Solid (Full Spectrum), then re-import the resulting .3mf into Primed3D to continue editing — all your painted colours are preserved on the faces and can be further refined with the brush, gradient, or photo tools before re-exporting as a dithered CMY version.</p>
+        <h3>Filament Colours</h3>
+        <p>Use the <strong>🎨 Filament Colours</strong> button to set the actual hex codes of your filaments. This only affects how the slicer preview displays — the dithering ratios themselves are always computed using ideal CMY theory regardless of your specific filament brand.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:16px;text-align:center"><p style="font-size:11px;color:var(--txd)">A <a href="https://www.YouTube.com/3DRevolution" target="_blank" style="color:var(--yl);text-decoration:none">3D Revolution</a> Tool</p><a href="https://www.YouTube.com/3DRevolution" target="_blank" style="display:inline-block;margin-top:6px"><img src="https://primed3d.3drevolution.net/3dr.svg" alt="3D Revolution" style="height:22px;filter:invert(1) grayscale(1) brightness(.7)"></a></div>
+  <button class="get-started" onclick="$('helpModal').classList.remove('vis','first-visit')">Get Started 🚀</button>
+</div></div>
+<div id="termsModal" onclick="if(event.target===this)this.classList.remove('vis')"><div class="hm-box">
+  <button class="hm-close" onclick="$('termsModal').classList.remove('vis')">✕</button>
+  <h2>Terms of Use</h2>
+
+  <h3>About Primed3D</h3>
+  <p>Primed3D is a free, open-source tool created and shared with the 3D printing community by Josh at <a href="https://www.YouTube.com/3DRevolution" target="_blank" style="color:var(--yl);text-decoration:none">3D Revolution</a>. It is provided as-is, free of charge, for personal and commercial use.</p>
+
+  <h3>Your Privacy & Data</h3>
+  <p><strong>Everything happens in your browser.</strong> Primed3D runs entirely client-side — your STL files, painted models, and exported 3MF files are never uploaded to any server. No data leaves your device at any point. There are no accounts, no tracking, and no analytics. Your files stay yours.</p>
+
+  <h3>Open Source</h3>
+  <p>Primed3D is released as an open-source project. You are free to use, modify, and share it. If you redistribute or build upon it, please credit the original project and its creator.</p>
+
+  <h3>No Warranty</h3>
+  <p>This tool is provided without warranty of any kind, express or implied. The creator is not liable for any damages or issues arising from its use, including but not limited to failed prints, material waste, or printer issues. Use at your own discretion.</p>
+
+  <h3>3D Printing Results</h3>
+  <p>Print quality depends on many factors outside the control of this tool, including your printer, filament, slicer settings, and model geometry. The colour dithering is an approximation — results will vary between setups. The recommended slicer settings are a starting point, not a guarantee.</p>
+
+  <h3>Third-Party Services</h3>
+  <p>Primed3D itself does not connect to any external services. Optional links to YouTube and Buy Me a Coffee are provided for convenience and open in new tabs — they are governed by their own terms and privacy policies.</p>
+
+  <div style="margin-top:18px;text-align:center"><p style="font-size:11px;color:var(--txd)">Primed3D — A <a href="https://www.YouTube.com/3DRevolution" target="_blank" style="color:var(--yl);text-decoration:none">3D Revolution</a> Tool</p><a href="https://www.YouTube.com/3DRevolution" target="_blank" style="display:inline-block;margin-top:6px"><img src="https://primed3d.3drevolution.net/3dr.svg" alt="3D Revolution" style="height:22px;filter:invert(1) grayscale(1) brightness(.7)"></a></div>
+</div></div>
+<div id="thankModal" onclick="if(event.target===this)this.classList.remove('vis')"><div class="thk-box">
+  <h2>Thanks for using Primed3D! 🎉</h2>
+  <p>I hope you found it useful! Primed3D was created by <strong>Josh</strong> at <strong>3D Revolution</strong>.</p>
+  <p><a class="thk-link" href="https://www.youtube.com/3DRevolution?sub_confirmation=1" target="_blank">▶ Subscribe to 3D Revolution</a> for tips, tutorials, and more tools.</p>
+  <p style="margin-top:14px;font-size:12px;color:var(--txd)">If you'd like to say thanks or support the project, the best way is to become a channel member — or if you'd prefer, buy me a coffee ☕</p>
+  <div class="thk-btns">
+    <a class="thk-btn thk-btn-member" href="https://www.youtube.com/3DRevolution/join" target="_blank">⭐ Become a Member</a>
+    <a class="thk-btn thk-btn-coffee" href="https://buymeacoffee.com/3drevolution" target="_blank">☕ Buy me a coffee</a>
+  </div>
+  <button class="thk-close" onclick="$('thankModal').classList.remove('vis')">Close</button>
+</div></div>
+<div id="vp">
+  <canvas id="tc"></canvas>
+  <div id="photoOverlay"><img id="photoOverlayImg" src="" alt=""><div class="ph" id="photoHandle"></div></div>
+  <div class="vp-undo" id="vpUndo" style="display:none"><button class="sb" id="ub" disabled onclick="undo()">↩ Undo</button><button class="sb" id="rb" disabled onclick="redo()">↪ Redo</button></div>
+  <div class="vc"><button class="vb" onclick="resetCamera()">Reset</button><button class="vb" id="wfb" onclick="togWF()">Wireframe</button><button class="vb a" id="grb" onclick="togGrid()">Grid</button><button class="vb" id="vnb" onclick="togViewNav()">Views ▾</button></div>
+  <div id="dl-overlay" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"><button onclick="event.stopPropagation();dl3MF()">📦 Download .3mf</button></div>
+  <div id="reprocess-overlay" style="display:none" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"><button onclick="event.stopPropagation();processModel()">🔄 Re-Process CMY</button></div>
+  <div class="vnav" id="vnav"><div class="vnav-title">Camera Views</div><div class="vnav-grid"><button class="vnav-btn" onclick="setView('front')">Front<kbd>1</kbd></button><button class="vnav-btn" onclick="setView('back')">Back<kbd>2</kbd></button><button class="vnav-btn" onclick="setView('left')">Left<kbd>3</kbd></button><button class="vnav-btn" onclick="setView('right')">Right<kbd>4</kbd></button><button class="vnav-btn" onclick="setView('top')">Top<kbd>5</kbd></button><button class="vnav-btn" onclick="setView('bottom')">Bottom<kbd>6</kbd></button></div></div>
+  <div class="hh" id="hh" style="display:none"><kbd>Left click</kbd> Paint <kbd>Right drag</kbd> Orbit <kbd>Middle</kbd> Pan <kbd>Scroll</kbd> Zoom<br><kbd>Ctrl+Z/Y</kbd> Undo/Redo <kbd>Ctrl+1‑6</kbd> Camera views</div>
+  <div id="sb2"><span id="sf">No model loaded</span><span style="opacity:.4"><a href="https://primed3d.3drevolution.net/UpdatesLog" target="_blank" title="Version History" style="color:inherit;text-decoration:underline;cursor:pointer">v0.9.3.3</a> · <a href="#" onclick="event.preventDefault();$('termsModal').classList.add('vis')" style="color:inherit;text-decoration:underline;cursor:pointer">Terms of Use</a></span><span style="display:flex;align-items:center;gap:5px"><span id="st" style="display:none"></span><span onclick="toggleTheme()" title="Toggle light/dark mode" style="display:flex;align-items:center;gap:5px;cursor:pointer;opacity:.7;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><span id="themeLabel" style="font-size:10px;font-weight:500;letter-spacing:.5px">Dark Mode</span><svg id="themeIcon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 18a8 8 0 0 1 0-16v4a4 4 0 0 0 0 8v4z"/><circle cx="12" cy="8" r="1.5" opacity=".4"/><circle cx="12" cy="16" r="1.5"/></svg></span></span></div>
+</div>
+</div>
+<div id="filColModal" onclick="if(event.target===this)closeFilColModal()"><div class="fcm-box">
+  <button class="hm-close" onclick="closeFilColModal()">✕</button>
+  <h2>🎨 Filament Colours</h2>
+  <p>Set the actual hex colours of your filaments. These are used during processing to accurately mix and assign colours, so the output matches what your printer will produce.</p>
+  <div class="fcm-row"><label>Cyan</label><div class="fcm-swatch" id="fcmSwC" onclick="$('fcmNpC').click()"></div><input class="fcm-hex" id="fcmHexC" maxlength="7" oninput="fcmSync('C',this.value)"><input type="color" id="fcmNpC" style="width:0;height:0;opacity:0;position:absolute" oninput="fcmFromPicker('C',this.value)"></div>
+  <div class="fcm-row"><label>Magenta</label><div class="fcm-swatch" id="fcmSwM" onclick="$('fcmNpM').click()"></div><input class="fcm-hex" id="fcmHexM" maxlength="7" oninput="fcmSync('M',this.value)"><input type="color" id="fcmNpM" style="width:0;height:0;opacity:0;position:absolute" oninput="fcmFromPicker('M',this.value)"></div>
+  <div class="fcm-row"><label>Yellow</label><div class="fcm-swatch" id="fcmSwY" onclick="$('fcmNpY').click()"></div><input class="fcm-hex" id="fcmHexY" maxlength="7" oninput="fcmSync('Y',this.value)"><input type="color" id="fcmNpY" style="width:0;height:0;opacity:0;position:absolute" oninput="fcmFromPicker('Y',this.value)"></div>
+  <div class="fcm-row"><label>White</label><div class="fcm-swatch" id="fcmSwW" onclick="$('fcmNpW').click()"></div><input class="fcm-hex" id="fcmHexW" maxlength="7" oninput="fcmSync('W',this.value)"><input type="color" id="fcmNpW" style="width:0;height:0;opacity:0;position:absolute" oninput="fcmFromPicker('W',this.value)"></div>
+  <div class="fcm-row"><label>Black</label><div class="fcm-swatch" id="fcmSwK" onclick="$('fcmNpK').click()"></div><input class="fcm-hex" id="fcmHexK" maxlength="7" oninput="fcmSync('K',this.value)"><input type="color" id="fcmNpK" style="width:0;height:0;opacity:0;position:absolute" oninput="fcmFromPicker('K',this.value)"></div>
+  <button class="fcm-reset" onclick="resetFilColDefaults()">↺ Reset to defaults</button>
+  <div class="fcm-actions">
+    <button class="fcm-close-btn" onclick="closeFilColModal()">Cancel</button>
+    <button class="fcm-apply" onclick="applyFilCol()">Apply</button>
+  </div>
+</div></div>
+<div id="do">Drop STL or 3MF file here</div>
+<div id="toast" class="toast"><span class="toast-icon" id="toastIcon">⚠️</span><span id="toastMsg"></span><button class="toast-close" onclick="hideToast()">✕</button></div>
+<div id="po"><div class="print-anim" id="loadAnim" style="display:none"><div class="print-cube"><div class="face fr"></div><div class="face bk"></div><div class="face lt"></div><div class="face rt"></div><div class="face tp"></div><div class="face bt"></div><div class="txt3d"><span class="t1">Primed</span><span class="t2">3D</span></div></div></div><div id="pt">Processing...</div><div class="pbar" id="pbarWrap"><div class="pfill" id="pf"></div></div></div>
+<div id="bc"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+// ── Theme ────────────────────────────────────────────────
+const DARK_BG=0x0f1117,LIGHT_BG=0xe8eaf0;
+const YY_DARK='<path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 18a8 8 0 0 1 0-16v4a4 4 0 0 0 0 8v4z"/><circle cx="12" cy="8" r="1.5" opacity=".4"/><circle cx="12" cy="16" r="1.5"/>';
+const YY_LIGHT='<path d="M12 2a10 10 0 1 1 0 20A10 10 0 0 1 12 2zm0 18a8 8 0 0 0 0-16v4a4 4 0 0 1 0 8v4z"/><circle cx="12" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5" opacity=".4"/>';
+function toggleTheme(){
+  const light=document.body.classList.toggle('light');
+  localStorage.setItem('primed3d_theme',light?'light':'dark');
+  if(typeof R!=='undefined')R.setClearColor(light?LIGHT_BG:DARK_BG);
+  if(typeof gridH!=='undefined'){
+    const m=Array.isArray(gridH.material)?gridH.material:[gridH.material,gridH.material];
+    m[0].color.set(light?0xdde0ea:0x252936);
+    m[1].color.set(light?0xc4c8d8:0x1a1d27);
+  }
+  $('themeIcon').innerHTML=light?YY_LIGHT:YY_DARK;
+  $('themeLabel').textContent=light?'Lite Mode':'Dark Mode';
+}
+const S={fn:'',tool:'brush',brushR:5,fillMode:'connected',hue:0,sat:1,val:1,col:new THREE.Color(1,0,0),base:new THREE.Color(.78,.78,.78),painting:false,mesh:null,geo:null,fc:null,painted:null,adj:null,fn2:null,us:[],rs:[],wf:false,wfm:null,mdl3mf:null,msz:1,processed:false,tex:null,uvs:null,texCtx:null,texW:0,texH:0,gradA:'#ff0000',gradB:'#0000ff',gradAxis:'z',gradPick:'A',fil2A:'#ffffff',fil2B:'#000000',gradMode:'all',gradSubTool:'brush',gradSel:new Set(),gradPtA:null,gradPtB:null,gradYaw:0,gradPitch:0,gradCenter:0.5,
+filHex:{c:'#00FFFF',m:'#FF00FF',y:'#FFFF00',k:'#000000',w:'#FFFFFF'},photoProjection:null};
+let pend=new Map();
+let selPend=new Set(); // tracks faces added to grad/photo sel during current brush stroke
+let fillHoverFi=-1; // last face index the fill-angle preview was computed for
+let fillHoverFaces=new Set(); // faces currently highlighted by fill-angle preview
+
+// BFS from startFi collecting all faces within the current angle limit.
+// Used by: fill-angle hover preview, fillF, gradSelFill, photoSelFill.
+function computeAngleFill(startFi){
+  const ma=+$('fa').value*Math.PI/180;
+  const snx=S.fn2[startFi*3],sny=S.fn2[startFi*3+1],snz=S.fn2[startFi*3+2];
+  const result=new Set([startFi]);
+  const q=[startFi];
+  while(q.length){
+    const fi=q.shift();
+    const nb=S.adj.get(fi);if(!nb)continue;
+    for(const n of nb){
+      if(result.has(n))continue;
+      const nx=S.fn2[n*3],ny=S.fn2[n*3+1],nz=S.fn2[n*3+2];
+      if(Math.acos(Math.max(-1,Math.min(1,snx*nx+sny*ny+snz*nz)))<=ma){result.add(n);q.push(n);}
+    }
+  }
+  return result;
+}
+
+// Clear the fill-angle hover highlight, restoring each face to its actual colour
+// (or to the selection highlight if it belongs to an active grad/photo selection).
+function clearFillHover(){
+  if(fillHoverFaces.size===0)return;
+  for(const fi of fillHoverFaces){
+    if(S.gradSel&&S.gradSel.has(fi)){
+      const stripe=fi%2===0;
+      drawFaceOnCanvas(fi,stripe?0.3:0.1,stripe?0.8:0.4,stripe?0.3:0.8);
+    }else if(S.photoSel&&S.photoSel.has(fi)){
+      const stripe=fi%2===0;
+      drawFaceOnCanvas(fi,stripe?0.2:0.05,stripe?0.7:0.35,stripe?0.9:0.6);
+    }else{
+      const r=S.painted.has(fi)?S.fc[fi*3]:S.base.r;
+      const g=S.painted.has(fi)?S.fc[fi*3+1]:S.base.g;
+      const b=S.painted.has(fi)?S.fc[fi*3+2]:S.base.b;
+      drawFaceOnCanvas(fi,r,g,b);
+    }
+  }
+  fillHoverFaces.clear();fillHoverFi=-1;
+  if(S.tex)S.tex.needsUpdate=true;
+}
+const cv=$('tc'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+R.setPixelRatio(Math.min(devicePixelRatio,2));R.setClearColor(0x0f1117);
+const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.01,50000);
+cam.up.set(0,0,1); // Z-up for 3D printing
+cam.position.set(50,50,50);
+sc.add(new THREE.AmbientLight(0xffffff,.45));
+const dl=new THREE.DirectionalLight(0xffffff,.55);dl.position.set(1,1,2);sc.add(dl);
+sc.add(new THREE.DirectionalLight(0xffffff,.25)).position.set(-1,-1,-0.5);
+const gridH=new THREE.GridHelper(500,50,0x252936,0x1a1d27);
+gridH.rotation.x=Math.PI/2; // rotate grid into XY plane (Z-up)
+sc.add(gridH);
+// Apply saved theme (default = dark; only switch if user previously chose light)
+(function(){if(localStorage.getItem('primed3d_theme')==='light'){document.body.classList.add('light');R.setClearColor(LIGHT_BG);const m=Array.isArray(gridH.material)?gridH.material:[gridH.material,gridH.material];m[0].color.set(0xdde0ea);m[1].color.set(0xc4c8d8);$('themeIcon').innerHTML=YY_LIGHT;$('themeLabel').textContent='Lite Mode';}})();
+const rc=new THREE.Raycaster(),mo=new THREE.Vector2();
+// Spherical orbit with Z-up: ph=angle from Z+, th=azimuth around Z
+const O={rot:false,pan:false,lx:0,ly:0,th:Math.PI/4,ph:Math.PI/3,d:100,t:new THREE.Vector3()};
+function uCam(){const{th,ph,d,t}=O;
+  cam.position.set(t.x+d*Math.sin(ph)*Math.cos(th),t.y+d*Math.sin(ph)*Math.sin(th),t.z+d*Math.cos(ph));
+  cam.up.set(0,0,1);cam.lookAt(t);}
+uCam();
+// Z-up views: front=+Y, back=-Y, left=-X, right=+X, top=+Z, bottom=-Z
+const VIEWS={front:{th:Math.PI/2,ph:Math.PI/2},back:{th:-Math.PI/2,ph:Math.PI/2},left:{th:Math.PI,ph:Math.PI/2},right:{th:0,ph:Math.PI/2},top:{th:0,ph:0.001},bottom:{th:0,ph:Math.PI-0.001}};
+function setView(n){const v=VIEWS[n];if(v){O.th=v.th;O.ph=v.ph;uCam();}}
+function togViewNav(){$('vnav').classList.toggle('vis');$('vnb').classList.toggle('a');}
+function resetCamera(){if(S.mesh){const b=new THREE.Box3().setFromObject(S.mesh),c=b.getCenter(new THREE.Vector3()),sz=b.getSize(new THREE.Vector3()),m=Math.max(sz.x,sz.y,sz.z);O.t.copy(c);O.d=m*2;O.th=Math.PI/4;O.ph=Math.PI/3;S.msz=m;}uCam();}
+const vp=$('vp'),bcu=$('bc');
+// Track whether mouse is over toolbar or download overlay so we can hide the brush cursor
+let mouseOverUI=false;
+$('toolbar').addEventListener('mouseenter',()=>{mouseOverUI=true;bcu.style.display='none';});
+$('toolbar').addEventListener('mouseleave',()=>{mouseOverUI=false;});
+$('dl-overlay').addEventListener('mouseenter',()=>{mouseOverUI=true;bcu.style.display='none';});
+$('dl-overlay').addEventListener('mouseleave',()=>{mouseOverUI=false;});
+vp.addEventListener('mousedown',e=>{if(e.button===2||(e.button===0&&e.altKey)){O.rot=true;O.lx=e.clientX;O.ly=e.clientY;e.preventDefault();}else if(e.button===1||(e.button===0&&e.shiftKey)){O.pan=true;O.lx=e.clientX;O.ly=e.clientY;e.preventDefault();}else if(e.button===0&&S.mesh&&!e.altKey&&!e.shiftKey){clearFillHover();S.painting=true;pend.clear();paint(e);}});
+let lastMx=0,lastMy=0;
+vp.addEventListener('mousemove',e=>{lastMx=e.clientX;lastMy=e.clientY;
+const wantCursor=S.mesh&&!mouseOverUI&&(
+  S.tool==='brush'||S.tool==='sphere-brush'||
+  (S.tool==='gradient'&&S.gradMode==='sel'&&S.gradSubTool==='brush')||
+  (S.tool==='photo'&&S.photoMode==='sel'&&S.photoSubTool==='brush'));
+if(wantCursor){
+  const sz=getBrushPxApprox(e);
+  bcu.style.display='block';bcu.style.left=e.clientX+'px';bcu.style.top=e.clientY+'px';
+  bcu.style.width=bcu.style.height=Math.max(6,sz*2)+'px';
+}else bcu.style.display='none';
+// Orient tool hover highlight
+if(S.tool==='orient'&&S.mesh&&!O.rot&&!O.pan&&!S.painting){
+  const rect2=vp.getBoundingClientRect();
+  mo.x=((e.clientX-rect2.left)/rect2.width)*2-1;
+  mo.y=-((e.clientY-rect2.top)/rect2.height)*2+1;
+  rc.setFromCamera(mo,cam);
+  const h=rc.intersectObject(S.mesh);
+  if(h.length){const fi2=gfi(h[0]);highlightFace(fi2);}else clearHighlight();
+}else if(S.tool!=='orient')clearHighlight();
+// Fill angle-limit hover preview
+const wantFillHover=S.mesh&&!O.rot&&!O.pan&&!S.painting&&!mouseOverUI&&S.fillMode==='angle'&&(
+  S.tool==='fill'||
+  (S.tool==='gradient'&&S.gradMode==='sel'&&S.gradSubTool==='fill')||
+  (S.tool==='photo'&&S.photoMode==='sel'&&S.photoSubTool==='fill'));
+if(wantFillHover){
+  const rect3=vp.getBoundingClientRect();
+  mo.x=((e.clientX-rect3.left)/rect3.width)*2-1;
+  mo.y=-((e.clientY-rect3.top)/rect3.height)*2+1;
+  rc.setFromCamera(mo,cam);
+  const h2=rc.intersectObject(S.mesh);
+  if(h2.length){
+    const hfi=gfi(h2[0]);
+    if(hfi!==fillHoverFi){
+      clearFillHover(); // restore previous
+      fillHoverFi=hfi;
+      fillHoverFaces=computeAngleFill(hfi);
+      for(const fi of fillHoverFaces)drawFaceOnCanvas(fi,0.95,0.45,0.08); // warm orange preview
+      if(S.tex)S.tex.needsUpdate=true;
+    }
+  }else clearFillHover();
+}else if(fillHoverFaces.size>0)clearFillHover();
+if(O.rot){O.th-=(e.clientX-O.lx)*.005;O.ph-=(e.clientY-O.ly)*.005;O.lx=e.clientX;O.ly=e.clientY;uCam();}else if(O.pan){const dx=e.clientX-O.lx,dy=e.clientY-O.ly,ps=O.d*.001,fw=new THREE.Vector3().subVectors(O.t,cam.position).normalize(),ri=new THREE.Vector3().crossVectors(fw,new THREE.Vector3(0,0,1)).normalize(),up=new THREE.Vector3().crossVectors(ri,fw).normalize();O.t.addScaledVector(ri,-dx*ps).addScaledVector(up,dy*ps);O.lx=e.clientX;O.ly=e.clientY;uCam();}else if(S.painting)paint(e);});
+window.addEventListener('mouseup',()=>{
+  if(S.painting){
+    S.painting=false;
+    // For gradient/photo selection brushes, flush any pending sel changes to undo stack
+    if((S.tool==='gradient'&&S.gradMode==='sel'&&S.gradSubTool==='brush')||
+       (S.tool==='photo'&&S.photoMode==='sel'&&S.photoSubTool==='brush')){
+      if(selPend.size>0){
+        const snapshot=new Set(selPend);
+        const isSel=S.tool==='gradient'?'grad':'photo';
+        S.us.push({selType:isSel,added:snapshot});
+        if(S.us.length>40)S.us.shift();
+        S.rs=[];selPend.clear();updUB();
+      }
+    }else{
+      commitU();
+    }
+  }
+  O.rot=false;O.pan=false;
+});
+vp.addEventListener('wheel',e=>{e.preventDefault();O.d*=(1+e.deltaY*.0008);O.d=Math.max(.1,Math.min(50000,O.d));uCam();},{passive:false});
+vp.addEventListener('contextmenu',e=>e.preventDefault());
+function onRz(){const r=vp.getBoundingClientRect();R.setSize(r.width,r.height);cam.aspect=r.width/r.height;cam.updateProjectionMatrix();}
+window.addEventListener('resize',onRz);
+(function anim(){requestAnimationFrame(anim);R.render(sc,cam);})();setTimeout(onRz,50);
+if(!localStorage.getItem('primed3d_visited')){localStorage.setItem('primed3d_visited','1');const hm=$('helpModal');hm.classList.add('vis','first-visit');}
+
+function parseSTL(buf){const h=String.fromCharCode.apply(null,new Uint8Array(buf,0,Math.min(80,buf.byteLength)));if(h.trimStart().startsWith('solid')){const t=new TextDecoder().decode(buf);if(t.includes('facet')){const r=pA(t);if(r.n>0)return r;}}return pB(buf);}
+function pB(buf){const dv=new DataView(buf),n=dv.getUint32(80,true),p=new Float32Array(n*9);let colors=null,hasColor=false;
+  for(let i=0;i<n;i++){const o=84+i*50;for(let v=0;v<3;v++){p[i*9+v*3]=dv.getFloat32(o+12+v*12,true);p[i*9+v*3+1]=dv.getFloat32(o+12+v*12+4,true);p[i*9+v*3+2]=dv.getFloat32(o+12+v*12+8,true);}
+    const attr=dv.getUint16(o+48,true);if(attr&0x8000){if(!colors){colors=new Float32Array(n*3);}
+      colors[i*3]=((attr>>10)&0x1f)/31;colors[i*3+1]=((attr>>5)&0x1f)/31;colors[i*3+2]=(attr&0x1f)/31;hasColor=true;}}
+  return{p,n,colors:hasColor?colors:null};}
+function pA(txt){const re=/facet\s+normal\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)\s+outer\s+loop\s+vertex\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)\s+vertex\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)\s+vertex\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)\s+endloop\s+endfacet/gi;const a=[];let m;while((m=re.exec(txt)))for(let v=0;v<3;v++)a.push(+m[4+v*3],+m[5+v*3],+m[6+v*3]);return{p:new Float32Array(a),n:a.length/9,colors:null};}
+
+function loadSTL(buf,name){
+  const d=parseSTL(buf);
+  loadModelData(d.p,d.n,name.replace(/\.stl$/i,''),d.colors,null,null);
+}
+
+// === ZIP Reader (supports STORE and DEFLATE via DecompressionStream) ===
+async function readZip(buf){
+  const u8=new Uint8Array(buf),dv=new DataView(buf),files={};
+  let eocd=u8.length-22;
+  while(eocd>0&&dv.getUint32(eocd,true)!==0x06054b50)eocd--;
+  if(eocd<=0)return files;
+  const cdOff=dv.getUint32(eocd+16,true),cdN=dv.getUint16(eocd+10,true);
+  let off=cdOff;
+  for(let i=0;i<cdN;i++){
+    const nLen=dv.getUint16(off+28,true),xLen=dv.getUint16(off+30,true),cLen=dv.getUint16(off+32,true);
+    const comp=dv.getUint16(off+10,true),cSize=dv.getUint32(off+20,true);
+    const lOff=dv.getUint32(off+42,true);
+    const name=new TextDecoder().decode(u8.slice(off+46,off+46+nLen));
+    const lnLen=dv.getUint16(lOff+26,true),lxLen=dv.getUint16(lOff+28,true);
+    const dStart=lOff+30+lnLen+lxLen;
+    const raw=u8.slice(dStart,dStart+cSize);
+    if(comp===0){files[name]=raw;}
+    else if(comp===8){try{
+      const ds=new DecompressionStream('deflate-raw');
+      const w=ds.writable.getWriter();w.write(raw);w.close();
+      const rd=ds.readable.getReader();const ch=[];
+      while(true){const{done,value}=await rd.read();if(done)break;ch.push(value);}
+      const tot=ch.reduce((a,c)=>a+c.length,0);const out=new Uint8Array(tot);let p=0;
+      for(const c of ch){out.set(c,p);p+=c.length;}files[name]=out;
+    }catch(e){console.warn('Inflate failed for',name);}}
+    off+=46+nLen+xLen+cLen;
+  }
+  return files;
+}
+
+// === 3MF Importer ===
+async function load3MF(buf,name){
+  try{
+  const files=await readZip(buf);
+  const fileNames=Object.keys(files);
+  console.log('3MF files:',fileNames);
+
+  const modelContents=[];
+  for(const fn of fileNames){if(fn.toLowerCase().endsWith('.model')){
+    modelContents.push({path:fn,xml:new TextDecoder().decode(files[fn])});
+  }}
+  if(!modelContents.length){alert('No .model file in 3MF');return;}
+
+  // Parse colors from ALL model files
+  const colorMap=new Map();
+  let defPid=null,defP1=null;
+
+  for(const mf of modelContents){
+    const bmRe=/<[\w:]*basematerials\s+id="(\d+)"[^>]*>([\s\S]*?)<\/[\w:]*basematerials>/gi;
+    let bm;while((bm=bmRe.exec(mf.xml))){
+      const pid=bm[1],arr=[];
+      const dcRe=/displaycolor="([^"]+)"/gi;let dc;
+      while((dc=dcRe.exec(bm[2]))){const h=dc[1];arr.push({r:parseInt(h.substr(1,2),16)/255,g:parseInt(h.substr(3,2),16)/255,b:parseInt(h.substr(5,2),16)/255});}
+      if(arr.length)colorMap.set(pid,arr);
+    }
+    const cgRe=/<[\w:]*colorgroup\s+id="(\d+)"[^>]*>([\s\S]*?)<\/[\w:]*colorgroup>/gi;
+    let cg;while((cg=cgRe.exec(mf.xml))){
+      const pid=cg[1],arr=[];
+      const ccRe=/color="(#[0-9a-fA-F]+)"/gi;let cc;
+      while((cc=ccRe.exec(cg[2]))){const h=cc[1];arr.push({r:parseInt(h.substr(1,2),16)/255,g:parseInt(h.substr(3,2),16)/255,b:parseInt(h.substr(5,2),16)/255});}
+      if(arr.length)colorMap.set(pid,arr);
+    }
+  }
+  console.log('Colors:',colorMap.size);setLoadMsg("Parsing materials...");await sl(0);
+  for(const[pid,arr] of colorMap)console.log('  pid',pid,':',arr.length,'colors');
+
+  // Parse Bambu Studio filament colors from config files
+  const filamentColors=[];
+  for(const fn of fileNames){
+    if(fn.toLowerCase().includes('project_settings')||fn.toLowerCase().includes('config')){
+      try{
+        const txt=new TextDecoder().decode(files[fn]);
+        const fcM=txt.match(/"filament_colour"\s*:\s*\[([\s\S]*?)\]/);
+        if(fcM){
+          // Match 6-char or 8-char hex (Bambu sometimes appends AA alpha channel e.g. #0047BB80)
+          const hexes=fcM[1].match(/#[0-9a-fA-F]{6,8}/g);
+          if(hexes)for(let h of hexes){h='#'+h.slice(1,7);filamentColors.push({r:parseInt(h.substr(1,2),16)/255,g:parseInt(h.substr(3,2),16)/255,b:parseInt(h.substr(5,2),16)/255,hex:h});}
+        }
+      }catch(e){}
+    }
+  }
+  console.log('Bambu filament colors:',filamentColors.length,filamentColors.map(c=>c.hex));
+
+  // Parse per-object/part default extruder from model_settings.config
+  const objExtruder=new Map(); // objectId/partId -> 0-indexed filament
+  const objPartRanges=new Map(); // objectId -> [{startFace, count, extruder}]
+  const partSubtype=new Map(); // partId -> subtype string (e.g. 'normal_part','negative_part','modifier')
+  for(const fn of fileNames){
+    if(fn.toLowerCase().includes('model_settings')){
+      try{
+        const txt=new TextDecoder().decode(files[fn]);
+        const oRe=/<object\s+id="(\d+)"[^>]*>([\s\S]*?)<\/object>/gi;
+        let om;while((om=oRe.exec(txt))){
+          const oid=om[1],body=om[2];
+          const eM=body.match(/<metadata\s+key="extruder"\s+value="(\d+)"/);
+          const objExt=eM?parseInt(eM[1])-1:0;
+          objExtruder.set(oid,objExt);
+          // Parse per-part extruders, subtypes, and face counts for multi-part objects
+          const parts=[];
+          const pRe=/<part\s+id="(\d+)"\s+subtype="([^"]*)"[^>]*>([\s\S]*?)<\/part>/gi;
+          let pm;while((pm=pRe.exec(body))){
+            const pid=pm[1],psubtype=pm[2],pbody=pm[3];
+            const peM=pbody.match(/<metadata\s+key="extruder"\s+value="(\d+)"/);
+            const fcM=pbody.match(/face_count="(\d+)"/);
+            const partExt=peM?parseInt(peM[1])-1:objExt;
+            const faceCount=fcM?parseInt(fcM[1]):0;
+            parts.push({id:pid,extruder:partExt,faceCount,subtype:psubtype});
+            objExtruder.set(pid,partExt);
+            partSubtype.set(pid,psubtype); // track subtype so non-normal parts can be skipped
+          }
+          // Build cumulative face ranges per part
+          if(parts.length>1){
+            let start=0;
+            const ranges=[];
+            for(const p of parts){
+              ranges.push({start,count:p.faceCount,extruder:p.extruder,subtype:p.subtype});
+              start+=p.faceCount;
+            }
+            objPartRanges.set(oid,ranges);
+          }
+        }
+      }catch(e){}
+    }
+  }
+  console.log('Object extruder assignments:',Object.fromEntries(objExtruder));
+  console.log('Multi-part ranges:',Object.fromEntries(objPartRanges));
+  console.log('Non-normal parts:',Object.fromEntries([...partSubtype].filter(([,v])=>v!=='normal_part')));
+
+  // Parse ALL objects from ALL model files into a map: id -> {verts, tris, pid, pindex}
+  const objMap=new Map();
+  for(const mf of modelContents){
+    const objRe=/<[\w:]*object\s+[^>]*id="(\d+)"[^>]*>([\s\S]*?)<\/[\w:]*object>/gi;
+    let ob;while((ob=objRe.exec(mf.xml))){
+      const objId=ob[1],objBody=ob[2];
+      const verts=[];const vtag=/<[\w:]*vertex\s+x="([^"]+)"\s+y="([^"]+)"\s+z="([^"]+)"/gi;
+      let vm;while((vm=vtag.exec(objBody)))verts.push(parseFloat(vm[1]),parseFloat(vm[2]),parseFloat(vm[3]));
+      const tris=[];const ttag=/<[\w:]*triangle\s+([^>]*)\/?>/gi;
+      let tm;while((tm=ttag.exec(objBody))){
+        const a=tm[1];const v1M=a.match(/v1="(\d+)"/),v2M=a.match(/v2="(\d+)"/),v3M=a.match(/v3="(\d+)"/);
+        const pidM=a.match(/\bpid="(\d+)"/),p1M=a.match(/\bp1="(\d+)"/);
+        const pcM=a.match(/paint_color="([^"]+)"/);
+        if(v1M&&v2M&&v3M)tris.push({v1:+v1M[1],v2:+v2M[1],v3:+v3M[1],pid:pidM?pidM[1]:null,p1:p1M?p1M[1]:null,pc:pcM?pcM[1]:null});
+      }
+      const comps=[];const cRe=/<[\w:]*component\s+([^>]*)\/?>/gi;
+      let cm;while((cm=cRe.exec(objBody))){
+        const ca=cm[1];
+        const oidM=ca.match(/objectid="(\d+)"/);const trM=ca.match(/transform="([^"]+)"/);
+        if(oidM)comps.push({objectid:oidM[1],transform:trM?trM[1]:null});
+      }
+      const objTag=ob[0].substring(0,ob[0].indexOf('>'));
+      const oPidM=objTag.match(/\bpid="(\d+)"/);const oPiM=objTag.match(/\bpindex="(\d+)"/);
+      if(!defPid&&oPidM){defPid=oPidM[1];defP1=oPiM?oPiM[1]:'0';}
+      objMap.set(objId,{verts,tris,comps,pid:oPidM?oPidM[1]:null,pindex:oPiM?oPiM[1]:null});
+    }
+  }
+  setLoadMsg("Reading geometry...");await sl(0);console.log('Objects:',objMap.size,[...objMap.entries()].map(([id,o])=>id+':'+o.verts.length/3+'v/'+o.tris.length+'t/'+o.comps.length+'c'));
+
+  // Parse build items with transforms from ALL files
+  const buildItems=[];
+  for(const mf of modelContents){
+    const iRe=/<[\w:]*item\s+([^>]*)\/?>|<[\w:]*item\s+([^>]*)>/gi;
+    let im;while((im=iRe.exec(mf.xml))){
+      const ia=im[1]||im[2];
+      const oidM=ia.match(/objectid="(\d+)"/);const trM=ia.match(/transform="([^"]+)"/);
+      if(oidM)buildItems.push({objectid:oidM[1],transform:trM?trM[1]:null});
+    }
+  }
+  console.log('Build items:',buildItems.length,buildItems.map(b=>b.objectid+(b.transform?' +T':'')));
+
+  // Transform helper
+  function parseMat(str){
+    if(!str)return null;
+    const n=str.trim().split(/\s+/).map(Number);
+    if(n.length<12)return null;
+    return n;
+  }
+  function applyMat(mat,x,y,z){
+    if(!mat)return[x,y,z];
+    return[mat[0]*x+mat[3]*y+mat[6]*z+mat[9],
+           mat[1]*x+mat[4]*y+mat[7]*z+mat[10],
+           mat[2]*x+mat[5]*y+mat[8]*z+mat[11]];
+  }
+
+  // Flatten: recursively resolve objects and components into triangles
+  // First, count total triangles to pre-allocate
+  let totalTris=0;
+  function countTris(objId,visited){
+    if(visited.has(objId))return;visited.add(objId);
+    const obj=objMap.get(objId);if(!obj)return;
+    totalTris+=obj.tris.length;
+    for(const comp of obj.comps)countTris(comp.objectid,visited);
+  }
+  if(buildItems.length){for(const bi of buildItems)countTris(bi.objectid,new Set());}
+  else{for(const[id] of objMap)countTris(id,new Set());}
+  console.log('Pre-counted triangles:',totalTris);
+  if(totalTris>5000000){alert('Model too large ('+totalTris.toLocaleString()+' triangles). Max 5M.');hideLoading();return;}
+
+  const posArr=new Float32Array(totalTris*9);
+  const fcArr=new Float32Array(totalTris*3);
+  let triIdx=0,hasColors=false;
+
+  // Bambu paint_color state→filament mapping
+  // States 1-3: extruders 1-3 (filaments 0-2)
+  // States 4-6: seed fill versions of extruders 1-3 (same filaments 0-2)
+  // States 7+: each block of 4 = one filament (1 regular + 3 seed)
+  //   state 7-10 → filament 3, state 11-14 → filament 4, state 15-18 → filament 5, etc.
+  function stateToFilament(state){
+    if(state<=0)return-1;
+    if(state<=6)return(state-1)%3;
+    return 3+Math.floor((state-7)/4);
+  }
+
+  function addObject(objId,parentMat,visited,partRanges){
+    if(visited.has(objId))return;visited.add(objId);
+    const obj=objMap.get(objId);if(!obj)return;
+    // Skip non-geometry parts (negative volumes, modifiers, etc.)
+    const subtype=partSubtype.get(objId);
+    if(subtype&&subtype!=='normal_part'){return;}
+    if(obj.tris.length>0&&obj.verts.length>0){
+      let localFaceIdx=0;
+      for(const t of obj.tris){
+        for(let v=0;v<3;v++){
+          const vi=[t.v1,t.v2,t.v3][v];
+          let x=obj.verts[vi*3],y=obj.verts[vi*3+1],z=obj.verts[vi*3+2];
+          if(parentMat){
+            const nx=parentMat[0]*x+parentMat[3]*y+parentMat[6]*z+parentMat[9];
+            const ny=parentMat[1]*x+parentMat[4]*y+parentMat[7]*z+parentMat[10];
+            const nz=parentMat[2]*x+parentMat[5]*y+parentMat[8]*z+parentMat[11];
+            x=nx;y=ny;z=nz;
+          }
+          posArr[triIdx*9+v*3]=x;posArr[triIdx*9+v*3+1]=y;posArr[triIdx*9+v*3+2]=z;
+        }
+        // Color: Bambu paint_color takes priority, then standard pid/p1
+        let colored=false;
+        if(t.pc&&filamentColors.length>0){
+          let filIdx=-1;
+          if(t.pc.length<=2){
+            const state=parseInt(t.pc,16)>>2;
+            filIdx=stateToFilament(state);
+          }else{
+            // Complex tree: count clean leaf chars (val&3)==0
+            const counts=new Map();
+            for(let i=0;i<t.pc.length;i++){
+              const v=parseInt(t.pc[i],16);
+              if(isNaN(v)||(v&3)!==0||v===0)continue;
+              const fi=stateToFilament(v>>2);
+              if(fi>=0&&fi<filamentColors.length)counts.set(fi,(counts.get(fi)||0)+1);
+            }
+            let maxC=0;
+            for(const[fi,c]of counts)if(c>maxC){maxC=c;filIdx=fi;}
+          }
+          if(filIdx>=0&&filIdx<filamentColors.length){
+            fcArr[triIdx*3]=filamentColors[filIdx].r;fcArr[triIdx*3+1]=filamentColors[filIdx].g;fcArr[triIdx*3+2]=filamentColors[filIdx].b;
+            hasColors=true;colored=true;
+          }
+        }
+        if(!colored){
+          const pid=t.pid||obj.pid||defPid;
+          const p1=t.p1||(t.pid?null:(obj.pindex||defP1));
+          if(pid&&p1!==null&&colorMap.has(pid)){
+            const cs=colorMap.get(pid),ci=parseInt(p1);
+            if(ci<cs.length){fcArr[triIdx*3]=cs[ci].r;fcArr[triIdx*3+1]=cs[ci].g;fcArr[triIdx*3+2]=cs[ci].b;hasColors=true;colored=true;}
+          }
+        }
+        // Apply default filament color for unpainted faces
+        if(!colored&&filamentColors.length>0){
+          let defIdx=objExtruder.get(objId)||0;
+          // For multi-part objects, look up which part this face belongs to
+          if(partRanges){
+            for(const pr of partRanges){
+              if(localFaceIdx>=pr.start&&localFaceIdx<pr.start+pr.count){defIdx=pr.extruder;break;}
+            }
+          }
+          const fi=defIdx<filamentColors.length?defIdx:0;
+          fcArr[triIdx*3]=filamentColors[fi].r;fcArr[triIdx*3+1]=filamentColors[fi].g;fcArr[triIdx*3+2]=filamentColors[fi].b;
+          hasColors=true;
+        }
+        triIdx++;localFaceIdx++;
+      }
+    }
+    for(const comp of obj.comps){
+      const cMat=parseMat(comp.transform);
+      let combined=cMat;
+      if(parentMat&&cMat){
+        const a=parentMat,b=cMat;
+        combined=[
+          a[0]*b[0]+a[3]*b[1]+a[6]*b[2], a[1]*b[0]+a[4]*b[1]+a[7]*b[2], a[2]*b[0]+a[5]*b[1]+a[8]*b[2],
+          a[0]*b[3]+a[3]*b[4]+a[6]*b[5], a[1]*b[3]+a[4]*b[4]+a[7]*b[5], a[2]*b[3]+a[5]*b[4]+a[8]*b[5],
+          a[0]*b[6]+a[3]*b[7]+a[6]*b[8], a[1]*b[6]+a[4]*b[7]+a[7]*b[8], a[2]*b[6]+a[5]*b[7]+a[8]*b[8],
+          a[0]*b[9]+a[3]*b[10]+a[6]*b[11]+a[9], a[1]*b[9]+a[4]*b[10]+a[7]*b[11]+a[10], a[2]*b[9]+a[5]*b[10]+a[8]*b[11]+a[11]
+        ];
+      }else if(parentMat) combined=parentMat;
+      addObject(comp.objectid,combined,visited,objPartRanges.get(comp.objectid));
+    }
+  }
+
+  if(buildItems.length){for(const bi of buildItems) addObject(bi.objectid,parseMat(bi.transform),new Set(),objPartRanges.get(bi.objectid));}
+  else{for(const[id] of objMap) addObject(id,null,new Set(),objPartRanges.get(id));}
+
+  const nf=triIdx;
+  console.log('Total merged:',nf,'tris, hasColors:',hasColors);setLoadMsg("Building mesh...");await sl(0);
+  if(!nf){alert('No geometry found');hideLoading();return;}
+
+  // Check for zero-color placeholders
+  let cc=0;for(let i=0;i<nf;i++)if(fcArr[i*3]||fcArr[i*3+1]||fcArr[i*3+2])cc++;
+  console.log('Colored faces:',cc,'/',nf);setLoadMsg("Applying colors...");await sl(0);
+
+  // Trim to actual size
+  const finalPos=nf===totalTris?posArr:posArr.slice(0,nf*9);
+  const finalFC=nf===totalTris?fcArr:fcArr.slice(0,nf*3);
+
+  setLoadMsg("Finalizing...");await sl(0);
+  await loadModelData(finalPos,nf,name.replace(/\.3mf$/i,''),hasColors&&cc>0?finalFC:null,null,null);
+  }catch(e){alert('Error loading 3MF: '+e.message);console.error(e);}
+}
+async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas){
+  S.fn=name;if(S.mesh){sc.remove(S.mesh);if(S.wfm)sc.remove(S.wfm);}
+  S.tex=null;S.uvs=null;S.texCtx=null;S.texW=0;S.texH=0;S.uvScale=1;
+
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(posArr,3));geo.computeVertexNormals();
+  const br=S.base.r,bg=S.base.g,bb=S.base.b;
+  S.fc=new Float32Array(nf*3);S.painted=new Set();
+  for(let i=0;i<nf;i++){
+    let r=br,g=bg,b=bb;
+    if(faceColors){r=faceColors[i*3];g=faceColors[i*3+1];b=faceColors[i*3+2];S.painted.add(i);}
+    S.fc[i*3]=r;S.fc[i*3+1]=g;S.fc[i*3+2]=b;
+  }
+
+  // Compute face normals
+  S.fn2=new Float32Array(nf*3);
+  for(let i=0;i<nf;i++){const i9=i*9,e1x=posArr[i9+3]-posArr[i9],e1y=posArr[i9+4]-posArr[i9+1],e1z=posArr[i9+5]-posArr[i9+2],e2x=posArr[i9+6]-posArr[i9],e2y=posArr[i9+7]-posArr[i9+1],e2z=posArr[i9+8]-posArr[i9+2];let nx=e1y*e2z-e1z*e2y,ny=e1z*e2x-e1x*e2z,nz=e1x*e2y-e1y*e2x;const l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;S.fn2[i*3]=nx/l;S.fn2[i*3+1]=ny/l;S.fn2[i*3+2]=nz/l;}
+  buildAdj(posArr,nf);
+
+  // UV unwrap
+  const {uvs:genUvs,texW,texH,uvScale}=await unwrapMesh(posArr,nf);
+  S.uvs=genUvs;S.texW=texW;S.texH=texH;S.uvScale=uvScale;
+
+  setLoadMsg('Building texture canvas...');await sl(0);
+  const texCv=document.createElement('canvas');texCv.width=texW;texCv.height=texH;
+  S.texCtx=texCv.getContext('2d',{willReadFrequently:true,alpha:false});
+  const canTex=new THREE.CanvasTexture(texCv);
+  canTex.flipY=false; // UV Y-down matches canvas native
+  // NearestFilter: per-face solid-colour atlas must not blur across patch boundaries.
+  // Bilinear (default) samples PAD pixels from neighbouring patches → scattered colour artifacts.
+  canTex.minFilter=THREE.NearestFilter;
+  canTex.magFilter=THREE.NearestFilter;
+  S.tex=canTex;
+
+  // Paint initial face colors to canvas — use fillRect per patch (same as drawFaceOnCanvas)
+  {
+    const br2=S.base.r,bg2=S.base.g,bb2=S.base.b;
+    S.texCtx.fillStyle=`rgb(${Math.round(br2*255)},${Math.round(bg2*255)},${Math.round(bb2*255)})`;
+    S.texCtx.fillRect(0,0,texW,texH);
+    if(S.painted.size>0){
+      setLoadMsg('Painting texture...');await sl(0);
+      // Batch by color for fillRect — group same-color faces to minimize fillStyle changes
+      const cg2=new Map();
+      for(const fi of S.painted){
+        const rr=S.fc[fi*3],gg=S.fc[fi*3+1],bb3=S.fc[fi*3+2];
+        const ck=`${Math.round(rr*255)},${Math.round(gg*255)},${Math.round(bb3*255)}`;
+        if(!cg2.has(ck))cg2.set(ck,{r:rr,g:gg,b:bb3,faces:[]});
+        cg2.get(ck).faces.push(fi);
+      }
+      let cgN=0;
+      for(const[,{r:cr,g:cg3,b:cb,faces}] of cg2){
+        S.texCtx.fillStyle=`rgb(${Math.round(cr*255)},${Math.round(cg3*255)},${Math.round(cb*255)})`;
+        for(let j=0;j<faces.length;j++){
+          const fi=faces[j],u6=fi*6;
+          const u0=S.uvs[u6]*texW,v0=S.uvs[u6+1]*texH;
+          const u1=S.uvs[u6+2]*texW,v1=S.uvs[u6+3]*texH;
+          const u2=S.uvs[u6+4]*texW,v2=S.uvs[u6+5]*texH;
+          const minU=Math.floor(Math.min(u0,u1,u2));
+          const minV=Math.floor(Math.min(v0,v1,v2));
+          const maxU=Math.ceil(Math.max(u0,u1,u2));
+          const maxV=Math.ceil(Math.max(v0,v1,v2));
+          S.texCtx.fillRect(minU,minV,maxU-minU,maxV-minV);
+        }
+        cgN++;if(cgN%20===0){canTex.needsUpdate=true;setLoadMsg(`Painting texture... ${Math.round(cgN/cg2.size*100)}%`);await sl(0);}
+      }
+    }
+    canTex.needsUpdate=true;
+  }
+
+  // Add UV attribute so raycaster returns hit.uv
+  geo.setAttribute('uv',new THREE.BufferAttribute(S.uvs,2));
+
+  S.mesh=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({map:canTex,flatShading:true,side:THREE.DoubleSide,shininess:25}));
+  sc.add(S.mesh);S.geo=geo;
+
+  S.wfm=new THREE.LineSegments(new THREE.WireframeGeometry(geo),new THREE.LineBasicMaterial({color:0x444466,opacity:.2,transparent:true}));S.wfm.visible=S.wf;sc.add(S.wfm);
+  resetCamera();['bcs','ts','bs','cs','ps','orientSec'].forEach(id=>$(id).style.display='');
+  $('hh').style.display='';$('vpUndo').style.display='';$('ua').classList.add('hf');$('ua').querySelector('p').textContent=name;
+  $('sf').textContent=nf.toLocaleString()+' faces'+(faceColors?' (colored)':'');
+  $('dl-overlay').style.display='none';$('reprocess-overlay').style.display='none';$('linf').style.display='none';S.processed=false;
+  // Reset photo tool state
+  S.photoImg=null;S.photoCtx=null;S.photoSel=new Set();S.photoFaces=new Set();hidePhotoOverlay();
+  $('photoControls').style.display='none';$('photoUploadLabel').textContent='Click to load a JPG or PNG';$('photoFileIn').value='';
+  S.us=[];S.rs=[];pend.clear();updUB();initPk();hideLoading();
+}
+function buildAdj(pos,nf){
+  // pr=1e3: rounds to 3 decimal places (0.001mm tolerance).
+  // 1e4 (0.0001mm) was too tight — some STL exporters produce cube-face internal-diagonal
+  // vertices that differ by ~0.0001mm, causing the two triangles of a flat face to appear
+  // non-adjacent and breaking the angle-limit fill tool on vertical faces.
+  const pr=1e3,vk=(x,y,z)=>`${Math.round(x*pr)},${Math.round(y*pr)},${Math.round(z*pr)}`;const e2f=new Map();for(let fi=0;fi<nf;fi++)for(let e=0;e<3;e++){const a=fi*9+e*3,b=fi*9+((e+1)%3)*3,ka=vk(pos[a],pos[a+1],pos[a+2]),kb=vk(pos[b],pos[b+1],pos[b+2]),ek=ka<kb?ka+'|'+kb:kb+'|'+ka;if(!e2f.has(ek))e2f.set(ek,[]);e2f.get(ek).push(fi);}S.adj=new Map();for(let fi=0;fi<nf;fi++)S.adj.set(fi,new Set());for(const fs of e2f.values())for(let a=0;a<fs.length;a++)for(let b=a+1;b<fs.length;b++){S.adj.get(fs[a]).add(fs[b]);S.adj.get(fs[b]).add(fs[a]);}}
+$('fi').addEventListener('change',e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=ev=>loadFile(ev.target.result,f.name);r.readAsArrayBuffer(f);}});
+document.addEventListener('dragover',e=>{e.preventDefault();$('do').style.display='flex';});
+document.addEventListener('dragleave',e=>{if(!e.relatedTarget)$('do').style.display='none';});
+document.addEventListener('drop',e=>{e.preventDefault();$('do').style.display='none';const f=e.dataTransfer.files[0];if(f&&/\.(stl|3mf)$/i.test(f.name)){const r=new FileReader();r.onload=ev=>loadFile(ev.target.result,f.name);r.readAsArrayBuffer(f);}});
+function showLoading(msg){
+  $('loadAnim').style.display='block';$('pbarWrap').style.display='none';
+  $('pt').textContent=msg||'Loading...';$('po').classList.add('vis');
+}
+function setLoadMsg(msg){$('pt').textContent=msg;}
+function hideLoading(){
+  setTimeout(()=>{$('loadAnim').style.display='none';$('pbarWrap').style.display='';$('po').classList.remove('vis');},200);
+}
+function loadFile(buf,name){showLoading('Loading '+name+'...');setTimeout(()=>{if(/\.3mf$/i.test(name))load3MF(buf,name).catch(e=>{hideLoading();alert('Error loading 3MF: '+e.message);console.error(e);});else{try{const d=parseSTL(buf);loadModelData(d.p,d.n,name.replace(/\.stl$/i,''),d.colors,null,null).catch(e=>{hideLoading();alert('Error loading STL: '+e.message);console.error(e);});}catch(e){hideLoading();alert('Error parsing STL: '+e.message);}}},50);}
+function setBH(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return;S.base.set(hex);$('bsw').style.background=hex;$('bhx').value=hex;$('bnp').value=hex;applyB();}
+function applyB(){if(!S.geo)return;const nf=S.fc.length/3,r=S.base.r,g=S.base.g,b=S.base.b;for(let fi=0;fi<nf;fi++)if(!S.painted.has(fi)){S.fc[fi*3]=r;S.fc[fi*3+1]=g;S.fc[fi*3+2]=b;}rebuildTexCanvas();}
+function resetBase(){if(!S.geo)return;const nf=S.fc.length/3;
+  pend.clear();
+  for(const fi of S.painted)pend.set(fi,{oc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:true});
+  const r=S.base.r,g=S.base.g,b=S.base.b;
+  for(let fi=0;fi<nf;fi++){S.fc[fi*3]=r;S.fc[fi*3+1]=g;S.fc[fi*3+2]=b;}
+  S.painted.clear();rebuildTexCanvas();commitU();}
+
+let gradArrow=null,gradCenterMarker=null;
+function getGradDir(){
+  // Default: back to front (positive Y). Yaw rotates around Z. Pitch tilts up/down.
+  const yaw=S.gradYaw*Math.PI/180;
+  const pitch=S.gradPitch*Math.PI/180;
+  return new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch),Math.cos(yaw)*Math.cos(pitch),Math.sin(pitch)).normalize();
+}
+function onGradCenterChange(val){S.gradCenter=+val/100;$('gradCenterV').textContent=val+'%';updGradArrow();}
+function updGradArrow(){
+  if(gradArrow){sc.remove(gradArrow);gradArrow=null;}
+  if(gradCenterMarker){sc.remove(gradCenterMarker);gradCenterMarker=null;}
+  if(!S.mesh||S.tool!=='gradient'||S.gradMode!=='all')return;
+  S.geo.computeBoundingBox();
+  const bb=S.geo.boundingBox;
+  const center=new THREE.Vector3().addVectors(bb.min,bb.max).multiplyScalar(0.5);
+  const size=new THREE.Vector3().subVectors(bb.max,bb.min).length();
+  const dir=getGradDir();
+  const origin=center.clone().addScaledVector(dir,-size*0.7);
+  const len=size*1.4;
+  gradArrow=new THREE.ArrowHelper(dir,origin,len,0x6c5ce7,size*0.08,size*0.05);
+  sc.add(gradArrow);
+  const midT=S.gradCenter!=null?S.gradCenter:0.5;
+  const markerPos=origin.clone().addScaledVector(dir,len*midT);
+  const mg=new THREE.SphereGeometry(size*0.025,16,16);
+  const mm=new THREE.MeshBasicMaterial({color:0xffff00,transparent:true,opacity:0.9});
+  gradCenterMarker=new THREE.Mesh(mg,mm);
+  gradCenterMarker.position.copy(markerPos);
+  const rg=new THREE.RingGeometry(size*0.03,size*0.045,24);
+  const rm=new THREE.MeshBasicMaterial({color:0xffff00,side:THREE.DoubleSide,transparent:true,opacity:0.7,depthTest:false});
+  const ring=new THREE.Mesh(rg,rm);ring.lookAt(dir);
+  gradCenterMarker.add(ring);sc.add(gradCenterMarker);
+}
+function clearGradArrow(){if(gradArrow){sc.remove(gradArrow);gradArrow=null;}if(gradCenterMarker){sc.remove(gradCenterMarker);gradCenterMarker=null;}}
+
+// ── UV canvas helpers ──────────────────────────────────────────────────────────
+function drawFaceOnCanvas(fi,r,g,b){
+  if(!S.uvs||!S.texCtx)return;
+  const u6=fi*6;
+  const u0=S.uvs[u6]*S.texW,   v0=S.uvs[u6+1]*S.texH;
+  const u1=S.uvs[u6+2]*S.texW, v1=S.uvs[u6+3]*S.texH;
+  const u2=S.uvs[u6+4]*S.texW, v2=S.uvs[u6+5]*S.texH;
+  // Fill the entire patch bounding rectangle (not just the UV triangle).
+  // Patches are non-overlapping so this is safe. Prevents gray seam artifacts from
+  // Three.js bilinear sampling hitting uncoloured corners of the triangular UV region.
+  const minU=Math.floor(Math.min(u0,u1,u2));
+  const minV=Math.floor(Math.min(v0,v1,v2));
+  const maxU=Math.ceil(Math.max(u0,u1,u2));
+  const maxV=Math.ceil(Math.max(v0,v1,v2));
+  S.texCtx.fillStyle=`rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  S.texCtx.fillRect(minU,minV,maxU-minU,maxV-minV);
+}
+
+function rebuildTexCanvas(){
+  if(!S.uvs||!S.texCtx)return;
+  // Fill entire canvas with base color
+  const br=S.base.r,bg=S.base.g,bb=S.base.b;
+  S.texCtx.fillStyle=`rgb(${Math.round(br*255)},${Math.round(bg*255)},${Math.round(bb*255)})`;
+  S.texCtx.fillRect(0,0,S.texW,S.texH);
+  if(!S.painted||S.painted.size===0){if(S.tex)S.tex.needsUpdate=true;return;}
+  // Batch painted faces by color to minimise fillStyle changes, then fillRect each patch
+  const cg=new Map();
+  for(const fi of S.painted){
+    const rr=S.fc[fi*3],gg=S.fc[fi*3+1],bb2=S.fc[fi*3+2];
+    const ck=`${Math.round(rr*255)},${Math.round(gg*255)},${Math.round(bb2*255)}`;
+    if(!cg.has(ck))cg.set(ck,{r:rr,g:gg,b:bb2,faces:[]});
+    cg.get(ck).faces.push(fi);
+  }
+  for(const[,{r:cr,g:cg2,b:cb,faces}] of cg){
+    S.texCtx.fillStyle=`rgb(${Math.round(cr*255)},${Math.round(cg2*255)},${Math.round(cb*255)})`;
+    for(let j=0;j<faces.length;j++){
+      const fi=faces[j],u6=fi*6;
+      const u0=S.uvs[u6]*S.texW,  v0=S.uvs[u6+1]*S.texH;
+      const u1=S.uvs[u6+2]*S.texW,v1=S.uvs[u6+3]*S.texH;
+      const u2=S.uvs[u6+4]*S.texW,v2=S.uvs[u6+5]*S.texH;
+      const minU=Math.floor(Math.min(u0,u1,u2));
+      const minV=Math.floor(Math.min(v0,v1,v2));
+      const maxU=Math.ceil(Math.max(u0,u1,u2));
+      const maxV=Math.ceil(Math.max(v0,v1,v2));
+      S.texCtx.fillRect(minU,minV,maxU-minU,maxV-minV);
+    }
+  }
+  if(S.tex)S.tex.needsUpdate=true;
+}
+
+// ── UV Unwrapper ───────────────────────────────────────────────────────────────
+async function unwrapMesh(posArr,nf){
+  // Unique-face atlas: every face gets its own isolated rectangular patch.
+  // CRITICAL: patch size MUST be computed so ALL nf faces fit without overflow.
+  // If py2 ever exceeds texH, faces beyond that point share UV positions with
+  // earlier faces → wrong colours on import, painting appearing in wrong places.
+  // Formula: for square patches of size p, with PAD=1 between patches:
+  //   facesPerRow = floor((texW-PAD)/(p+PAD))
+  //   rowsNeeded  = ceil(nf/facesPerRow)
+  //   heightNeeded = PAD + rowsNeeded*(p+PAD)  must be <= texH
+  // Solving: p <= (texW-PAD)/sqrt(nf) - PAD
+  setLoadMsg('UV mapping...');await sl(0);
+  const texW=nf<8000?1024:nf<100000?2048:4096,texH=texW;
+  const PAD=1;
+  // Binary search for the largest square patch size p such that all nf patches fit
+  // within the texH texture height. The old area-formula overestimated p and caused
+  // patches for the last faces to overflow texH, producing UV clamping artifacts
+  // (wrong colours on unrelated faces when painting, swirling photo distortion).
+  let lo=3,hi=texW-PAD*2;
+  while(lo<hi){
+    const mid=(lo+hi+1)>>1;
+    const fpRow=Math.floor((texW-PAD)/(mid+PAD));
+    if(fpRow===0){hi=mid-1;continue;}
+    const rows=Math.ceil(nf/fpRow);
+    if(PAD+rows*(mid+PAD)<=texH)lo=mid;else hi=mid-1;
+  }
+  const p=lo,pw=p,ph=p;
+  const uvOut=new Float32Array(nf*6);
+  let px2=PAD,py2=PAD;
+  for(let fi=0;fi<nf;fi++){
+    if(px2+pw+PAD>texW){px2=PAD;py2+=ph+PAD;}
+    // No Min clamp needed — formula above guarantees py2+ph <= texH for all fi
+    const fy=py2;
+    // Isosceles triangle inside the patch: v0=bottom-left, v1=bottom-right, v2=top-centre
+    uvOut[fi*6+0]=(px2+0.5)/texW;      uvOut[fi*6+1]=(fy+ph-0.5)/texH; // v0
+    uvOut[fi*6+2]=(px2+pw-0.5)/texW;   uvOut[fi*6+3]=(fy+ph-0.5)/texH; // v1
+    uvOut[fi*6+4]=(px2+pw*0.5)/texW;   uvOut[fi*6+5]=(fy+0.5)/texH;    // v2
+    px2+=pw+PAD;
+    if(fi%60000===0){setLoadMsg(`UV mapping ${Math.round(fi/nf*100)}%...`);await sl(0);}
+  }
+  return{uvs:uvOut,texW,texH,uvScale:1};
+}
+
+// ── Photo Projection Tool ──────────────────────────────────────────────────────
+Object.assign(S,{photoImg:null,photoCtx:null,photoMode:'all',photoSel:new Set(),photoSubTool:'brush',photoFaces:new Set()});
+const photoOv=$('photoOverlay');
+let pOvX=40,pOvY=40,pOvW=320,pOvH=213,pOvDrag=false,pOvResize=false,pOvDx=0,pOvDy=0;
+let pOvRot=0,pOvBaseW=320,pOvBaseH=213; // rotation (degrees) and original size for scale slider
+
+function showPhotoOverlay(){if(S.photoImg)photoOv.style.display='block';}
+function hidePhotoOverlay(){photoOv.style.display='none';}
+
+function posPhotoOverlay(){
+  photoOv.style.left=pOvX+'px';photoOv.style.top=pOvY+'px';
+  photoOv.style.width=pOvW+'px';photoOv.style.height=pOvH+'px';
+  photoOv.style.transformOrigin='center center'; // rotate around photo's own centre
+  photoOv.style.transform=`rotate(${pOvRot}deg)`;
+}
+
+function resetPhotoOverlay(){
+  const r=vp.getBoundingClientRect();
+  const ar=S.photoImg?S.photoImg.naturalHeight/S.photoImg.naturalWidth:0.667;
+  pOvW=Math.min(r.width*0.5,400);pOvH=pOvW*ar;
+  pOvX=(r.width-pOvW)/2;pOvY=(r.height-pOvH)/2;
+  pOvBaseW=pOvW;pOvBaseH=pOvH;pOvRot=0;
+  if($('photoScale'))$('photoScale').value=100,$('photoScaleV').textContent='100%';
+  if($('photoRot'))$('photoRot').value=0,$('photoRotV').textContent='0°';
+  posPhotoOverlay();
+}
+
+photoOv.addEventListener('mousedown',e=>{
+  e.stopPropagation();e.preventDefault();
+  const r=vp.getBoundingClientRect();
+  if(e.target===$('photoHandle')){pOvResize=true;}else{pOvDrag=true;}
+  pOvDx=e.clientX-r.left-pOvX;pOvDy=e.clientY-r.top-pOvY;
+});
+document.addEventListener('mousemove',e=>{
+  if(!pOvDrag&&!pOvResize)return;
+  const r=vp.getBoundingClientRect();
+  const mx=e.clientX-r.left,my=e.clientY-r.top;
+  if(pOvDrag){pOvX=mx-pOvDx;pOvY=my-pOvDy;}
+  if(pOvResize){const ar=S.photoImg?S.photoImg.naturalHeight/S.photoImg.naturalWidth:pOvH/pOvW;pOvW=Math.max(60,mx-pOvX);pOvH=pOvW*ar;}
+  posPhotoOverlay();
+});
+document.addEventListener('mouseup',()=>{pOvDrag=false;pOvResize=false;});
+photoOv.addEventListener('wheel',e=>{
+  e.preventDefault();e.stopPropagation();
+  const ar=S.photoImg?S.photoImg.naturalHeight/S.photoImg.naturalWidth:pOvH/pOvW;
+  pOvW=Math.max(60,pOvW*(e.deltaY>0?0.92:1.09));pOvH=pOvW*ar;
+  // Keep sliders in sync when scrolling
+  if(pOvBaseW>0){const pct=Math.round(pOvW/pOvBaseW*100);if($('photoScale')){$('photoScale').value=pct;$('photoScaleV').textContent=pct+'%';}}
+  posPhotoOverlay();
+},{passive:false});
+
+function onPhotoScale(pct){
+  const ar=S.photoImg?S.photoImg.naturalHeight/S.photoImg.naturalWidth:pOvH/pOvW;
+  const cx=pOvX+pOvW/2,cy=pOvY+pOvH/2; // keep overlay centred on same point
+  pOvW=Math.max(30,pOvBaseW*pct/100);pOvH=pOvW*ar;
+  pOvX=cx-pOvW/2;pOvY=cy-pOvH/2;
+  $('photoScaleV').textContent=pct+'%';posPhotoOverlay();
+}
+function onPhotoRot(deg){
+  pOvRot=deg;$('photoRotV').textContent=deg+'°';posPhotoOverlay();
+}
+
+$('photoFileIn').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const url=URL.createObjectURL(f);
+  const img=new Image();
+  img.onload=()=>{
+    S.photoImg=img;
+    const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+    c.getContext('2d').drawImage(img,0,0);S.photoCtx=c.getContext('2d',{willReadFrequently:true});
+    $('photoOverlayImg').src=url;$('photoUploadLabel').textContent=f.name;
+    $('photoControls').style.display='';
+    resetPhotoOverlay(); // sets pOvBaseW/H and resets rotation/sliders
+    photoOv.style.opacity=$('photoOpacity').value/100;
+    photoOv.style.display='block';
+  };img.src=url;
+});
+
+function setPhotoMode(mode,ev){
+  S.photoMode=mode;
+  document.querySelectorAll('#photoModeGrp .fmb').forEach(b=>b.classList.remove('a'));
+  if(ev)ev.target.classList.add('a');
+  $('photoSelPanel').style.display=mode==='sel'?'block':'none';
+  if(mode!=='sel')clearPhotoSel();
+  updPhotoSubTools();
+}
+function updPhotoSubTools(){
+  const inSel=S.tool==='photo'&&S.photoMode==='sel';
+  const bw=$('br-wrap'),fo=$('fo');
+  if(inSel&&S.photoSubTool==='brush'){
+    // Move radius slider beneath sub-tool buttons inside photoSelPanel
+    const psc=$('photoSelCount');if(psc)psc.parentNode.insertBefore(bw,psc);
+    bw.style.display='';fo.style.display='none';
+  }else if(inSel&&S.photoSubTool==='fill'){
+    // Move fill options beneath sub-tool buttons inside photoSelPanel
+    const psc=$('photoSelCount');if(psc)psc.parentNode.insertBefore(fo,psc);
+    fo.style.display='';bw.style.display='none';
+  }else{
+    // Return elements to #bs (hidden) when not in selection+brush/fill mode
+    const bs=$('bs');if(bs){bs.appendChild(bw);bs.appendChild(fo);}
+    bw.style.display='none';fo.style.display='none';
+  }
+}
+function clearPhotoSel(){
+  if(!S.geo)return;
+  for(const fi of S.photoSel){
+    const r=S.painted.has(fi)?S.fc[fi*3]:S.base.r;
+    const g=S.painted.has(fi)?S.fc[fi*3+1]:S.base.g;
+    const b=S.painted.has(fi)?S.fc[fi*3+2]:S.base.b;
+    drawFaceOnCanvas(fi,r,g,b);
+  }
+  if(S.tex)S.tex.needsUpdate=true;
+  S.photoSel.clear();$('photoSelCount').textContent='0 faces selected';
+}
+function addToPhotoSel(fi){
+  if(S.photoSel.has(fi))return;S.photoSel.add(fi);selPend.add(fi);
+  const stripe=fi%2===0;drawFaceOnCanvas(fi,stripe?0.2:0.05,stripe?0.7:0.35,stripe?0.9:0.6);
+  if(S.tex)S.tex.needsUpdate=true;
+  $('photoSelCount').textContent=S.photoSel.size+' faces selected';
+}
+function photoSelBrush(hit){
+  if(!S.geo||!hit.point)return;
+  const pos=S.geo.getAttribute('position').array;
+  const cfi=gfi(hit);if(cfi<0)return;
+  addToPhotoSel(cfi);
+  const snx=S.fn2[cfi*3],sny=S.fn2[cfi*3+1],snz=S.fn2[cfi*3+2];
+  const r2=S.brushR*S.brushR,px=hit.point.x,py=hit.point.y,pz=hit.point.z;
+  const visited=new Set([cfi]),queue=[cfi];
+  while(queue.length){const fi=queue.shift();const nb=S.adj.get(fi);if(!nb)continue;for(const nfi of nb){if(visited.has(nfi))continue;visited.add(nfi);if(S.fn2[nfi*3]*snx+S.fn2[nfi*3+1]*sny+S.fn2[nfi*3+2]*snz<0)continue;const i9=nfi*9,cx=(pos[i9]+pos[i9+3]+pos[i9+6])/3,cy=(pos[i9+1]+pos[i9+4]+pos[i9+7])/3,cz=(pos[i9+2]+pos[i9+5]+pos[i9+8])/3;if((cx-px)**2+(cy-py)**2+(cz-pz)**2<=r2){addToPhotoSel(nfi);queue.push(nfi);}}}
+}
+function photoSelFill(hit){
+  if(!S.geo)return;const cfi=gfi(hit);if(cfi<0)return;
+  if(S.fillMode==='connected'){
+    const sr=S.fc[cfi*3],sg=S.fc[cfi*3+1],sb=S.fc[cfi*3+2];
+    const vis=new Set([cfi]),q=[cfi];
+    while(q.length){const fi=q.shift();if(Math.abs(S.fc[fi*3]-sr)<.01&&Math.abs(S.fc[fi*3+1]-sg)<.01&&Math.abs(S.fc[fi*3+2]-sb)<.01){addToPhotoSel(fi);const nb=S.adj.get(fi);if(nb)for(const n of nb)if(!vis.has(n)&&!S.photoSel.has(n)){vis.add(n);q.push(n);}}}
+  }else{for(const fi of computeAngleFill(cfi))if(!S.photoSel.has(fi))addToPhotoSel(fi);}
+}
+
+function bary2d(px,py,ax,ay,bx,by,cx,cy){
+  const d=(by-cy)*(ax-cx)+(cx-bx)*(ay-cy);
+  if(Math.abs(d)<1e-6)return null;
+  const w0=((by-cy)*(px-cx)+(cx-bx)*(py-cy))/d;
+  const w1=((cy-ay)*(px-cx)+(ax-cx)*(py-cy))/d;
+  const w2=1-w0-w1;
+  return(w0<-0.001||w1<-0.001||w2<-0.001)?null:[w0,w1,w2];
+}
+
+function applyPhotoProjection(){
+  if(!S.geo||!S.photoImg||!S.photoCtx){showToast('Please load a photo first.');return;}
+  if(!S.uvs||!S.texCtx){showToast('UV map not ready.');return;}
+  const nf=S.fc.length/3;
+  const pos=S.geo.getAttribute('position').array;
+  const faces=S.photoMode==='sel'&&S.photoSel.size>0
+    ?S.photoSel:(()=>{const s=new Set();for(let i=0;i<nf;i++)s.add(i);return s;})();
+  if(faces.size===0){showToast('No faces to paint.');return;}
+
+  syncCam();
+  const rect=vp.getBoundingClientRect();
+  const imgW=S.photoImg.naturalWidth,imgH=S.photoImg.naturalHeight;
+  const photoData=S.photoCtx.getImageData(0,0,imgW,imgH).data;
+
+  // Clear UV canvas before writing new photo data
+  rebuildTexCanvas();
+  const texData=S.texCtx.getImageData(0,0,S.texW,S.texH);
+  const td=texData.data;
+  pend.clear();
+  let painted=0;
+  const thisApplyFaces=new Set(); // only faces painted in THIS application (not accumulated)
+
+  const ovCx=pOvX+pOvW/2,ovCy=pOvY+pOvH/2;
+  const th=pOvRot*Math.PI/180;
+  const tmp3=new THREE.Vector3();
+
+  for(const fi of faces){
+    const i9=fi*9;
+    // Back-face cull
+    const fcx=(pos[i9]+pos[i9+3]+pos[i9+6])/3;
+    const fcy=(pos[i9+1]+pos[i9+4]+pos[i9+7])/3;
+    const fcz=(pos[i9+2]+pos[i9+5]+pos[i9+8])/3;
+    const nx=S.fn2[fi*3],ny=S.fn2[fi*3+1],nz=S.fn2[fi*3+2];
+    if((cam.position.x-fcx)*nx+(cam.position.y-fcy)*ny+(cam.position.z-fcz)*nz<=0)continue;
+
+    // UV patch bounds for this face
+    const u6=fi*6;
+    const tu0=S.uvs[u6]*S.texW,   tv0=S.uvs[u6+1]*S.texH;
+    const tu1=S.uvs[u6+2]*S.texW, tv1=S.uvs[u6+3]*S.texH;
+    const tu2=S.uvs[u6+4]*S.texW, tv2=S.uvs[u6+5]*S.texH;
+    const minU=Math.max(0,Math.floor(Math.min(tu0,tu1,tu2)));
+    const maxU=Math.min(S.texW-1,Math.ceil(Math.max(tu0,tu1,tu2)));
+    const minV=Math.max(0,Math.floor(Math.min(tv0,tv1,tv2)));
+    const maxV=Math.min(S.texH-1,Math.ceil(Math.max(tv0,tv1,tv2)));
+
+    let faceUsed=false;let avgR=0,avgG=0,avgB=0,avgN=0;
+
+    for(let pv=minV;pv<=maxV;pv++){
+      for(let pu=minU;pu<=maxU;pu++){
+        // Barycentric coords of this UV texel in UV space
+        const w=bary2d(pu+0.5,pv+0.5,tu0,tv0,tu1,tv1,tu2,tv2);if(!w)continue;
+
+        // Map UV barycentric weights → 3D position → screen
+        // This gives per-texel photo sampling: each UV texel gets the photo colour
+        // at its corresponding 3D surface position, giving sub-face detail in preview
+        tmp3.set(
+          w[0]*pos[i9  ]+w[1]*pos[i9+3]+w[2]*pos[i9+6],
+          w[0]*pos[i9+1]+w[1]*pos[i9+4]+w[2]*pos[i9+7],
+          w[0]*pos[i9+2]+w[1]*pos[i9+5]+w[2]*pos[i9+8]
+        );
+        tmp3.project(cam);
+        if(tmp3.z>1)continue;
+        const sx=(tmp3.x+1)/2*rect.width;
+        const sy=(1-tmp3.y)/2*rect.height;
+
+        // Map screen → photo coords, undoing CSS rotation
+        const dx=sx-ovCx,dy=sy-ovCy;
+        const lx=dx*Math.cos(th)+dy*Math.sin(th)+pOvW/2;
+        const ly=-dx*Math.sin(th)+dy*Math.cos(th)+pOvH/2;
+        if(lx<0||ly<0||lx>=pOvW||ly>=pOvH)continue;
+
+        const ix=Math.max(0,Math.min(imgW-1,Math.round(lx/pOvW*imgW)));
+        const iy=Math.max(0,Math.min(imgH-1,Math.round(ly/pOvH*imgH)));
+        const pidx=(iy*imgW+ix)*4;
+        const pa=photoData[pidx+3];
+        if(pa<128)continue;
+        const a=pa/255;
+        const blendR=Math.round(photoData[pidx]*a);
+        const blendG=Math.round(photoData[pidx+1]*a);
+        const blendB=Math.round(photoData[pidx+2]*a);
+
+        // Write per-texel colour to UV atlas
+        const tidx=(pv*S.texW+pu)*4;
+        td[tidx]=blendR;td[tidx+1]=blendG;td[tidx+2]=blendB;td[tidx+3]=255;
+        avgR+=blendR;avgG+=blendG;avgB+=blendB;avgN++;faceUsed=true;painted++;
+      }
+    }
+
+    if(faceUsed){
+      pend.set(fi,{oc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:S.painted.has(fi)});
+      // S.fc stores centroid average — used by the export's saved-projection path
+      S.fc[fi*3]=(avgR/avgN)/255;S.fc[fi*3+1]=(avgG/avgN)/255;S.fc[fi*3+2]=(avgB/avgN)/255;
+      S.painted.add(fi);S.photoFaces.add(fi);thisApplyFaces.add(fi);
+    }
+  }
+
+  S.texCtx.putImageData(texData,0,0);
+  if(S.tex)S.tex.needsUpdate=true;
+
+  // Save camera + overlay state for per-sub-triangle export reprojection
+  S.photoProjection={
+    photoData:new Uint8ClampedArray(photoData),
+    imgW,imgH,
+    ovCx,ovCy,ovW:pOvW,ovH:pOvH,th,
+    vpW:rect.width,vpH:rect.height,
+    viewMat:cam.matrixWorldInverse.clone(),
+    projMat:cam.projectionMatrix.clone(),
+    faces:thisApplyFaces
+  };
+
+  commitU();
+  S.photoSel.clear();$('photoSelCount').textContent='0 faces selected';
+  if(S.processed){$('reprocess-overlay').style.display='block';S.processed=false;}
+  showToast(`Photo painted onto ${painted.toLocaleString()} texels across ${S.photoFaces.size.toLocaleString()} faces.`,'🎨');
+  // Auto-select WKCMY — photos need white+black for accurate neutral tones
+  const fm=$('fmode');
+  if(fm&&!['wkcmy','wcmy','kcmy'].includes(fm.value)){fm.value='wkcmy';fm.dispatchEvent(new Event('change'));}
+  S.tool='brush';document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));
+  const brushBtn=document.querySelector('.tb[data-tool=brush]');if(brushBtn)brushBtn.classList.add('a');
+  $('st').textContent='Tool: Brush';
+  $('photoPanel').style.display='none';$('br-wrap').style.display='';$('cs').style.display='';
+  hidePhotoOverlay();
+}
+
+// Gradient tool
+function setGradColor(hex){if(S.gradPick==='A'){S.gradA=hex;$('gradA').style.background=hex;}else{S.gradB=hex;$('gradB').style.background=hex;}}
+function setGradMode(mode){
+  S.gradMode=mode;
+  document.querySelectorAll('#gradModeGrp .fmb').forEach(b=>b.classList.remove('a'));
+  event.target.classList.add('a');
+  $('gradSelPanel').style.display=mode==='sel'?'block':'none';
+  $('gradAxisPanel').style.display=mode==='all'?'block':'none';
+  if(mode==='sel'){S.gradPtA=null;S.gradPtB=null;updGradPtStatus();clearGradArrow();updGradSubTools();}
+  else{updGradArrow();updGradSubTools();}
+}
+function updGradSubTools(){
+  const inSel=S.tool==='gradient'&&S.gradMode==='sel';
+  const bw=$('br-wrap'),fo=$('fo');
+  if(inSel&&S.gradSubTool==='brush'){
+    // Move radius slider beneath sub-tool buttons inside gradSelPanel
+    const gsc=$('gradSelCount');if(gsc)gsc.parentNode.insertBefore(bw,gsc);
+    bw.style.display='';fo.style.display='none';
+  }else if(inSel&&S.gradSubTool==='fill'){
+    // Move fill options beneath sub-tool buttons inside gradSelPanel
+    const gsc=$('gradSelCount');if(gsc)gsc.parentNode.insertBefore(fo,gsc);
+    fo.style.display='';bw.style.display='none';
+  }else{
+    // Return elements to #bs (hidden) when not in selection+brush/fill mode
+    const bs=$('bs');if(bs){bs.appendChild(bw);bs.appendChild(fo);}
+    bw.style.display='none';fo.style.display='none';
+  }
+}
+function clearGradSel(){
+  if(!S.geo)return;
+  for(const fi of S.gradSel){
+    const r=S.painted.has(fi)?S.fc[fi*3]:S.base.r;
+    const g=S.painted.has(fi)?S.fc[fi*3+1]:S.base.g;
+    const b=S.painted.has(fi)?S.fc[fi*3+2]:S.base.b;
+    drawFaceOnCanvas(fi,r,g,b);
+  }
+  if(S.tex)S.tex.needsUpdate=true;
+  S.gradSel.clear();S.gradPtA=null;S.gradPtB=null;clearGradPtSpheres();
+  $('gradSelCount').textContent='0 faces selected';updGradPtStatus();
+}
+function addToGradSel(fi){
+  if(S.gradSel.has(fi))return;
+  S.gradSel.add(fi);selPend.add(fi);
+  const stripe=fi%2===0;
+  const hr=stripe?0.3:0.1,hg=stripe?0.8:0.4,hb=stripe?0.3:0.8;
+  drawFaceOnCanvas(fi,hr,hg,hb);
+  if(S.tex)S.tex.needsUpdate=true;
+  $('gradSelCount').textContent=S.gradSel.size+' faces selected';
+}
+function gradSelBrush(hit){
+  if(!S.geo||!hit.point)return;
+  const pos=S.geo.getAttribute('position').array,nf=S.fc.length/3;
+  const cfi=gfi(hit);if(cfi<0)return;
+  addToGradSel(cfi);
+  const snx=S.fn2[cfi*3],sny=S.fn2[cfi*3+1],snz=S.fn2[cfi*3+2];
+  const r2=S.brushR*S.brushR,px=hit.point.x,py=hit.point.y,pz=hit.point.z;
+  const visited=new Set([cfi]),queue=[cfi];
+  while(queue.length){
+    const fi=queue.shift();
+    const nb=S.adj.get(fi);if(!nb)continue;
+    for(const nfi of nb){
+      if(visited.has(nfi))continue;visited.add(nfi);
+      if(S.fn2[nfi*3]*snx+S.fn2[nfi*3+1]*sny+S.fn2[nfi*3+2]*snz<0)continue;
+      const i9=nfi*9,cx=(pos[i9]+pos[i9+3]+pos[i9+6])/3,cy=(pos[i9+1]+pos[i9+4]+pos[i9+7])/3,cz=(pos[i9+2]+pos[i9+5]+pos[i9+8])/3;
+      const d2=(cx-px)*(cx-px)+(cy-py)*(cy-py)+(cz-pz)*(cz-pz);
+      if(d2<=r2){addToGradSel(nfi);queue.push(nfi);}
+    }
+  }
+}
+function gradSelFill(hit){
+  if(!S.geo)return;
+  const cfi=gfi(hit);if(cfi<0)return;
+  if(S.fillMode==='connected'){
+    const sr=S.fc[cfi*3],sg=S.fc[cfi*3+1],sb=S.fc[cfi*3+2];
+    const visited=new Set([cfi]),queue=[cfi];
+    while(queue.length){
+      const fi=queue.shift();
+      if(Math.abs(S.fc[fi*3]-sr)<.01&&Math.abs(S.fc[fi*3+1]-sg)<.01&&Math.abs(S.fc[fi*3+2]-sb)<.01){
+        addToGradSel(fi);const nb=S.adj.get(fi);if(nb)for(const n of nb)if(!visited.has(n)&&!S.gradSel.has(n)){visited.add(n);queue.push(n);}
+      }
+    }
+  }else{for(const fi of computeAngleFill(cfi))if(!S.gradSel.has(fi))addToGradSel(fi);}
+}
+let gradSphA=null,gradSphB=null;
+function showGradPtSphere(pt,which){
+  // Fixed apparent screen size: radius = 1.5% of camera distance so it looks the same regardless of model scale
+  const screenR=O.d*0.015;
+  const sph=new THREE.Mesh(new THREE.SphereGeometry(screenR,12,12),new THREE.MeshBasicMaterial({color:which==='A'?0x00ff88:0xff4488,transparent:true,opacity:0.8,depthTest:false}));
+  sph.position.copy(pt);sc.add(sph);
+  if(which==='A'){if(gradSphA)sc.remove(gradSphA);gradSphA=sph;}
+  else{if(gradSphB)sc.remove(gradSphB);gradSphB=sph;}
+}
+function clearGradPtSpheres(){
+  if(gradSphA){sc.remove(gradSphA);gradSphA=null;}
+  if(gradSphB){sc.remove(gradSphB);gradSphB=null;}
+}
+function updGradPtStatus(){
+  const el=$('gradPtStatus');
+  if(!S.gradPtA)el.textContent='Click on model to set start point';
+  else if(!S.gradPtB)el.textContent='Start set ✓ — click end point';
+  else el.textContent='Start ✓ End ✓ — ready to apply';
+}
+function handleGradClick(hit){
+  if(S.gradMode!=='sel')return;
+  if(S.gradSel.size===0)return;
+  const pt=hit.point;if(!pt)return;
+  if(!S.gradPtA){S.gradPtA=pt.clone();showGradPtSphere(pt,'A');updGradPtStatus();}
+  else if(!S.gradPtB){S.gradPtB=pt.clone();showGradPtSphere(pt,'B');updGradPtStatus();}
+  else{S.gradPtA=pt.clone();S.gradPtB=null;clearGradPtSpheres();showGradPtSphere(pt,'A');updGradPtStatus();}
+}
+function applyGradient(){
+  if(!S.geo)return;
+  if(S.gradMode==='sel'&&S.gradSel.size>0&&(!S.gradPtA||!S.gradPtB)){
+    showToast('Set a start point and end point on the model before applying the gradient.');
+    return;
+  }
+  const pos=S.geo.getAttribute('position').array,nf=S.fc.length/3;
+  const steps=parseInt($('gradSteps').value)||16;
+  const cA=new THREE.Color(S.gradA),cB=new THREE.Color(S.gradB);
+
+  let faces,projectFn;
+  if(S.gradMode==='sel'&&S.gradSel.size>0&&S.gradPtA&&S.gradPtB){
+    // Selection mode with custom direction
+    faces=S.gradSel;
+    const dir=new THREE.Vector3().subVectors(S.gradPtB,S.gradPtA);
+    const len2=dir.lengthSq();if(len2<1e-8){alert('Start and end points are too close');return;}
+    const origin=S.gradPtA;
+    // Project face centroids onto the direction vector
+    let tMin=Infinity,tMax=-Infinity;
+    const tVals=new Map();
+    for(const fi of faces){
+      const i9=fi*9;const cx=(pos[i9]+pos[i9+3]+pos[i9+6])/3,cy=(pos[i9+1]+pos[i9+4]+pos[i9+7])/3,cz=(pos[i9+2]+pos[i9+5]+pos[i9+8])/3;
+      const t=((cx-origin.x)*dir.x+(cy-origin.y)*dir.y+(cz-origin.z)*dir.z)/len2;
+      tVals.set(fi,t);if(t<tMin)tMin=t;if(t>tMax)tMax=t;
+    }
+    const tRange=tMax-tMin||1;
+    projectFn=(fi)=>(tVals.get(fi)-tMin)/tRange;
+  }else{
+    // Whole model mode with rotated direction
+    faces=new Set();for(let i=0;i<nf;i++)faces.add(i);
+    const dir=getGradDir();
+    let mn=Infinity,mx=-Infinity;
+    const tVals=new Map();
+    for(let fi=0;fi<nf;fi++){
+      const i9=fi*9;const cx=(pos[i9]+pos[i9+3]+pos[i9+6])/3,cy=(pos[i9+1]+pos[i9+4]+pos[i9+7])/3,cz=(pos[i9+2]+pos[i9+5]+pos[i9+8])/3;
+      const t=cx*dir.x+cy*dir.y+cz*dir.z;
+      tVals.set(fi,t);if(t<mn)mn=t;if(t>mx)mx=t;
+    }
+    const tRange=mx-mn||1;
+    projectFn=(fi)=>(tVals.get(fi)-mn)/tRange;
+  }
+
+  pend.clear();
+  const ctr=S.gradCenter!=null?S.gradCenter:0.5;
+  for(const fi of faces){
+    let t=Math.max(0,Math.min(1,projectFn(fi)));
+    if(Math.abs(ctr-0.5)>0.01){t=t<ctr?(t/ctr)*0.5:0.5+((t-ctr)/(1-ctr))*0.5;}
+    t=Math.round(t*(steps-1))/(steps-1);
+    const r=cA.r+(cB.r-cA.r)*t,g=cA.g+(cB.g-cA.g)*t,b=cA.b+(cB.b-cA.b)*t;
+    pend.set(fi,{oc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:S.painted.has(fi)});
+    S.fc[fi*3]=r;S.fc[fi*3+1]=g;S.fc[fi*3+2]=b;
+    S.painted.add(fi);
+    drawFaceOnCanvas(fi,r,g,b);
+  }
+  if(S.tex)S.tex.needsUpdate=true;
+  commitU();
+  S.gradSel.clear();S.gradPtA=null;S.gradPtB=null;clearGradPtSpheres();
+  $('gradSelCount').textContent='0 faces selected';updGradPtStatus();
+  if(S.processed){$('reprocess-overlay').style.display='block';S.processed=false;}
+  // Auto-deselect gradient tool, switch back to brush
+  S.tool='brush';$('st').textContent='Tool: Brush';
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));
+  document.querySelector('.tb[data-tool=brush]').classList.add('a');
+  $('gradPanel').style.display='none';$('br-wrap').style.display='';$('fo').style.display='none';$('cs').style.display='';$('photoPanel').style.display='none';
+  clearGradArrow();
+}
+function showToast(msg,icon='⚠️'){
+  const t=$('toast');$('toastMsg').textContent=msg;$('toastIcon').textContent=icon;
+  t.classList.add('vis');if(t._timer)clearTimeout(t._timer);
+  t._timer=setTimeout(hideToast,4000);
+}
+function hideToast(){const t=$('toast');t.classList.remove('vis');}
+function gfi(h){if(h.faceIndex!==undefined)return h.faceIndex;if(h.face)return Math.floor(h.face.a/3);return-1;}
+// Helper: ensure camera matrices are fresh for projection
+function syncCam(){cam.updateMatrixWorld();cam.matrixWorldInverse.copy(cam.matrixWorld).invert();}
+// Helper: get screen-space brush size at a given 3D point
+function getBrushPxAt(pt){
+  syncCam();
+  const r=vp.getBoundingClientRect();
+  const right=new THREE.Vector3(1,0,0).applyQuaternion(cam.quaternion);
+  const c=pt.clone().project(cam);
+  const e=pt.clone().add(right.multiplyScalar(S.brushR)).project(cam);
+  return Math.max(6,Math.abs(e.x-c.x)*r.width/2);
+}
+// Approximate brush size using raycast hit or orbit target
+function getBrushPxApprox(ev){
+  const rect=vp.getBoundingClientRect();
+  const mx=((ev.clientX-rect.left)/rect.width)*2-1;
+  const my=-((ev.clientY-rect.top)/rect.height)*2+1;
+  syncCam();
+  const r2=new THREE.Raycaster();r2.setFromCamera(new THREE.Vector2(mx,my),cam);
+  const h=S.mesh?r2.intersectObject(S.mesh):[];
+  if(h.length) return getBrushPxAt(h[0].point);
+  return getBrushPxAt(O.t);
+}
+function paint(ev){if(!S.mesh)return;const rect=vp.getBoundingClientRect();mo.x=((ev.clientX-rect.left)/rect.width)*2-1;mo.y=-((ev.clientY-rect.top)/rect.height)*2+1;rc.setFromCamera(mo,cam);const hits=rc.intersectObject(S.mesh);if(!hits.length)return;const fi=gfi(hits[0]);if(fi<0||fi>=S.fc.length/3)return;
+if(S.tool==='eyedropper'){S.col.setRGB(S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]);updCD();const hsv=r2h(S.col.r*255,S.col.g*255,S.col.b*255);S.hue=hsv[0]*360;S.sat=hsv[1];S.val=hsv[2];$('hs').value=S.hue;drawPk();S.painting=false;return;}
+if(S.tool==='orient'){orientToFace(fi);S.painting=false;return;}
+if(S.tool==='gradient'){
+  if(S.gradMode==='sel'){
+    if(S.gradSubTool==='brush'){gradSelBrush(hits[0]);return;}
+    if(S.gradSubTool==='fill'){gradSelFill(hits[0]);S.painting=false;return;}
+    if(S.gradSubTool==='points'){handleGradClick(hits[0]);S.painting=false;return;}
+  }
+  S.painting=false;return;
+}
+if(S.tool==='photo'){
+  if(S.photoMode==='sel'){
+    if(S.photoSubTool==='brush'){photoSelBrush(hits[0]);return;}
+    if(S.photoSubTool==='fill'){photoSelFill(hits[0]);S.painting=false;return;}
+  }
+  S.painting=false;return;
+}
+if(S.tool==='fill'){clearFillHover();fillF(fi);if(S.tex)S.tex.needsUpdate=true;S.painting=false;commitU();return;}
+if(S.tool==='brush')bSurf(hits[0].point,fi,hits[0].uv);else if(S.tool==='sphere-brush')bSph(hits[0].point);}
+function mf(fi){
+  if(!pend.has(fi))pend.set(fi,{oc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:S.painted.has(fi)});
+  S.fc[fi*3]=S.col.r;S.fc[fi*3+1]=S.col.g;S.fc[fi*3+2]=S.col.b;
+  S.painted.add(fi);
+  drawFaceOnCanvas(fi,S.col.r,S.col.g,S.col.b);
+}
+function bSurf(pt,cfi,hitUV){
+  const pa=S.geo.getAttribute('position').array,r=S.brushR,vis=new Set([cfi]),q=[cfi];mf(cfi);
+  // Starting face normal — only spread to faces within 90° (dot product > 0) to prevent
+  // the brush BFS from rounding corners onto perpendicular/back faces
+  const snx=S.fn2[cfi*3],sny=S.fn2[cfi*3+1],snz=S.fn2[cfi*3+2];
+  while(q.length){
+    const fi=q.shift();const nb=S.adj.get(fi);if(!nb)continue;
+    for(const n of nb){
+      if(vis.has(n))continue;vis.add(n);
+      // Skip faces pointing away from the starting face (more than 90° turn)
+      if(S.fn2[n*3]*snx+S.fn2[n*3+1]*sny+S.fn2[n*3+2]*snz<0)continue;
+      const i9=n*9;
+      const cx=(pa[i9]+pa[i9+3]+pa[i9+6])/3,cy=(pa[i9+1]+pa[i9+4]+pa[i9+7])/3,cz=(pa[i9+2]+pa[i9+5]+pa[i9+8])/3;
+      if(Math.sqrt((cx-pt.x)**2+(cy-pt.y)**2+(cz-pt.z)**2)<=r){mf(n);q.push(n);}
+    }
+  }
+  if(S.tex)S.tex.needsUpdate=true;
+}
+function bSph(pt){
+  // Use raw position array (100× faster than BufferAttribute.getX() calls)
+  const pa=S.geo.getAttribute('position').array,r2=S.brushR*S.brushR,nf=S.fc.length/3;
+  for(let fi=0;fi<nf;fi++){
+    const i9=fi*9;
+    const cx=(pa[i9]+pa[i9+3]+pa[i9+6])/3,cy=(pa[i9+1]+pa[i9+4]+pa[i9+7])/3,cz=(pa[i9+2]+pa[i9+5]+pa[i9+8])/3;
+    if((cx-pt.x)**2+(cy-pt.y)**2+(cz-pt.z)**2<=r2)mf(fi);
+  }
+  if(S.tex)S.tex.needsUpdate=true; // was missing — sphere brush appeared to do nothing
+}
+function fillF(sfi){if(S.fillMode==='connected'){const sr=S.fc[sfi*3],sg=S.fc[sfi*3+1],sb=S.fc[sfi*3+2],vis=new Set([sfi]),q=[sfi];while(q.length){const fi=q.shift();if(Math.abs(S.fc[fi*3]-sr)<.01&&Math.abs(S.fc[fi*3+1]-sg)<.01&&Math.abs(S.fc[fi*3+2]-sb)<.01){mf(fi);const nb=S.adj.get(fi);if(nb)for(const n of nb)if(!vis.has(n)){vis.add(n);q.push(n);}}}}else{for(const fi of computeAngleFill(sfi))mf(fi);}}
+function commitU(){if(!pend.size)return;const e={ch:new Map()};for(const[fi,info]of pend)e.ch.set(fi,{oc:info.oc,nc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:info.wp,ip:S.painted.has(fi)});S.us.push(e);if(S.us.length>40)S.us.shift();S.rs=[];pend.clear();updUB();if(S.processed){S.processed=false;$('dl-overlay').style.display='none';$('reprocess-overlay').style.display='block';}}
+function applyUR(e,rev){const br=S.base.r,bg=S.base.g,bb=S.base.b;for(const[fi,info]of e.ch){const c=rev?info.oc:info.nc,p=rev?info.wp:info.ip;if(p){S.fc[fi*3]=c[0];S.fc[fi*3+1]=c[1];S.fc[fi*3+2]=c[2];S.painted.add(fi);}else{S.painted.delete(fi);S.fc[fi*3]=br;S.fc[fi*3+1]=bg;S.fc[fi*3+2]=bb;}}rebuildTexCanvas();}
+function undo(){
+  if(!S.us.length)return;
+  const e=S.us.pop();
+  if(e.selType){
+    // Selection undo: remove the added faces from the selection set and restore their canvas colour
+    const sel=e.selType==='grad'?S.gradSel:S.photoSel;
+    for(const fi of e.added){
+      sel.delete(fi);
+      const r2=S.painted.has(fi)?S.fc[fi*3]:S.base.r;
+      const g2=S.painted.has(fi)?S.fc[fi*3+1]:S.base.g;
+      const b2=S.painted.has(fi)?S.fc[fi*3+2]:S.base.b;
+      drawFaceOnCanvas(fi,r2,g2,b2);
+    }
+    if(S.tex)S.tex.needsUpdate=true;
+    const countEl=e.selType==='grad'?$('gradSelCount'):$('photoSelCount');
+    if(countEl)countEl.textContent=((e.selType==='grad'?S.gradSel:S.photoSel).size)+' faces selected';
+  }else{
+    if(S.gradSel&&S.gradSel.size)clearGradSel();
+    applyUR(e,true);
+  }
+  S.rs.push(e);updUB();
+}
+function redo(){
+  if(!S.rs.length)return;
+  const e=S.rs.pop();
+  if(e.selType){
+    // Selection redo: re-add the faces to the selection set with highlight colour
+    const sel=e.selType==='grad'?S.gradSel:S.photoSel;
+    for(const fi of e.added){
+      sel.add(fi);
+      const stripe=fi%2===0;
+      const hr=stripe?0.3:0.1,hg=stripe?0.8:0.4,hb=stripe?0.3:0.8;
+      drawFaceOnCanvas(fi,hr,hg,hb);
+    }
+    if(S.tex)S.tex.needsUpdate=true;
+    const countEl=e.selType==='grad'?$('gradSelCount'):$('photoSelCount');
+    if(countEl)countEl.textContent=((e.selType==='grad'?S.gradSel:S.photoSel).size)+' faces selected';
+  }else{
+    if(S.gradSel&&S.gradSel.size)clearGradSel();
+    applyUR(e,false);
+  }
+  S.us.push(e);updUB();
+}
+function updUB(){$('ub').disabled=!S.us.length;$('rb').disabled=!S.rs.length;}
+document.addEventListener('keydown',e=>{const mod=e.metaKey||e.ctrlKey;if(mod&&e.key==='z'){e.preventDefault();undo();}if(mod&&e.key==='y'){e.preventDefault();redo();}if(mod&&e.key>='1'&&e.key<='6'){e.preventDefault();setView(['front','back','left','right','top','bottom'][+e.key-1]);}});
+document.querySelectorAll('.tb').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));btn.classList.add('a');$('orientBtn').classList.remove('a');$('scaleBtn').classList.remove('a');hideScaleUI();S.tool=btn.dataset.tool;const names={brush:'Brush','sphere-brush':'Sphere Brush',fill:'Fill',eyedropper:'Colour Picker',gradient:'Gradient',photo:'Photo'};$('st').textContent='Tool: '+(names[S.tool]||S.tool);if(S.tool==='gradient'){$('fo').style.display='none';$('br-wrap').style.display='none';$('gradPanel').style.display='block';$('cs').style.display='none';$('photoPanel').style.display='none';clearPhotoSel();hidePhotoOverlay();updGradSubTools();updGradArrow();}else if(S.tool==='photo'){$('fo').style.display='none';$('br-wrap').style.display='none';$('gradPanel').style.display='none';$('cs').style.display='none';$('photoPanel').style.display='';clearGradSel();clearGradArrow();updPhotoSubTools();if(S.photoImg)showPhotoOverlay();}else{const _bs=$('bs');if(_bs){_bs.appendChild($('br-wrap'));_bs.appendChild($('fo'));}$('fo').style.display=S.tool==='fill'?'':'none';$('br-wrap').style.display=(S.tool==='brush'||S.tool==='sphere-brush')?'':'none';$('gradPanel').style.display='none';$('photoPanel').style.display='none';$('cs').style.display='';clearGradSel();clearPhotoSel();clearGradArrow();hidePhotoOverlay();}}));
+$('fmode').addEventListener('change',function(){const descs={cmy:'Standard subtractive colour mixing. Best for vibrant colours with a white base filament in the printer.',wcmy:'Adds white filament for cleaner pastels and highlights. Use when your base isn\'t white, or for better light colour accuracy. Requires 4 filament slots.',kcmy:'Adds black filament for richer darks and shadows. Avoids muddy dark tones from CMY overlap. Requires 4 filament slots.',wkcmy:'Full spectrum — white for highlights, black for shadows, CMY for colours. Best colour accuracy but requires 5 filament slots.','2c':'Dual nozzle mode. Pick two filament colours — painted surfaces are dithered between them. Great for gradients and two-tone effects.',solid:'Exports each painted face as a solid flat colour — no dithering, no CMY filaments. Use this to paint a model for normal multi-colour printing (e.g. in Bambu Studio with a multi-filament printer). Not for colour blending.'};$('fmDesc').textContent=descs[this.value]||'';$('twoColorPanel').style.display=this.value==='2c'?'block':'none';$('solidColPanel').style.display=this.value==='solid'?'block':'none';});
+function togWF(){S.wf=!S.wf;if(S.wfm)S.wfm.visible=S.wf;$('wfb').classList.toggle('a',S.wf);}
+function togGrid(){gridH.visible=!gridH.visible;$('grb').classList.toggle('a',gridH.visible);}
+
+function orientToFace(fi){
+  if(!S.geo)return;
+  S.photoProjection=null; // geometry positions change, saved camera projection invalidated
+  const nx=S.fn2[fi*3],ny=S.fn2[fi*3+1],nz=S.fn2[fi*3+2];
+  const from=new THREE.Vector3(nx,ny,nz).normalize();
+  const to=new THREE.Vector3(0,0,-1);
+  // Handle case where from ≈ to (already oriented) or from ≈ -to (180° flip)
+  if(from.distanceTo(to)<0.01)return;
+  let q;
+  if(from.distanceTo(to.clone().negate())<0.01){
+    // 180° rotation around any perpendicular axis
+    const perp=Math.abs(from.x)<0.9?new THREE.Vector3(1,0,0):new THREE.Vector3(0,1,0);
+    const axis=new THREE.Vector3().crossVectors(from,perp).normalize();
+    q=new THREE.Quaternion().setFromAxisAngle(axis,Math.PI);
+  }else{
+    q=new THREE.Quaternion().setFromUnitVectors(from,to);
+  }
+  const mat4=new THREE.Matrix4().makeRotationFromQuaternion(q);
+  const pos=S.geo.getAttribute('position');
+  const v3=new THREE.Vector3();
+  for(let i=0;i<pos.count;i++){
+    v3.set(pos.getX(i),pos.getY(i),pos.getZ(i));v3.applyMatrix4(mat4);
+    pos.setXYZ(i,v3.x,v3.y,v3.z);
+  }
+  pos.needsUpdate=true;
+  S.geo.computeBoundingBox();
+  const zMin=S.geo.boundingBox.min.z;
+  for(let i=0;i<pos.count;i++) pos.setZ(i,pos.getZ(i)-zMin);
+  pos.needsUpdate=true;
+  S.geo.computeVertexNormals();
+  // Recompute ALL face normals from scratch
+  const p=pos.array,nf2=S.fc.length/3;
+  for(let i=0;i<nf2;i++){
+    const i9=i*9;
+    const e1x=p[i9+3]-p[i9],e1y=p[i9+4]-p[i9+1],e1z=p[i9+5]-p[i9+2];
+    const e2x=p[i9+6]-p[i9],e2y=p[i9+7]-p[i9+1],e2z=p[i9+8]-p[i9+2];
+    let fnx=e1y*e2z-e1z*e2y,fny=e1z*e2x-e1x*e2z,fnz=e1x*e2y-e1y*e2x;
+    const l=Math.sqrt(fnx*fnx+fny*fny+fnz*fnz)||1;
+    S.fn2[i*3]=fnx/l;S.fn2[i*3+1]=fny/l;S.fn2[i*3+2]=fnz/l;
+  }
+  // Rebuild wireframe
+  if(S.wfm){sc.remove(S.wfm);S.wfm=new THREE.LineSegments(new THREE.WireframeGeometry(S.geo),
+    new THREE.LineBasicMaterial({color:0x444466,opacity:.2,transparent:true}));S.wfm.visible=S.wf;sc.add(S.wfm);}
+  // Rebuild adjacency
+  buildAdj(pos.array,nf2);
+  // Force geometry update
+  S.geo.computeBoundingBox();S.geo.computeBoundingSphere();
+  resetCamera();
+  if($('scalePanel').style.display!=='none') updateDims();
+}
+
+// Scale tool
+let scaleBBox=null,origDims=null;
+function showScaleUI(){
+  $('scalePanel').style.display='block';
+  updateDims();
+  origDims={x:+$('dimX').value,y:+$('dimY').value,z:+$('dimZ').value};
+  $('scaleSlider').value=100;$('scalePct').value=100;
+  showBBox();
+}
+function hideScaleUI(){
+  $('scalePanel').style.display='none';
+  hideBBox();
+}
+function showBBox(){
+  hideBBox();
+  if(!S.mesh)return;
+  scaleBBox=new THREE.BoxHelper(S.mesh,0x6c5ce7);
+  sc.add(scaleBBox);
+}
+function hideBBox(){
+  if(scaleBBox){sc.remove(scaleBBox);scaleBBox=null;}
+}
+function updateDims(){
+  if(!S.geo)return;
+  S.geo.computeBoundingBox();
+  const bb=S.geo.boundingBox;
+  const sx=bb.max.x-bb.min.x,sy=bb.max.y-bb.min.y,sz=bb.max.z-bb.min.z;
+  $('dimX').value=sx.toFixed(2);
+  $('dimY').value=sy.toFixed(2);
+  $('dimZ').value=sz.toFixed(2);
+}
+function onDimChange(axis,val){
+  if(!S.geo)return;
+  S.geo.computeBoundingBox();
+  const bb=S.geo.boundingBox;
+  const cur={x:bb.max.x-bb.min.x,y:bb.max.y-bb.min.y,z:bb.max.z-bb.min.z};
+  const nv=Math.max(0.01,parseFloat(val)||0.01);
+  const factor=nv/cur[axis];
+  scaleGeo(factor);
+  if(origDims){const pct=Math.round(+$('dimX').value/origDims.x*100);$('scalePct').value=pct;$('scaleSlider').value=Math.min(500,Math.max(10,pct));}
+}
+function onScaleSlider(val){
+  if(!S.geo||!origDims)return;
+  const pct=parseFloat(val)/100;
+  $('scalePct').value=Math.round(pct*100);
+  S.geo.computeBoundingBox();
+  const bb=S.geo.boundingBox;
+  const curX=bb.max.x-bb.min.x;
+  const targetX=origDims.x*pct;
+  const factor=targetX/curX;
+  if(Math.abs(factor-1)<0.001)return;
+  scaleGeo(factor);
+}
+function onScalePctType(val){
+  if(!S.geo||!origDims)return;
+  const pct=Math.max(1,parseFloat(val)||100)/100;
+  $('scaleSlider').value=Math.min(500,Math.max(10,pct*100));
+  S.geo.computeBoundingBox();
+  const bb=S.geo.boundingBox;
+  const curX=bb.max.x-bb.min.x;
+  const targetX=origDims.x*pct;
+  const factor=targetX/curX;
+  if(Math.abs(factor-1)<0.001)return;
+  scaleGeo(factor);
+}
+function scaleGeo(factor){
+  if(Math.abs(factor-1)<1e-6)return;
+  // Invalidate saved photo projection — its camera matrices are relative to the
+  // OLD geometry positions and would produce wrong results after scaling
+  S.photoProjection=null;
+  const pos=S.geo.getAttribute('position');
+  S.geo.computeBoundingBox();
+  const bb=S.geo.boundingBox;
+  const cx=(bb.max.x+bb.min.x)/2,cy=(bb.max.y+bb.min.y)/2,cz=(bb.max.z+bb.min.z)/2;
+  for(let i=0;i<pos.count;i++){
+    pos.setXYZ(i,(pos.getX(i)-cx)*factor+cx,(pos.getY(i)-cy)*factor+cy,(pos.getZ(i)-cz)*factor+cz);
+  }
+  // Re-ground on Z=0
+  pos.needsUpdate=true;
+  S.geo.computeBoundingBox();
+  const zMin=S.geo.boundingBox.min.z;
+  if(Math.abs(zMin)>0.001) for(let i=0;i<pos.count;i++) pos.setZ(i,pos.getZ(i)-zMin);
+  pos.needsUpdate=true;
+  S.geo.computeBoundingBox();S.geo.computeBoundingSphere();
+  if(scaleBBox)scaleBBox.update();
+  if(S.wfm){sc.remove(S.wfm);S.wfm=new THREE.LineSegments(new THREE.WireframeGeometry(S.geo),
+    new THREE.LineBasicMaterial({color:0x444466,opacity:.2,transparent:true}));S.wfm.visible=S.wf;sc.add(S.wfm);}
+  updateDims();
+}
+
+let hoverFi=-1;
+function highlightFace(fi){
+  if(fi===hoverFi)return;
+  if(hoverFi>=0){
+    const pr=S.painted.has(hoverFi)?[S.fc[hoverFi*3],S.fc[hoverFi*3+1],S.fc[hoverFi*3+2]]:[S.base.r,S.base.g,S.base.b];
+    drawFaceOnCanvas(hoverFi,pr[0],pr[1],pr[2]);if(S.tex)S.tex.needsUpdate=true;
+  }
+  hoverFi=fi;
+  if(fi>=0){drawFaceOnCanvas(fi,1,1,0);if(S.tex)S.tex.needsUpdate=true;}
+}
+function clearHighlight(){if(hoverFi>=0)highlightFace(-1);}
+
+let pkC,pkX;
+function initPk(){pkC=$('cpc');pkX=pkC.getContext('2d');drawPk();pkC.onmousedown=pickC;pkC.onmousemove=e=>{if(e.buttons===1)pickC(e);};}
+function drawPk(){const w=pkC.width,h=pkC.height,img=pkX.createImageData(w,h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const rgb=h2r(S.hue/360,x/w,1-y/h),i=(y*w+x)*4;img.data[i]=rgb[0];img.data[i+1]=rgb[1];img.data[i+2]=rgb[2];img.data[i+3]=255;}pkX.putImageData(img,0,0);updMk();}
+function updMk(){const m=$('cpMarker');if(m){m.style.left=(S.sat*pkC.width)+'px';m.style.top=((1-S.val)*pkC.height)+'px';}const h=$('hsMarker');if(h)h.style.left=(S.hue/360*100)+'%';}
+function pickC(e){const r=pkC.getBoundingClientRect();S.sat=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));S.val=Math.max(0,Math.min(1,1-(e.clientY-r.top)/r.height));const rgb=h2r(S.hue/360,S.sat,S.val);S.col.setRGB(rgb[0]/255,rgb[1]/255,rgb[2]/255);updCD();updMk();}
+function uHue(v){S.hue=v;drawPk();const rgb=h2r(S.hue/360,S.sat,S.val);S.col.setRGB(rgb[0]/255,rgb[1]/255,rgb[2]/255);updCD();}
+function updCD(){const hex='#'+S.col.getHexString();$('cc').style.background=hex;$('hi').value=hex;}
+function sCH(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return;S.col.set(hex);updCD();const hsv=r2h(S.col.r*255,S.col.g*255,S.col.b*255);S.hue=hsv[0]*360;S.sat=hsv[1];S.val=hsv[2];$('hs').value=S.hue;drawPk();}
+function h2r(h,s,v){let r,g,b;const i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)];}
+function r2h(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h,s=mx===0?0:d/mx,v=mx;if(mx===mn)h=0;else{switch(mx){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}h/=6;}return[h,s,v];}
+
+// ===========================================================
+// ===========================================================
+// CMY DECOMPOSITION → 3MF with layer-dithered materials
+// ===========================================================
+const sl=ms=>new Promise(r=>setTimeout(r,ms));
+
+// Clip triangle to Z band
+function cTZ(tri,zB,zT){let ps=[tri];ps=cPs(ps,zB,true);ps=cPs(ps,zT,false);const o=[];for(const p of ps){if(p.length<3)continue;for(let i=1;i<p.length-1;i++)o.push([p[0],p[i],p[i+1]]);}return o;}
+function cPs(ps,z,ab){const o=[];for(const p of ps){const c=cP(p,z,ab);if(c.length>=3)o.push(c);}return o;}
+function cP(poly,z,ab){const o=[];for(let i=0;i<poly.length;i++){const c=poly[i],n=poly[(i+1)%poly.length],cI=ab?c[2]>=z-1e-8:c[2]<=z+1e-8,nI=ab?n[2]>=z-1e-8:n[2]<=z+1e-8;if(cI){o.push(c);if(!nI)o.push(lv(c,n,z));}else if(nI)o.push(lv(c,n,z));}return o;}
+function lv(a,b,z){const d=b[2]-a[2];if(Math.abs(d)<1e-12)return[a[0],a[1],z];const t=(z-a[2])/d;return[a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1]),z];}
+
+// ── Filament Colour Calibration ───────────────────────────────────────────────
+const FCM_DEFAULTS={c:'#00FFFF',m:'#FF00FF',y:'#FFFF00',k:'#000000',w:'#FFFFFF'};
+function h2rgb(hex){const h=hex.replace('#','');return[parseInt(h.substr(0,2),16)/255,parseInt(h.substr(2,2),16)/255,parseInt(h.substr(4,2),16)/255];}
+function fcmSync(ch,val){
+  if(!/^#[0-9a-fA-F]{6}$/.test(val))return;
+  const sw=$('fcmSw'+ch),np=$('fcmNp'+ch);
+  if(sw)sw.style.background=val;if(np)np.value=val;
+}
+function fcmFromPicker(ch,val){
+  const hex=$('fcmHex'+ch);if(hex){hex.value=val;fcmSync(ch,val);}
+}
+function openFilColModal(){
+  const fh=S.filHex;
+  ['C','M','Y','W','K'].forEach(c=>{
+    const key=c.toLowerCase();
+    const v=fh[key]||'#ffffff';
+    const hx=$('fcmHex'+c),sw=$('fcmSw'+c),np=$('fcmNp'+c);
+    if(hx)hx.value=v;if(sw)sw.style.background=v;if(np)np.value=v;
+  });
+  $('filColModal').classList.add('vis');
+}
+function closeFilColModal(){$('filColModal').classList.remove('vis');}
+function resetFilColDefaults(){
+  Object.assign(S.filHex,FCM_DEFAULTS);
+  ['C','M','Y','W','K'].forEach(c=>{
+    const v=FCM_DEFAULTS[c.toLowerCase()];
+    const hx=$('fcmHex'+c),sw=$('fcmSw'+c),np=$('fcmNp'+c);
+    if(hx)hx.value=v;if(sw)sw.style.background=v;if(np)np.value=v;
+  });
+}
+function applyFilCol(){
+  ['C','M','Y','W','K'].forEach(c=>{
+    const v=($('fcmHex'+c)||{}).value||'';
+    if(/^#[0-9a-fA-F]{6}$/.test(v))S.filHex[c.toLowerCase()]=v;
+  });
+  closeFilColModal();
+  showToast('Filament colours saved. Re-process the model to apply them.','🎨');
+}
+
+// Solve: find fractions on the colour-mixing simplex that best reproduce target.
+// filRGB: array of [r,g,b] each in 0-1. target: [r,g,b] in 0-1.
+// Uses Frank-Wolfe algorithm — guaranteed to converge to the global minimum
+// over a convex set. Correctly handles White→100%W, Black→100%K, etc.
+// Results are cached per unique quantized colour so this is called at most once per colour.
+function makeDecompose(filRGB){
+  const n=filRGB.length;
+  return function(r8,g8,b8){
+    const t=[r8/255,g8/255,b8/255];
+    let f=new Array(n).fill(1/n);
+    for(let it=0;it<80;it++){
+      // Compute current mixed colour
+      const mix=[0,0,0];
+      for(let i=0;i<n;i++)for(let c=0;c<3;c++)mix[c]+=f[i]*filRGB[i][c];
+      // Find the atom (vertex) with the steepest descent direction
+      let bestI=0,bestV=Infinity;
+      for(let i=0;i<n;i++){let v=0;for(let c=0;c<3;c++)v+=filRGB[i][c]*(mix[c]-t[c]);if(v<bestV){bestV=v;bestI=i;}}
+      // Step toward that atom with decreasing step size (2/(it+3) ensures convergence)
+      const gamma=2/(it+3);
+      for(let i=0;i<n;i++)f[i]=(1-gamma)*f[i]+(i===bestI?gamma:0);
+    }
+    return f;
+  };
+}
+
+async function processModel(){
+  if(!S.mesh)return;
+  const ov=$('po');ov.classList.add('vis');const fe=$('pf'),te=$('pt');
+  te.textContent='Analyzing...';fe.style.width='5%';await sl(30);
+  const pos=S.geo.getAttribute('position').array,nf=S.fc.length/3;
+  const mode=$('fmode').value;
+
+  // ── SOLID COLOURS EXPORT (no dithering) ─────────────────────────────────
+  if(mode==='solid'){
+    const kTarget=parseInt($('solidColCount').value)||0; // 0 = full spectrum
+    te.textContent='Collecting colours...';fe.style.width='15%';await sl(30);
+
+    // Build weighted unique-colour list from S.fc (all faces)
+    const Q8=8;
+    const uniqueMap=new Map();
+    for(let fi=0;fi<nf;fi++){
+      const r=Math.min(255,Math.round(S.fc[fi*3]*255/Q8)*Q8);
+      const g=Math.min(255,Math.round(S.fc[fi*3+1]*255/Q8)*Q8);
+      const b=Math.min(255,Math.round(S.fc[fi*3+2]*255/Q8)*Q8);
+      const key=(r<<16)|(g<<8)|b;
+      if(!uniqueMap.has(key))uniqueMap.set(key,[r,g,b,0]);
+      uniqueMap.get(key)[3]++;
+    }
+    const uniqueColors=[...uniqueMap.values()]; // [r,g,b,weight]
+    let palette=[]; // final [r,g,b] entries
+
+    if(kTarget>0&&kTarget<uniqueColors.length){
+      // k-means++ weighted colour clustering
+      te.textContent='Clustering to '+kTarget+' colours ('+uniqueColors.length+' → '+kTarget+')...';fe.style.width='30%';await sl(30);
+      const k=Math.min(kTarget,uniqueColors.length);
+      // k-means++ init: pick first centroid as highest-weight colour, then successively
+      // pick the colour furthest (weighted by weight) from existing centroids
+      uniqueColors.sort((a,b2)=>b2[3]-a[3]);
+      const cents=[[uniqueColors[0][0],uniqueColors[0][1],uniqueColors[0][2]]];
+      for(let i=1;i<k;i++){
+        let maxScore=-1,maxIdx=0;
+        for(let j=0;j<uniqueColors.length;j++){
+          let minD2=Infinity;
+          for(const c of cents){const d=(uniqueColors[j][0]-c[0])**2+(uniqueColors[j][1]-c[1])**2+(uniqueColors[j][2]-c[2])**2;if(d<minD2)minD2=d;}
+          const score=minD2*uniqueColors[j][3];
+          if(score>maxScore){maxScore=score;maxIdx=j;}
+        }
+        cents.push([uniqueColors[maxIdx][0],uniqueColors[maxIdx][1],uniqueColors[maxIdx][2]]);
+      }
+      // Iterate k-means (weighted)
+      for(let iter=0;iter<40;iter++){
+        const sums=Array.from({length:k},()=>[0,0,0,0]);
+        for(const [r,g,b,w] of uniqueColors){
+          let minD=Infinity,best=0;
+          for(let i=0;i<k;i++){const d=(r-cents[i][0])**2+(g-cents[i][1])**2+(b-cents[i][2])**2;if(d<minD){minD=d;best=i;}}
+          sums[best][0]+=r*w;sums[best][1]+=g*w;sums[best][2]+=b*w;sums[best][3]+=w;
+        }
+        let moved=false;
+        for(let i=0;i<k;i++){
+          if(sums[i][3]===0)continue;
+          const nr=sums[i][0]/sums[i][3],ng=sums[i][1]/sums[i][3],nb=sums[i][2]/sums[i][3];
+          if(Math.abs(nr-cents[i][0])>0.4||Math.abs(ng-cents[i][1])>0.4||Math.abs(nb-cents[i][2])>0.4)moved=true;
+          cents[i]=[nr,ng,nb];
+        }
+        if(!moved)break;
+        if(iter%10===9){await sl(0);}
+      }
+      palette=cents.map(c=>[Math.round(c[0]),Math.round(c[1]),Math.round(c[2])]);
+    }else{
+      // Full spectrum — one entry per unique quantized colour
+      for(const [r,g,b] of uniqueColors)palette.push([r,g,b]);
+    }
+
+    // Assign each face to nearest palette entry
+    te.textContent='Assigning '+nf.toLocaleString()+' faces to palette...';fe.style.width='50%';await sl(30);
+    const faceMat=new Int32Array(nf);
+    for(let fi=0;fi<nf;fi++){
+      const r=Math.min(255,Math.round(S.fc[fi*3]*255/Q8)*Q8);
+      const g=Math.min(255,Math.round(S.fc[fi*3+1]*255/Q8)*Q8);
+      const b=Math.min(255,Math.round(S.fc[fi*3+2]*255/Q8)*Q8);
+      let minD=Infinity,best=0;
+      for(let i=0;i<palette.length;i++){const d=(r-palette[i][0])**2+(g-palette[i][1])**2+(b-palette[i][2])**2;if(d<minD){minD=d;best=i;}}
+      faceMat[fi]=best;
+      if(fi%100000===0)await sl(0);
+    }
+
+    // Weld vertices and build triangle list
+    te.textContent='Welding vertices...';fe.style.width='62%';await sl(30);
+    const PR=1e6;const vMap=new Map();const uPos=[];let uid=0;const triData2=[];
+    for(let fi=0;fi<nf;fi++){
+      const i9=fi*9;const vis=[];
+      for(let v=0;v<3;v++){const x=pos[i9+v*3],y=pos[i9+v*3+1],z=pos[i9+v*3+2];const kk=Math.round(x*PR)+','+Math.round(y*PR)+','+Math.round(z*PR);if(!vMap.has(kk)){vMap.set(kk,uid);uPos.push(x,y,z);uid++;}vis.push(vMap.get(kk));}
+      if(vis[0]!==vis[1]&&vis[1]!==vis[2]&&vis[0]!==vis[2])triData2.push({v1:vis[0],v2:vis[1],v3:vis[2],m:faceMat[fi]});
+      if(fi%50000===0&&fi>0){te.textContent='Welding '+Math.round(fi/nf*100)+'%...';await sl(0);}
+    }
+
+    // Build 3MF XML
+    te.textContent='Building 3MF...';fe.style.width='78%';await sl(30);
+    let cgXml='<m:colorgroup id="1">\n';
+    for(const [r,g,b] of palette)cgXml+=`<m:color color="#${r.toString(16).padStart(2,'0').toUpperCase()}${g.toString(16).padStart(2,'0').toUpperCase()}${b.toString(16).padStart(2,'0').toUpperCase()}FF"/>\n`;
+    cgXml+='</m:colorgroup>\n';
+    const xp=['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02">\n<resources>\n'+cgXml+'<object id="2" type="model">\n<mesh>\n<vertices>\n'];
+    for(let i=0;i<uid;i++)xp.push(`<vertex x="${uPos[i*3]}" y="${uPos[i*3+1]}" z="${uPos[i*3+2]}"/>\n`);
+    xp.push('</vertices>\n<triangles>\n');
+    for(const t of triData2)xp.push(`<triangle v1="${t.v1}" v2="${t.v2}" v3="${t.v3}" pid="1" p1="${t.m}"/>\n`);
+    xp.push('</triangles>\n</mesh>\n</object>\n</resources>\n<build>\n<item objectid="2"/>\n</build>\n</model>');
+
+    te.textContent='Packaging...';fe.style.width='90%';await sl(30);
+    const enc2=new TextEncoder();
+    const ctypes='<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n</Types>';
+    const rels2='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';
+    S.mdl3mf=makeZip([{name:'[Content_Types].xml',data:enc2.encode(ctypes).buffer},{name:'_rels/.rels',data:enc2.encode(rels2).buffer},{name:'3D/3dmodel.model',data:enc2.encode(xp.join('')).buffer}]);
+    fe.style.width='100%';te.textContent='Done — '+palette.length+' colours, '+uid.toLocaleString()+' verts';await sl(400);
+    ov.classList.remove('vis');$('dl-overlay').style.display='block';$('reprocess-overlay').style.display='none';S.processed=true;
+    $('linf').style.display='';$('linf').innerHTML='Solid · <span>'+palette.length+'</span> colours · <span>'+triData2.length.toLocaleString()+'</span> tris';
+    return;
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  let zMn=Infinity,zMx=-Infinity;
+  for(let i=2;i<pos.length;i+=3){if(pos[i]<zMn)zMn=pos[i];if(pos[i]>zMx)zMx=pos[i];}
+  const LH=0.08;
+  const nL=Math.max(1,Math.ceil((zMx-zMn)/LH));
+
+  // Filament mode configuration
+  // DECOMPOSE uses ideal subtractive CMY theory — this produces the correct layer-dithering
+  // ratios regardless of the exact filament gamut. Real filament colours are used ONLY for
+  // the 3MF colorgroup hex values so the slicer preview displays accurately.
+  const fh=S.filHex;
+  const hex4=h=>(h.replace('#','')).toUpperCase()+'FF';
+  const MODES={
+    cmy:{
+      ch:[{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){return[1-r/255,1-g/255,1-b/255];}
+    },
+    wcmy:{
+      ch:[{n:'White',hex:'#'+hex4(fh.w)},{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){
+        const c=1-r/255,m=1-g/255,y=1-b/255;
+        const k=Math.min(c,m,y);
+        const w=1-Math.max(c,m,y);
+        const k3=k/3;
+        return[w,c-k+k3,m-k+k3,y-k+k3];
+      }
+    },
+    kcmy:{
+      ch:[{n:'Black',hex:'#'+hex4(fh.k)},{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){
+        const c=1-r/255,m=1-g/255,y=1-b/255;
+        const kMax=Math.min(c,m,y);
+        const chroma=Math.max(c,m,y)-kMax;
+        const kThresh=Math.max(0,(kMax-0.35)/0.65);
+        const kScale=(1-chroma*0.7)*kThresh;
+        const k=kMax*kScale;
+        return[k,c-k,m-k,y-k];
+      }
+    },
+    wkcmy:{
+      ch:[{n:'White',hex:'#'+hex4(fh.w)},{n:'Black',hex:'#'+hex4(fh.k)},{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){
+        const c=1-r/255,m=1-g/255,y=1-b/255;
+        const kMax=Math.min(c,m,y);
+        const chroma=Math.max(c,m,y)-kMax;
+        const kScale=1-chroma*0.7;
+        const k=kMax*kScale;
+        const w=1-Math.max(c,m,y);
+        return[w,k,c-k,m-k,y-k];
+      }
+    }
+  };
+  // Build 2C mode dynamically from user-selected colors
+  const cA2=new THREE.Color(S.fil2A),cB2=new THREE.Color(S.fil2B);
+  const aR=Math.round(cA2.r*255),aG=Math.round(cA2.g*255),aB=Math.round(cA2.b*255);
+  const bR=Math.round(cB2.r*255),bG=Math.round(cB2.g*255),bB=Math.round(cB2.b*255);
+  MODES['2c']={
+    ch:[{n:'Fil A',hex:S.fil2A+'FF'},{n:'Fil B',hex:S.fil2B+'FF'}],
+    decompose(r,g,b){
+      // Project color onto line A→B
+      const dABr=bR-aR,dABg=bG-aG,dABb=bB-aB;
+      const dot2=dABr*dABr+dABg*dABg+dABb*dABb;
+      if(dot2<1)return[0.5,0.5]; // A≈B, split evenly
+      const t=Math.max(0,Math.min(1,((r-aR)*dABr+(g-aG)*dABg+(b-aB)*dABb)/dot2));
+      return[1-t,t];
+    }
+  };
+  const M=MODES[mode];
+  const nCh=M.ch.length;
+
+  // Export colour sampling: always use per-face S.fc colours.
+  // Photo-projected faces have S.fc set to the centroid-average of the projected pixels
+  // (written by applyPhotoProjection). UV texture sampling was removed because the
+  // Export colour: non-photo faces use exact S.fc. Photo faces use the saved camera
+  // projection to re-sample the photo at each sub-triangle centroid — this gives
+  // per-layer colour variation on any mesh (including low-poly ones like a cube)
+  // without any UV texture UV↔screen mismatch.
+  const pp=S.photoProjection; // may be null if no photo was applied
+  const hasPhoto=pp&&S.photoFaces&&S.photoFaces.size>0;
+  // Pre-flatten saved camera matrices to plain arrays for fast inline math (no Three.js calls)
+  let ppVM=null,ppPM=null;
+  if(hasPhoto){ppVM=pp.viewMat.elements;ppPM=pp.projMat.elements;}
+
+  function sampleSavedPhoto(cx,cy,cz){
+    // Apply view matrix (world → view)
+    const vx=ppVM[0]*cx+ppVM[4]*cy+ppVM[8]*cz+ppVM[12];
+    const vy=ppVM[1]*cx+ppVM[5]*cy+ppVM[9]*cz+ppVM[13];
+    const vz=ppVM[2]*cx+ppVM[6]*cy+ppVM[10]*cz+ppVM[14];
+    const vw=ppVM[3]*cx+ppVM[7]*cy+ppVM[11]*cz+ppVM[15];
+    // Apply projection matrix (view → clip, with perspective divide)
+    const cpx=ppPM[0]*vx+ppPM[4]*vy+ppPM[8]*vz+ppPM[12]*vw;
+    const cpy=ppPM[1]*vx+ppPM[5]*vy+ppPM[9]*vz+ppPM[13]*vw;
+    const cpz=ppPM[2]*vx+ppPM[6]*vy+ppPM[10]*vz+ppPM[14]*vw;
+    const cpw=ppPM[3]*vx+ppPM[7]*vy+ppPM[11]*vz+ppPM[15]*vw;
+    if(Math.abs(cpw)<1e-10||cpz/cpw>1)return null;
+    const sx=(cpx/cpw+1)/2*pp.vpW;
+    const sy=(1-cpy/cpw)/2*pp.vpH;
+    // Map screen → photo coords
+    const dx=sx-pp.ovCx,dy=sy-pp.ovCy;
+    const lx=dx*Math.cos(pp.th)+dy*Math.sin(pp.th)+pp.ovW/2;
+    const ly=-dx*Math.sin(pp.th)+dy*Math.cos(pp.th)+pp.ovH/2;
+    if(lx<0||ly<0||lx>=pp.ovW||ly>=pp.ovH)return null;
+    const ix=Math.max(0,Math.min(pp.imgW-1,Math.round(lx/pp.ovW*pp.imgW)));
+    const iy=Math.max(0,Math.min(pp.imgH-1,Math.round(ly/pp.ovH*pp.imgH)));
+    const pidx=(iy*pp.imgW+ix)*4;
+    const pa=pp.photoData[pidx+3];if(pa<128)return null;
+    const a=pa/255;
+    return[Math.round(pp.photoData[pidx]*a),Math.round(pp.photoData[pidx+1]*a),Math.round(pp.photoData[pidx+2]*a)];
+  }
+
+  const Q=8;
+  function getColor(fi,cx,cy,cz){
+    if(hasPhoto&&pp.faces.has(fi)){
+      const tc=sampleSavedPhoto(cx,cy,cz);
+      if(tc)return[Math.min(255,Math.round(tc[0]/Q)*Q),Math.min(255,Math.round(tc[1]/Q)*Q),Math.min(255,Math.round(tc[2]/Q)*Q)];
+    }
+    return[Math.min(255,Math.round(S.fc[fi*3]*255/Q)*Q),Math.min(255,Math.round(S.fc[fi*3+1]*255/Q)*Q),Math.min(255,Math.round(S.fc[fi*3+2]*255/Q)*Q)];
+  }
+
+  // Lazy dither sequence cache
+  // Uses proportional Bresenham with deterministic tie-breaking
+  // for spatial coherence (similar colors → similar sequences)
+  function getDitherSeq(r,g,b){
+    const key=r+','+g+','+b;
+    if(colorSeqs.has(key))return{key,seq:colorSeqs.get(key)};
+    const demands=M.decompose(r,g,b);
+    const total=demands.reduce((a,v)=>a+Math.max(0,v),0);
+    const seq=new Uint8Array(nL);
+    if(total<0.001){
+      // Decompose yielded no usable demand (e.g. white in a mode with no white channel,
+      // or any colour the formula cancelled to zero).
+      // Cycle C+M+Y channels equally — avoids printing pure Black (KCMY ch0) or pure White (WCMY ch0).
+      const ci=M.ch.findIndex(ch=>ch.n==='Cyan');
+      if(ci>=0){const nc=Math.min(3,nCh-ci);for(let li=0;li<nL;li++)seq[li]=ci+(li%nc);}
+      else{for(let li=0;li<nL;li++)seq[li]=li%nCh;}
+    }
+    else{
+      const frac=demands.map(d=>Math.max(0,d)/total);
+      const placed=new Array(nCh).fill(0);
+      for(let li=0;li<nL;li++){
+        // Pick channel with greatest accumulated under-representation
+        let bestCh=0,bestD=-Infinity;
+        for(let ch=0;ch<nCh;ch++){
+          if(frac[ch]<0.001)continue;
+          const d=frac[ch]*(li+1)-placed[ch];
+          // Deterministic tie-breaking: slight bias by channel index + layer
+          // This ensures similar colors break ties the same way → coherent patterns
+          const tieBreak=d+ch*1e-6+(li%nCh===ch?1e-7:0);
+          if(tieBreak>bestD){bestD=tieBreak;bestCh=ch;}
+        }
+        seq[li]=bestCh;placed[bestCh]++;
+      }
+    }
+    colorSeqs.set(key,seq);
+    return{key,seq};
+  }
+
+  // Step 1: Precompute dither sequences for non-photo faces (one colour per face, exact S.fc).
+  // Photo faces use per-sub-triangle colour sampling (sampleSavedPhoto), so they don't
+  // need a pre-computed sequence — getDitherSeq is called per sub-triangle in Step 2.
+  te.textContent='Computing dither sequences ('+mode.toUpperCase()+')...';fe.style.width='8%';await sl(30);
+  const colorSeqs=new Map();
+  const faceColorKey=new Array(nf);
+
+  for(let fi=0;fi<nf;fi++){
+    if(hasPhoto&&pp.faces.has(fi))continue; // photo faces handled per sub-triangle
+    const [r,g,b]=getColor(fi,0,0,0);
+    const{key}=getDitherSeq(r,g,b);
+    faceColorKey[fi]=key;
+  }
+  te.textContent=colorSeqs.size+' unique colors...';fe.style.width='12%';await sl(30);
+
+  // Step 2: Clip faces at offset layer boundaries
+  const allTris=[];
+  const ZOFF=LH/2;
+
+  for(let fi=0;fi<nf;fi++){
+    const i9=fi*9;
+    const fzMin=Math.min(pos[i9+2],pos[i9+5],pos[i9+8]);
+    const fzMax=Math.max(pos[i9+2],pos[i9+5],pos[i9+8]);
+    const tri=[[pos[i9],pos[i9+1],pos[i9+2]],
+               [pos[i9+3],pos[i9+4],pos[i9+5]],
+               [pos[i9+6],pos[i9+7],pos[i9+8]]];
+
+    const liStart=Math.max(0,Math.floor((fzMin-zMn-ZOFF)/LH));
+    const liEnd=Math.min(nL-1,Math.ceil((fzMax-zMn-ZOFF)/LH));
+
+    const isPhotoFace=hasPhoto&&pp.faces.has(fi);
+    if(!isPhotoFace){
+      // Non-photo face: use pre-computed single dither sequence (fast)
+      const seq=colorSeqs.get(faceColorKey[fi]);
+      if(liStart===liEnd||liStart>=nL){
+        const cz=(fzMin+fzMax)/2;
+        const li2=Math.max(0,Math.min(nL-1,Math.floor((cz-zMn-ZOFF)/LH)));
+        allTris.push({v:tri,m:seq[li2]});
+      }else{
+        for(let li=liStart;li<=liEnd&&li<nL;li++){
+          const zB=zMn+ZOFF+li*LH,zT=zMn+ZOFF+(li+1)*LH;
+          const clipped=cTZ(tri,zB,zT);
+          for(const ct of clipped) allTris.push({v:ct,m:seq[Math.max(0,Math.min(nL-1,li))]});
+        }
+      }
+    }else{
+      // Photo face: sample per sub-triangle centroid → per-layer colour variation
+      const subTris=[];
+      if(liStart===liEnd||liStart>=nL){
+        const li2=Math.max(0,Math.min(nL-1,Math.floor(((fzMin+fzMax)/2-zMn-ZOFF)/LH)));
+        subTris.push({v:tri,li:li2});
+      }else{
+        for(let li=liStart;li<=liEnd&&li<nL;li++){
+          const zB=zMn+ZOFF+li*LH,zT=zMn+ZOFF+(li+1)*LH;
+          const clipped=cTZ(tri,zB,zT);
+          for(const ct of clipped) subTris.push({v:ct,li:Math.max(0,Math.min(nL-1,li))});
+        }
+      }
+      for(const st of subTris){
+        const cx=(st.v[0][0]+st.v[1][0]+st.v[2][0])/3;
+        const cy=(st.v[0][1]+st.v[1][1]+st.v[2][1])/3;
+        const cz=(st.v[0][2]+st.v[1][2]+st.v[2][2])/3;
+        const [r,g,b]=getColor(fi,cx,cy,cz);
+        const{seq}=getDitherSeq(r,g,b);
+        allTris.push({v:st.v,m:seq[st.li]});
+      }
+    }
+
+    if(fi%Math.max(1,Math.min(10000,Math.floor(nf/40)))===0){fe.style.width=12+(fi/nf)*55+'%';te.textContent='Clipping '+Math.round(fi/nf*100)+'% ('+allTris.length.toLocaleString()+' sub-faces)...';await sl(0);}
+  }
+
+  te.textContent=allTris.length.toLocaleString()+' sub-faces, welding...';fe.style.width='70%';await sl(30);
+
+  // Step 3: Weld vertices (with async yields for large models)
+  const PR=1e6;const vMap=new Map();const uPos=[];let uid=0;const triData=[];
+  const weldChunk=50000;
+  for(let ti=0;ti<allTris.length;ti++){
+    const t=allTris[ti];
+    const vis=[];
+    for(let v=0;v<3;v++){
+      const p=t.v[v];
+      const k=Math.round(p[0]*PR)+','+Math.round(p[1]*PR)+','+Math.round(p[2]*PR);
+      if(!vMap.has(k)){vMap.set(k,uid);uPos.push(p[0],p[1],p[2]);uid++;}
+      vis.push(vMap.get(k));
+    }
+    if(vis[0]!==vis[1]&&vis[1]!==vis[2]&&vis[0]!==vis[2])
+      triData.push({v1:vis[0],v2:vis[1],v3:vis[2],m:t.m});
+    if(ti%weldChunk===0){te.textContent='Welding '+Math.round(ti/allTris.length*100)+'%...';fe.style.width=70+(ti/allTris.length)*8+'%';await sl(0);}
+  }
+
+  te.textContent='Building 3MF...';fe.style.width='80%';await sl(30);
+  allTris.length=0; // free memory
+
+  // Step 4: Build 3MF with mode-appropriate colorgroup (chunked for large models)
+  let cgXml='<m:colorgroup id="1">\n';
+  for(const ch of M.ch) cgXml+='<m:color color="'+ch.hex+'"/>\n';
+  cgXml+='</m:colorgroup>\n';
+
+  // Helper: convert filament index to the hex encoding used by paint_color (Orca)
+  // and slic3rpe:mmu_segmentation (PrusaSlicer) — identical encoding, different attribute names.
+  // filament 0 = default, no attribute. filament 1→"8", 2→"0C", 3→"1C", 4→"2C" etc.
+  function filamentToColorHex(fi){
+    if(fi===0)return null;
+    const state=fi<=2?fi+1:7+(fi-3)*4; // matches stateToFilament inverse
+    const val=state*4;
+    const h=val.toString(16).toUpperCase();
+    return(val>=10&&val<16)?'0'+h:h; // "8","0C","1C","2C"... matching Bambu/Orca export convention
+  }
+
+  // Build XML in chunks to avoid blocking on huge string joins.
+  // xmlns:slic3rpe enables PrusaSlicer mmu_segmentation attributes on triangles.
+  // MmPaintingVersion:1 signals PrusaSlicer that this file uses per-face painting.
+  const xmlChunks=['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06">\n<metadata name="slic3rpe:MmPaintingVersion">1</metadata>\n<resources>\n'+cgXml+'<object id="2" name="'+S.fn.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" type="model">\n<mesh>\n<vertices>\n'];
+  const xmlBatch=20000;
+  for(let i=0;i<uid;i++){
+    xmlChunks.push('<vertex x="'+uPos[i*3]+'" y="'+uPos[i*3+1]+'" z="'+uPos[i*3+2]+'"/>\n');
+    if(i%xmlBatch===0&&i>0){await sl(0);te.textContent='Vertices '+Math.round(i/uid*100)+'%...';}
+  }
+  xmlChunks.push('</vertices>\n<triangles>\n');
+  te.textContent='Writing triangles...';await sl(0);
+
+  const counts=new Array(nCh).fill(0);
+  for(let i=0;i<triData.length;i++){
+    const t=triData[i];
+    const colorHex=filamentToColorHex(t.m);
+    // paint_color → Orca/Bambu-fork per-triangle filament assignment
+    // slic3rpe:mmu_segmentation → PrusaSlicer per-triangle extruder assignment
+    // Both use identical hex encoding; each slicer reads its own attribute, ignores the other
+    const extraAttrs=colorHex?' paint_color="'+colorHex+'" slic3rpe:mmu_segmentation="'+colorHex+'"':'';
+    xmlChunks.push('<triangle v1="'+t.v1+'" v2="'+t.v2+'" v3="'+t.v3+'" pid="1" p1="'+t.m+'"'+extraAttrs+'/>\n');
+    counts[t.m]++;
+    if(i%xmlBatch===0&&i>0){await sl(0);te.textContent='Triangles '+Math.round(i/triData.length*100)+'%...';}
+  }
+  xmlChunks.push('</triangles>\n</mesh>\n</object>\n</resources>\n<build>\n<item objectid="2"/>\n</build>\n</model>');
+
+  te.textContent='Encoding XML...';fe.style.width='85%';await sl(30);
+  // Encode XML in chunks to avoid massive string join blocking the thread
+  const tEnc=new TextEncoder();
+  const encodedChunks=[];let totalBytes=0;
+  const joinBatch=5000;
+  for(let i=0;i<xmlChunks.length;i+=joinBatch){
+    const batch=xmlChunks.slice(i,i+joinBatch).join('');
+    const encoded=tEnc.encode(batch);
+    encodedChunks.push(encoded);totalBytes+=encoded.length;
+    if(i%50000===0){te.textContent='Encoding XML '+Math.round(i/xmlChunks.length*100)+'%...';await sl(0);}
+  }
+  xmlChunks.length=0;
+  // Merge encoded chunks into single ArrayBuffer
+  te.textContent='Merging '+Math.round(totalBytes/1048576)+'MB...';fe.style.width='88%';await sl(30);
+  const modelBuf=new Uint8Array(totalBytes);let bOff=0;
+  for(const chunk of encodedChunks){modelBuf.set(chunk,bOff);bOff+=chunk.length;}
+  encodedChunks.length=0;
+  const contentTypes='<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n</Types>';
+  const rels='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';
+
+  te.textContent='Packaging...';fe.style.width='90%';await sl(30);
+  const enc=new TextEncoder();
+
+  // Generate slicer-specific metadata files — added to ZIP alongside the model.
+  // These are ignored by Bambu (which reads its own project_settings format separately),
+  // but tell PrusaSlicer about extruder count/colours, and tell Orca about filament colours.
+  const chColors6=M.ch.map(ch=>ch.hex.slice(0,7)); // #RRGGBB for each channel
+  const prusaExtruderColours=chColors6.join(';');
+  const prusaNozzles=M.ch.map(()=>'0.4').join(',');
+  // Slic3r_PE.config: PrusaSlicer reads this for extruder colour hints and nozzle count.
+  const prusaConfig='; extruder_colour = '+prusaExtruderColours+'\n; filament_colour = '+prusaExtruderColours+'\n; nozzle_diameter = '+prusaNozzles+'\n';
+  // Slic3r_PE_model.config: PrusaSlicer reads this to map the object's triangles to a volume.
+  // The volume covers all triangles (firstid=0, lastid=total-1); extruder="0" is the base slot.
+  const safeN=S.fn.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  const prusaModelConfig='<?xml version="1.0" encoding="UTF-8"?>\n<config>\n <object id="2" instances_count="1">\n  <metadata type="object" key="name" value="'+safeN+'"/>\n  <volume firstid="0" lastid="'+(triData.length-1)+'">\n   <metadata type="volume" key="name" value="'+safeN+'"/>\n   <metadata type="volume" key="volume_type" value="ModelPart"/>\n   <metadata type="volume" key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>\n   <metadata type="volume" key="extruder" value="0"/>\n  </volume>\n </object>\n</config>';
+  // project_settings.config: Orca/Bambu-fork reads filament_colour to name/colour each slot.
+  const orcaProjectSettings=JSON.stringify({filament_colour:chColors6});
+
+  S.mdl3mf=makeZip([
+    {name:'[Content_Types].xml',data:enc.encode(contentTypes).buffer},
+    {name:'_rels/.rels',data:enc.encode(rels).buffer},
+    {name:'3D/3dmodel.model',data:modelBuf.buffer},
+    {name:'Metadata/Slic3r_PE.config',data:enc.encode(prusaConfig).buffer},
+    {name:'Metadata/Slic3r_PE_model.config',data:enc.encode(prusaModelConfig).buffer},
+    {name:'Metadata/project_settings.config',data:enc.encode(orcaProjectSettings).buffer}
+  ]);
+
+  fe.style.width='100%';te.textContent='Done!';await sl(400);
+  ov.classList.remove('vis');
+  $('dl-overlay').style.display='block';
+  $('reprocess-overlay').style.display='none';
+  S.processed=true;
+  const info=$('linf');info.style.display='';
+  const chColors=['var(--tx)','var(--tx)','var(--cy)','var(--mg)','var(--yl)'];
+  const modeColors={cmy:['var(--cy)','var(--mg)','var(--yl)'],wcmy:['var(--tx)','var(--cy)','var(--mg)','var(--yl)'],kcmy:['var(--txd)','var(--cy)','var(--mg)','var(--yl)'],wkcmy:['var(--tx)','var(--txd)','var(--cy)','var(--mg)','var(--yl)'],'2c':[S.fil2A,S.fil2B]};
+  const cols=modeColors[mode];
+  info.innerHTML='Verts: <span>'+uid.toLocaleString()+'</span> · Tris: <span>'+triData.length.toLocaleString()+'</span><br>'+
+    M.ch.map((ch,i)=>'<span style="color:'+cols[i]+'">'+ch.n[0]+':'+counts[i].toLocaleString()+'</span>').join(' · ')+' · '+nL+' layers';
+}
+function dl3MF(){
+  if(!S.mdl3mf)return;
+  const mode=$('fmode').value.toUpperCase();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([S.mdl3mf],{type:'application/vnd.ms-package.3dmanufacturing-3dmodel+xml'}));
+  a.download=S.fn+'_'+(mode==='SOLID'?'SOLID_NoFilter':mode)+'.3mf';a.click();
+  setTimeout(()=>$('thankModal').classList.add('vis'),1500);
+}
+
+// === ZIP ===
+function makeZip(files){
+  const enc=new TextEncoder();
+  let offset=0;const entries=[];
+  let totalSize=0;
+  for(const f of files){
+    const nb=enc.encode(f.name);
+    const data=f.data instanceof ArrayBuffer?f.data:(typeof f.data==='string'?enc.encode(f.data).buffer:f.data);
+    f._data=data;f._nb=nb;
+    totalSize+=30+nb.length+data.byteLength+46+nb.length;
+  }
+  totalSize+=22;
+  const buf=new ArrayBuffer(totalSize);const dv=new DataView(buf);const u8=new Uint8Array(buf);
+  for(const f of files){
+    const nb=f._nb,data=new Uint8Array(f._data);
+    const start=offset;
+    dv.setUint32(offset,0x04034b50,true);offset+=4;
+    dv.setUint16(offset,20,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;
+    const crc=crc32(data);
+    dv.setUint32(offset,crc,true);offset+=4;
+    dv.setUint32(offset,data.byteLength,true);offset+=4;
+    dv.setUint32(offset,data.byteLength,true);offset+=4;
+    dv.setUint16(offset,nb.length,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;
+    u8.set(nb,offset);offset+=nb.length;
+    u8.set(data,offset);offset+=data.byteLength;
+    entries.push({nb,offset:start,size:data.byteLength,crc});
+  }
+  const cdStart=offset;
+  for(const e of entries){
+    dv.setUint32(offset,0x02014b50,true);offset+=4;
+    dv.setUint16(offset,20,true);offset+=2;dv.setUint16(offset,20,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint32(offset,e.crc,true);offset+=4;
+    dv.setUint32(offset,e.size,true);offset+=4;
+    dv.setUint32(offset,e.size,true);offset+=4;
+    dv.setUint16(offset,e.nb.length,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint16(offset,0,true);offset+=2;dv.setUint16(offset,0,true);offset+=2;
+    dv.setUint32(offset,32,true);offset+=4;
+    dv.setUint32(offset,e.offset,true);offset+=4;
+    u8.set(e.nb,offset);offset+=e.nb.length;
+  }
+  const cdSize=offset-cdStart;
+  dv.setUint32(offset,0x06054b50,true);offset+=4;
+  dv.setUint16(offset,0,true);offset+=2;dv.setUint16(offset,0,true);offset+=2;
+  dv.setUint16(offset,entries.length,true);offset+=2;
+  dv.setUint16(offset,entries.length,true);offset+=2;
+  dv.setUint32(offset,cdSize,true);offset+=4;
+  dv.setUint32(offset,cdStart,true);offset+=4;
+  dv.setUint16(offset,0,true);offset+=2;
+  return buf.slice(0,offset);
+}
+function crc32(data){
+  let c=0xFFFFFFFF;
+  if(!crc32.t){crc32.t=new Uint32Array(256);for(let n=0;n<256;n++){let c2=n;for(let k=0;k<8;k++)c2=c2&1?0xEDB88320^(c2>>>1):c2>>>1;crc32.t[n]=c2;}}
+  for(let i=0;i<data.length;i++)c=crc32.t[(c^data[i])&0xFF]^(c>>>8);
+  return(c^0xFFFFFFFF)>>>0;
+}
+</script>
+</body>
+</html>
