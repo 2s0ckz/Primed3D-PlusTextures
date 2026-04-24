@@ -230,18 +230,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .photo-upload-area{border:2px dashed var(--bd);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:8px}
 .photo-upload-area:hover{border-color:var(--ac);background:var(--ag)}
 .photo-upload-area p{font-size:12px;color:var(--txd);margin-top:4px}
-</style>
+.palette-row{display:flex;gap:6px;margin-bottom:6px}.palette-row input[type=color]{width:30px;height:30px}.palette-row .pal-del{width:28px;background:var(--sf2);color:var(--txd);border:1px solid var(--bd);border-radius:5px}.palette-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}</style>
 </head>
 <body>
 <div id="app">
 <div id="toolbar">
   <div class="thdr"><div class="logo"><img src="https://primed3d.3drevolution.net/primed3d_text.png" alt="Primed3D" style="height:46px"></div><div class="thdr-right"><a href="https://www.YouTube.com/3DRevolution" target="_blank" style="font-size:11px;color:var(--txd);text-decoration:none;letter-spacing:.3px;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">A <span class="rev-orange" style="color:var(--yl)">3D Revolution</span> Tool</a><div class="socials"><a href="https://youtube.com/3DRevolution" target="_blank" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.3 31.3 0 000 12a31.3 31.3 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.3 31.3 0 0024 12a31.3 31.3 0 00-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a><a href="https://www.facebook.com/the3drev" target="_blank" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0024 12z"/></svg></a><a href="https://x.com/The3DRev" target="_blank" title="X / Twitter"><svg viewBox="0 0 24 24"><path d="M18.2 2.25h3.5l-7.7 8.8L23 21.75h-7.1l-5.5-7.2-6.3 7.2H.6l8.2-9.4L.4 2.25h7.3l5 6.6 5.5-6.6zm-1.2 17.5h2L7.1 4.3H5L17 19.75z"/></svg></a><a href="https://www.instagram.com/the3drevolution/" target="_blank" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.3 1.1.4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1.1.3-2.2.4-1.3.1-1.6.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4a3.9 3.9 0 01-1.4-.9 3.9 3.9 0 01-.9-1.4c-.2-.4-.3-1.1-.4-2.2-.1-1.3-.1-1.6-.1-4.9s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1.1-.3 2.2-.4 1.3-.1 1.6-.1 4.9-.1M12 0C8.7 0 8.3 0 7.1.1 5.8.1 4.9.3 4.1.6c-.8.3-1.5.7-2.2 1.4A6 6 0 00.6 4.1C.3 4.9.1 5.8.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c0 1.3.2 2.2.5 3 .3.8.7 1.5 1.4 2.2.7.7 1.4 1.1 2.2 1.4.8.3 1.7.5 3 .5 1.2.1 1.6.1 4.8.1s3.7 0 4.9-.1c1.3 0 2.2-.2 3-.5.8-.3 1.5-.7 2.2-1.4.7-.7 1.1-1.4 1.4-2.2.3-.8.5-1.7.5-3 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c0-1.3-.2-2.2-.5-3a6 6 0 00-1.4-2.2A6 6 0 0019.9.6c-.8-.3-1.7-.5-3-.5C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4 6.2 6.2 0 000-12.4zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.9 1.4 1.4 0 000-2.9z"/></svg></a><button onclick="if(navigator.share)navigator.share({title:'Primed3D',text:'3D print in any colour with CMY filament dithering',url:'https://primed3d.3drevolution.net'}).catch(()=>{});else{navigator.clipboard.writeText('https://primed3d.3drevolution.net');this.innerHTML='✓';setTimeout(()=>{this.innerHTML='<svg viewBox=&quot;0 0 24 24&quot; style=&quot;width:16px;height:16px;fill:currentColor&quot;><path d=&quot;M18 16.1a2.9 2.9 0 00-1.9.7l-7-4.1a3.2 3.2 0 000-1.4l7-4.1a2.9 2.9 0 001.9.7 3 3 0 10-3-3c0 .2 0 .5.1.7l-7 4.1a3 3 0 100 4.6l7 4.1a2.6 2.6 0 00-.1.7 3 3 0 103-3z&quot;/></svg>';},1500)}" title="Share"><svg viewBox="0 0 24 24"><path d="M18 16.1a2.9 2.9 0 00-1.9.7l-7-4.1a3.2 3.2 0 000-1.4l7-4.1a2.9 2.9 0 001.9.7 3 3 0 10-3-3c0 .2 0 .5.1.7l-7 4.1a3 3 0 100 4.6l7 4.1a2.6 2.6 0 00-.1.7 3 3 0 103-3z"/></svg></button></div></div></div>
-  <div class="sec"><div class="stl">Model</div><div id="ua" onclick="document.getElementById('fi').click()"><div style="font-size:24px;opacity:.6">📦</div><p>Drop STL or 3MF here or click to browse</p></div><input type="file" id="fi" accept=".stl,.3mf"></div>
+  <div class="sec"><div class="stl">Model</div><div id="ua" onclick="document.getElementById('fi').click()"><div style="font-size:24px;opacity:.6">📦</div><p>Drop STL, 3MF, or OBJ bundle here or click to browse</p></div><input type="file" id="fi" accept=".stl,.3mf,.obj,.mtl,.jpg,.jpeg,.png,.tif,.tiff" multiple></div>
   <div class="orient-sec" id="orientSec" style="display:none"><button class="orient-btn" id="orientBtn" onclick="if(S.tool==='orient'){S.tool='brush';this.classList.remove('a');document.querySelector('.tb[data-tool=brush]').classList.add('a');$('st').textContent='Tool: Brush';return;}document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));S.tool='orient';this.classList.add('a');$('scaleBtn').classList.remove('a');hideScaleUI();$('st').textContent='Tool: Orient'">⬇️ Orient</button><button class="orient-btn" id="scaleBtn" onclick="if(S.tool==='scale'){S.tool='brush';this.classList.remove('a');hideScaleUI();document.querySelector('.tb[data-tool=brush]').classList.add('a');$('st').textContent='Tool: Brush';return;}document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));S.tool='scale';this.classList.add('a');$('orientBtn').classList.remove('a');showScaleUI();$('st').textContent='Tool: Scale'">📐 Scale</button></div>
   <div id="scalePanel"><div class="stl">Dimensions (mm)</div><div class="dim-row"><label>X</label><input type="number" id="dimX" step="0.1" min="0.1" onchange="onDimChange('x',this.value)"><span>mm</span></div><div class="dim-row"><label>Y</label><input type="number" id="dimY" step="0.1" min="0.1" onchange="onDimChange('y',this.value)"><span>mm</span></div><div class="dim-row"><label>Z</label><input type="number" id="dimZ" step="0.1" min="0.1" onchange="onDimChange('z',this.value)"><span>mm</span></div><div class="scale-pct"><label>Scale</label><input type="range" id="scaleSlider" min="10" max="500" value="100" oninput="onScaleSlider(this.value)"><input type="number" class="v" id="scalePct" value="100" min="1" max="10000" style="width:52px;border:1px solid var(--bd);cursor:text" onchange="onScalePctType(this.value)">%</div></div>
   <div class="sec" id="bcs" style="display:none"><div class="stl">Base Colour</div><p class="ht">Default colour for unpainted surfaces.</p><div class="clr" style="margin-top:0"><div class="bsw" id="bsw" style="background:#c7c7c7" onclick="document.getElementById('bnp').click()"></div><input type="text" class="hf2" id="bhx" value="#c7c7c7" onchange="setBH(this.value)"><input type="color" id="bnp" value="#c7c7c7" style="width:0;height:0;opacity:0;position:absolute" oninput="setBH(this.value)"></div><button class="sb fw" style="margin-top:8px" onclick="resetBase()">Reset all to base</button></div>
-  <div class="sec" id="ts" style="display:none"><div class="stl">Paint Tools</div><div class="tg"><button class="tb a" data-tool="brush"><span class="ti">🖌️</span>Brush</button><button class="tb" data-tool="sphere-brush"><span class="ti">⚪</span>Sphere</button><button class="tb" data-tool="fill"><span class="ti">🪣</span>Fill</button><button class="tb" data-tool="eyedropper"><span class="ti">💧</span>Colour Picker</button><button class="tb" data-tool="gradient"><span class="ti">🌈</span>Gradient</button><button class="tb" data-tool="photo"><span class="ti">📷</span>Photo</button></div></div>
-  <div class="sec" id="bs" style="display:none"><div class="stl">Brush Settings</div><div id="br-wrap"><div class="cr"><label>Radius</label><span class="v" id="rv">5.0</span></div><input type="range" id="br" min="0.5" max="50" value="5" step="0.5" oninput="S.brushR=+this.value;$('rv').textContent=(+this.value).toFixed(1);if(S.mesh){syncCam();const sz=getBrushPxAt(O.t);bcu.style.width=bcu.style.height=Math.max(6,sz*2)+'px';bcu.style.display='block';bcu.style.left=lastMx+'px';bcu.style.top=lastMy+'px';}"></div><div id="fo" style="display:none;margin-top:10px"><div class="cr"><label>Fill Mode</label></div><div class="fmg"><button class="fmb a" onclick="S.fillMode='connected';this.parentNode.querySelectorAll('.fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');$('alw').style.display='none'">Connected</button><button class="fmb" onclick="S.fillMode='angle';this.parentNode.querySelectorAll('.fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');$('alw').style.display=''">Angle Limit</button></div><div id="alw" style="display:none;margin-top:8px"><div class="cr"><label>Max Angle</label><span class="v" id="fav">45°</span></div><input type="range" id="fa" min="1" max="180" value="45" oninput="$('fav').textContent=this.value+'°';clearFillHover()"></div></div></div>
+  <div class="sec" id="ts" style="display:none"><div class="stl" id="toolsTitle">Paint Tools</div><div class="tg" id="paintTools"><button class="tb a" data-tool="brush"><span class="ti">🖌️</span>Brush</button><button class="tb" data-tool="sphere-brush"><span class="ti">⚪</span>Sphere</button><button class="tb" data-tool="fill"><span class="ti">🪣</span>Fill</button><button class="tb" data-tool="eyedropper"><span class="ti">💧</span>Colour Picker</button><button class="tb" data-tool="gradient"><span class="ti">🌈</span>Gradient</button><button class="tb" data-tool="photo"><span class="ti">📷</span>Photo</button></div><div class="tg" id="exportTools" style="display:none"><button class="tb a" data-tool="recolor-brush"><span class="ti">🖌️</span>Recolour Brush</button><button class="tb" data-tool="recolor-sphere"><span class="ti">⚪</span>Recolour Sphere</button></div></div>
+  <div class="sec" id="bs" style="display:none"><div class="stl">Brush Settings</div><div id="br-wrap"><div class="cr"><label>Radius</label><span class="v" id="rv">5.0</span></div><input type="range" id="br" min="0.5" max="50" value="5" step="0.5" oninput="S.brushR=+this.value;$('rv').textContent=(+this.value).toFixed(1);if(S.mesh){syncCam();const sz=getBrushPxAt(O.t);bcu.style.width=bcu.style.height=Math.max(6,sz*2)+'px';bcu.style.display='block';bcu.style.left=lastMx+'px';bcu.style.top=lastMy+'px';}"></div><div id="fo" style="display:none;margin-top:10px"><div class="cr"><label>Fill Mode</label></div><div class="fmg"><button class="fmb a" onclick="S.fillMode='connected';this.parentNode.querySelectorAll('.fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');$('alw').style.display='none'">Connected</button><button class="fmb" onclick="S.fillMode='angle';this.parentNode.querySelectorAll('.fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');$('alw').style.display=''">Angle Limit</button></div><div id="alw" style="display:none;margin-top:8px"><div class="cr"><label>Max Angle</label><span class="v" id="fav">45°</span></div><input type="range" id="fa" min="1" max="180" value="45" oninput="$('fav').textContent=this.value+'°';clearFillHover()"></div></div><div id="recolorPanel" style="display:none;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px"><div class="stl" style="margin-bottom:8px">Recolour Brush</div><p class="ht" style="margin-bottom:8px">Brush over the export preview to change matching solid-colour regions into the current paint colour. Process first, then enable Export Preview.</p><div class="cr"><label>From colour</label></div><div class="clr" style="margin-top:0"><div class="bsw" id="recolorFromSw" style="background:#000000" onclick="$('recolorFromPick').click()"></div><input type="text" class="hf2" id="recolorFromHex" value="#000000" onchange="setRecolorFrom(this.value)"><input type="color" id="recolorFromPick" value="#000000" style="width:0;height:0;opacity:0;position:absolute" oninput="setRecolorFrom(this.value)"></div><div class="cr" style="margin-top:8px"><label>To colour</label><span class="v" id="recolorToHex">#FF0000</span></div><div class="cr" style="margin-top:8px"><label>Tolerance</label><span class="v" id="recolorTolV">8%</span></div><input type="range" id="recolorTol" min="0" max="40" value="8" step="1" oninput="S.recolorTol=+this.value/100;$('recolorTolV').textContent=this.value+'%'"><div class="fmg" style="margin-top:8px"><button class="fmb" onclick="useCurrentAsRecolorFrom()">Use Paint as From</button><button class="fmb" onclick="swapRecolorColors()">Swap</button></div><button class="sb fw" style="margin-top:8px" onclick="recolorAllMatching()">Recolour all matching faces</button></div></div>
   <div id="gradPanel" style="display:none;margin-top:10px;border-top:1px solid var(--bd);padding:10px 20px 0"><div class="cr"><label>Gradient Colours</label></div><div style="display:flex;gap:8px;align-items:center;margin:8px 0"><label style="font-size:11px;color:var(--txd)">From</label><div style="position:relative"><div class="bsw" id="gradA" style="background:#ff0000;flex:0 0 28px;height:28px" onclick="S.gradPick='A';this.parentNode.querySelector('input').click()"></div><input type="color" value="#ff0000" style="position:absolute;left:0;top:100%;width:0;height:0;opacity:0" oninput="S.gradA=this.value;$('gradA').style.background=this.value"></div><label style="font-size:11px;color:var(--txd)">To</label><div style="position:relative"><div class="bsw" id="gradB" style="background:#0000ff;flex:0 0 28px;height:28px" onclick="this.parentNode.querySelector('input').click()"></div><input type="color" value="#0000ff" style="position:absolute;left:0;top:100%;width:0;height:0;opacity:0" oninput="S.gradB=this.value;$('gradB').style.background=this.value"></div></div><div class="cr" style="margin:8px 0"><label>Steps</label><span class="v" id="gradStepsV">64</span></div><input type="range" id="gradSteps" min="2" max="256" value="64" oninput="$('gradStepsV').textContent=this.value"><div class="cr" style="margin:10px 0 6px"><label>Apply To</label></div><div class="fmg" id="gradModeGrp"><button class="fmb a" onclick="setGradMode('all')">Whole Model</button><button class="fmb" onclick="setGradMode('sel')">Selection</button></div><div id="gradSelPanel" style="display:none;margin-top:8px"><div class="cr" style="margin:6px 0"><label>1. Select faces</label></div><div class="fmg"><button class="fmb a" id="gSelBrush" onclick="S.gradSubTool='brush';document.querySelectorAll('#gradSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updGradSubTools()">🖌️ Brush</button><button class="fmb" id="gSelFill" onclick="S.gradSubTool='fill';document.querySelectorAll('#gradSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updGradSubTools()">🪣 Fill</button><button class="fmb" onclick="S.gradSubTool='points';document.querySelectorAll('#gradSelPanel .fmb').forEach(b=>b.classList.remove('a'));this.classList.add('a');updGradSubTools()">📍 Points</button><button class="fmb" onclick="clearGradSel()">✕ Clear</button></div><p class="ht" id="gradSelCount" style="margin:6px 0">0 faces selected</p><div class="cr" style="margin:6px 0"><label>2. Click start & end points</label></div><p class="ht" id="gradPtStatus" style="margin:4px 0">Click on model to set start point</p></div><div id="gradAxisPanel"><div class="cr" style="margin:6px 0"><label>Direction</label></div><div class="cr" style="margin:6px 0"><label style="font-size:11px">Rotation</label><span class="v" id="gradYawV">0°</span></div><input type="range" id="gradYaw" min="-180" max="180" value="0" step="1" oninput="S.gradYaw=+this.value;$('gradYawV').textContent=this.value+'°';updGradArrow()"><div class="cr" style="margin:6px 0"><label style="font-size:11px">Pitch</label><span class="v" id="gradPitchV">0°</span></div><input type="range" id="gradPitch" min="-90" max="90" value="0" step="1" oninput="S.gradPitch=+this.value;$('gradPitchV').textContent=this.value+'°';updGradArrow()"><button class="sb fw" style="margin-top:6px" onclick="S.gradYaw=0;S.gradPitch=0;$('gradYaw').value=0;$('gradPitch').value=0;$('gradYawV').textContent='0°';$('gradPitchV').textContent='0°';updGradArrow()">Reset Direction</button><div class="cr" style="margin:8px 0"><label>Centre</label><span class="v" id="gradCenterV">50%</span></div><input type="range" id="gradCenter" min="0" max="100" value="50" step="1" oninput="onGradCenterChange(this.value)"></div><button class="sb fw" style="margin-top:10px" onclick="applyGradient()">Apply Gradient</button></div>
   <div id="photoPanel" style="display:none;padding:14px 20px;border-bottom:1px solid var(--bd)">
     <div class="stl" style="margin-bottom:8px">Photo Projection</div>
@@ -277,7 +277,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     </div>
   </div>
   <div class="sec" id="cs" style="display:none"><div class="stl">Paint Colour</div><div id="cpc-wrap"><canvas id="cpc" width="244" height="140"></canvas><div id="cpMarker" style="left:244px;top:0px"></div></div><div class="cr" style="margin-top:8px"><label>Hue</label></div><div id="hs-wrap"><input type="range" id="hs" min="0" max="360" value="0" oninput="uHue(+this.value)"><div id="hsMarker" style="left:0%"></div></div><div class="clr"><div id="cc" style="background:#ff0000"></div><input type="text" class="hf2" id="hi" value="#ff0000" onchange="sCH(this.value)"></div></div>
-  <div class="sec" id="ps" style="display:none"><div class="stl">Process & Export</div><div class="cr"><label>Filament Mode</label></div><select id="fmode" class="fsel"><option value="cmy" selected>CMY — 3 filaments</option><option value="wcmy">WCMY — 4 filaments</option><option value="kcmy">KCMY — 4 filaments</option><option value="wkcmy">WKCMY — 5 filaments</option><option value="2c">2 Filaments / Dual Nozzle</option><option value="solid">Solid Colours — No Dithering ✦</option></select><p class="ht" id="fmDesc">Standard subtractive colour mixing. Best for vibrant colours with a white base filament in the printer.</p><div id="twoColorPanel" style="display:none;margin:8px 0"><div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:var(--txd)">Filament A</label><div class="bsw" id="tc2A" style="background:#ffffff;flex:0 0 28px;height:28px" onclick="$('tc2ANP').click()"></div><input type="text" class="hf2" id="tc2AH" value="#FFFFFF" style="flex:1" onchange="S.fil2A=this.value;$('tc2A').style.background=this.value"><input type="color" id="tc2ANP" value="#ffffff" style="width:0;height:0;opacity:0;position:absolute" oninput="S.fil2A=this.value;$('tc2A').style.background=this.value;$('tc2AH').value=this.value"></div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><label style="font-size:11px;color:var(--txd)">Filament B</label><div class="bsw" id="tc2B" style="background:#000000;flex:0 0 28px;height:28px" onclick="$('tc2BNP').click()"></div><input type="text" class="hf2" id="tc2BH" value="#000000" style="flex:1" onchange="S.fil2B=this.value;$('tc2B').style.background=this.value"><input type="color" id="tc2BNP" value="#000000" style="width:0;height:0;opacity:0;position:absolute" oninput="S.fil2B=this.value;$('tc2B').style.background=this.value;$('tc2BH').value=this.value"></div></div><div id="solidColPanel" style="display:none;margin:8px 0"><div class="cr" style="margin-bottom:4px"><label style="font-size:12px;font-weight:500;color:var(--txd)">Palette Size</label></div><select id="solidColCount" class="fsel" style="margin-bottom:4px"><option value="4">4 colours</option><option value="8">8 colours</option><option value="12">12 colours</option><option value="16">16 colours</option><option value="20">20 colours</option><option value="24">24 colours</option><option value="0" selected>Full Spectrum</option></select><p class="ht" style="margin:0">Reduces colours to this palette using clustering. Set to match the number of filament slots in your slicer. Full Spectrum uses all painted colours.</p></div><button class="db" style="margin-top:8px;justify-content:center;gap:6px" onclick="openFilColModal()">🎨 Filament Colours</button><button class="pb pr" style="margin-top:8px" onclick="processModel()">⚙️ Process</button><div id="linf" class="li" style="display:none"></div></div>  <button class="help-btn" onclick="$('helpModal').classList.add('vis')">💡 Help & Tips</button>
+  <div class="sec" id="ps" style="display:none"><div class="stl">Process & Export</div><div class="cr"><label>Filament Mode</label></div><select id="fmode" class="fsel"><option value="cmy" selected>CMY — 3 filaments</option><option value="wcmy">WCMY — 4 filaments</option><option value="kcmy">KCMY — 4 filaments</option><option value="wkcmy">WKCMY — 5 filaments</option><option value="2c">2 Filaments / Dual Nozzle</option><option value="solid">Solid Colours — No Dithering ✦</option></select><p class="ht" id="fmDesc">Standard subtractive colour mixing. Best for vibrant colours with a white base filament in the printer.</p><div id="twoColorPanel" style="display:none;margin:8px 0"><div style="display:flex;gap:8px;align-items:center"><label style="font-size:11px;color:var(--txd)">Filament A</label><div class="bsw" id="tc2A" style="background:#ffffff;flex:0 0 28px;height:28px" onclick="$('tc2ANP').click()"></div><input type="text" class="hf2" id="tc2AH" value="#FFFFFF" style="flex:1" onchange="S.fil2A=this.value;$('tc2A').style.background=this.value"><input type="color" id="tc2ANP" value="#ffffff" style="width:0;height:0;opacity:0;position:absolute" oninput="S.fil2A=this.value;$('tc2A').style.background=this.value;$('tc2AH').value=this.value"></div><div style="display:flex;gap:8px;align-items:center;margin-top:6px"><label style="font-size:11px;color:var(--txd)">Filament B</label><div class="bsw" id="tc2B" style="background:#000000;flex:0 0 28px;height:28px" onclick="$('tc2BNP').click()"></div><input type="text" class="hf2" id="tc2BH" value="#000000" style="flex:1" onchange="S.fil2B=this.value;$('tc2B').style.background=this.value"><input type="color" id="tc2BNP" value="#000000" style="width:0;height:0;opacity:0;position:absolute" oninput="S.fil2B=this.value;$('tc2B').style.background=this.value;$('tc2BH').value=this.value"></div></div><div id="solidColPanel" style="display:none;margin:8px 0"><div class="cr" style="margin-bottom:4px"><label style="font-size:12px;font-weight:500;color:var(--txd)">Palette Size</label></div><select id="solidColCount" class="fsel" style="margin-bottom:4px"><option value="4">4 colours</option><option value="8">8 colours</option><option value="12">12 colours</option><option value="16">16 colours</option><option value="20">20 colours</option><option value="24">24 colours</option><option value="0" selected>Full Spectrum</option></select><div class="cr" style="margin:8px 0 4px"><label style="font-size:12px;font-weight:500;color:var(--txd)">Palette Source</label></div><div class="fmg"><button class="fmb a" id="solidPalAuto" onclick="setSolidPaletteMode('auto')">Auto</button><button class="fmb" id="solidPalCustom" onclick="setSolidPaletteMode('custom')">Custom</button></div><div id="customPalettePanel" style="display:none;margin-top:8px"><p class="ht" style="margin:0 0 6px">Choose exact solid filament colours. Export maps every face to the nearest colour in this list.</p><div id="paletteColors"></div><div class="palette-actions"><button class="sb fw" onclick="addPaletteColor()">+ Add</button><button class="sb fw" onclick="autoPaletteToCustom()">Auto → Edit</button></div></div><p class="ht" style="margin:8px 0 0">Auto uses diversity-aware clustering. Custom uses your selected filament palette.</p><div class="cr" style="margin:10px 0 4px"><label style="font-size:12px;font-weight:500;color:var(--txd)">Geometry Mapping</label></div><div class="fmg"><button class="fmb a" id="solidGeomFaces" onclick="setSolidGeometryMode('faces')">Existing Faces</button><button class="fmb" id="solidGeomTexture" onclick="setSolidGeometryMode('texture')">Texture Boundaries</button></div><div id="solidTexturePanel" style="display:none;margin-top:8px"><p class="ht" style="margin:0 0 6px">For textured OBJ files: recolours the texture to the palette, then subdivides triangles so exported solid-colour boundaries follow texture colour boundaries.</p><div class="cr"><label>Boundary Quality</label><span class="v" id="solidSubdivV">Medium</span></div><input type="range" id="solidSubdivDepth" min="1" max="5" value="3" step="1" oninput="setSolidSubdivDepth(this.value)"></div></div><button class="db" style="margin-top:8px;justify-content:center;gap:6px" onclick="openFilColModal()">🎨 Filament Colours</button><button class="pb pr" style="margin-top:8px" onclick="processModel()">⚙️ Process</button><div id="linf" class="li" style="display:none"></div></div>  <button class="help-btn" onclick="$('helpModal').classList.add('vis')">💡 Help & Tips</button>
   <a class="help-btn coffee-btn" href="https://buymeacoffee.com/3drevolution" target="_blank" style="text-decoration:none;border-color:#ff8000;margin-top:0;position:static">☕ Buy me a coffee</a>
 </div>
 <div id="helpModal" onclick="if(event.target===this)this.classList.remove('vis')"><div class="hm-box">
@@ -360,7 +360,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <strong>2 Filaments</strong> — dual nozzle, dithers between two chosen colours.</p>
         <h3>Solid Colours — No Dithering ✦</h3>
         <p>Exports each painted face as a solid flat colour. <strong>This is NOT the dithered colour-blending export</strong> — it's for use with normal multi-colour FDM printing. Use this if you want to paint your model and print it on a multi-filament printer (like a Bambu AMS) using standard solid filament colours, without any CMY dithering. No special slicer settings required.</p>
-        <p>The <strong>Palette Size</strong> option reduces all painted colours to a fixed number using colour clustering (k-means). Set this to match the number of filament slots in your slicer — e.g. choose 8 colours for an 8-slot AMS. Colours are automatically merged toward their nearest neighbours so the most visually distinct colours are preserved.</p>
+        <p>The <strong>Palette Size</strong> option reduces all painted colours to a fixed number using diversity-aware perceptual clustering. It compresses dominance from large same-colour areas, so a model with many black shades and small blue accents will keep black and blue instead of filling the palette with several blacks.</p>
         <p><strong>Re-importing into Primed3D:</strong> The Solid Colours export also works as a project save format. Export as Solid (Full Spectrum), then re-import the resulting .3mf into Primed3D to continue editing — all your painted colours are preserved on the faces and can be further refined with the brush, gradient, or photo tools before re-exporting as a dithered CMY version.</p>
         <h3>Filament Colours</h3>
         <p>Use the <strong>🎨 Filament Colours</strong> button to set the actual hex codes of your filaments. This only affects how the slicer preview displays — the dithering ratios themselves are always computed using ideal CMY theory regardless of your specific filament brand.</p>
@@ -411,7 +411,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <canvas id="tc"></canvas>
   <div id="photoOverlay"><img id="photoOverlayImg" src="" alt=""><div class="ph" id="photoHandle"></div></div>
   <div class="vp-undo" id="vpUndo" style="display:none"><button class="sb" id="ub" disabled onclick="undo()">↩ Undo</button><button class="sb" id="rb" disabled onclick="redo()">↪ Redo</button></div>
-  <div class="vc"><button class="vb" onclick="resetCamera()">Reset</button><button class="vb" id="wfb" onclick="togWF()">Wireframe</button><button class="vb a" id="grb" onclick="togGrid()">Grid</button><button class="vb" id="vnb" onclick="togViewNav()">Views ▾</button></div>
+  <div class="vc"><button class="vb" onclick="resetCamera()">Reset</button><button class="vb" id="epb" onclick="toggleExportPreview()" title="Show processed file as it will export" disabled>Export Preview</button><button class="vb" id="wfb" onclick="togWF()">Wireframe</button><button class="vb a" id="grb" onclick="togGrid()">Grid</button><button class="vb" id="vnb" onclick="togViewNav()">Views ▾</button></div>
   <div id="dl-overlay" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"><button onclick="event.stopPropagation();dl3MF()">📦 Download .3mf</button></div>
   <div id="reprocess-overlay" style="display:none" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"><button onclick="event.stopPropagation();processModel()">🔄 Re-Process CMY</button></div>
   <div class="vnav" id="vnav"><div class="vnav-title">Camera Views</div><div class="vnav-grid"><button class="vnav-btn" onclick="setView('front')">Front<kbd>1</kbd></button><button class="vnav-btn" onclick="setView('back')">Back<kbd>2</kbd></button><button class="vnav-btn" onclick="setView('left')">Left<kbd>3</kbd></button><button class="vnav-btn" onclick="setView('right')">Right<kbd>4</kbd></button><button class="vnav-btn" onclick="setView('top')">Top<kbd>5</kbd></button><button class="vnav-btn" onclick="setView('bottom')">Bottom<kbd>6</kbd></button></div></div>
@@ -434,7 +434,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <button class="fcm-apply" onclick="applyFilCol()">Apply</button>
   </div>
 </div></div>
-<div id="do">Drop STL or 3MF file here</div>
+<div id="do">Drop STL, OBJ, MTL, texture, or 3MF file here</div>
 <div id="toast" class="toast"><span class="toast-icon" id="toastIcon">⚠️</span><span id="toastMsg"></span><button class="toast-close" onclick="hideToast()">✕</button></div>
 <div id="po"><div class="print-anim" id="loadAnim" style="display:none"><div class="print-cube"><div class="face fr"></div><div class="face bk"></div><div class="face lt"></div><div class="face rt"></div><div class="face tp"></div><div class="face bt"></div><div class="txt3d"><span class="t1">Primed</span><span class="t2">3D</span></div></div></div><div id="pt">Processing...</div><div class="pbar" id="pbarWrap"><div class="pfill" id="pf"></div></div></div>
 <div id="bc"></div>
@@ -458,7 +458,7 @@ function toggleTheme(){
   $('themeLabel').textContent=light?'Lite Mode':'Dark Mode';
 }
 const S={fn:'',tool:'brush',brushR:5,fillMode:'connected',hue:0,sat:1,val:1,col:new THREE.Color(1,0,0),base:new THREE.Color(.78,.78,.78),painting:false,mesh:null,geo:null,fc:null,painted:null,adj:null,fn2:null,us:[],rs:[],wf:false,wfm:null,mdl3mf:null,msz:1,processed:false,tex:null,uvs:null,texCtx:null,texW:0,texH:0,gradA:'#ff0000',gradB:'#0000ff',gradAxis:'z',gradPick:'A',fil2A:'#ffffff',fil2B:'#000000',gradMode:'all',gradSubTool:'brush',gradSel:new Set(),gradPtA:null,gradPtB:null,gradYaw:0,gradPitch:0,gradCenter:0.5,
-filHex:{c:'#00FFFF',m:'#FF00FF',y:'#FFFF00',k:'#000000',w:'#FFFFFF'},photoProjection:null};
+filHex:{c:'#00FFFF',m:'#FF00FF',y:'#FFFF00',k:'#000000',w:'#FFFFFF'},solidPaletteMode:'auto',solidGeometryMode:'faces',solidSubdivDepth:3,customPalette:['#000000','#FFFFFF','#0066FF','#FF0000'],recolorFrom:'#000000',recolorTol:0.08,exportPreview:false,exportPreviewMesh:null,exportPreviewWfm:null,exportPreviewAdj:null,exportPreviewFn:null,exportSolid:null,photoProjection:null,objSource:null};
 let pend=new Map();
 let selPend=new Set(); // tracks faces added to grad/photo sel during current brush stroke
 let fillHoverFi=-1; // last face index the fill-angle preview was computed for
@@ -541,6 +541,7 @@ let lastMx=0,lastMy=0;
 vp.addEventListener('mousemove',e=>{lastMx=e.clientX;lastMy=e.clientY;
 const wantCursor=S.mesh&&!mouseOverUI&&(
   S.tool==='brush'||S.tool==='sphere-brush'||
+  ((S.tool==='recolor-brush'||S.tool==='recolor-sphere')&&S.exportPreview&&S.exportPreviewMesh)||
   (S.tool==='gradient'&&S.gradMode==='sel'&&S.gradSubTool==='brush')||
   (S.tool==='photo'&&S.photoMode==='sel'&&S.photoSubTool==='brush'));
 if(wantCursor){
@@ -934,9 +935,9 @@ async function load3MF(buf,name){
   await loadModelData(finalPos,nf,name.replace(/\.3mf$/i,''),hasColors&&cc>0?finalFC:null,null,null);
   }catch(e){alert('Error loading 3MF: '+e.message);console.error(e);}
 }
-async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas){
+async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas,_objSource){
   S.fn=name;if(S.mesh){sc.remove(S.mesh);if(S.wfm)sc.remove(S.wfm);}
-  S.tex=null;S.uvs=null;S.texCtx=null;S.texW=0;S.texH=0;S.uvScale=1;
+  S.tex=null;S.uvs=null;S.texCtx=null;S.texW=0;S.texH=0;S.uvScale=1;S.objSource=_objSource||null;
 
   const geo=new THREE.BufferGeometry();
   geo.setAttribute('position',new THREE.BufferAttribute(posArr,3));geo.computeVertexNormals();
@@ -1013,7 +1014,7 @@ async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas){
   resetCamera();['bcs','ts','bs','cs','ps','orientSec'].forEach(id=>$(id).style.display='');
   $('hh').style.display='';$('vpUndo').style.display='';$('ua').classList.add('hf');$('ua').querySelector('p').textContent=name;
   $('sf').textContent=nf.toLocaleString()+' faces'+(faceColors?' (colored)':'');
-  $('dl-overlay').style.display='none';$('reprocess-overlay').style.display='none';$('linf').style.display='none';S.processed=false;
+  $('dl-overlay').style.display='none';$('reprocess-overlay').style.display='none';$('linf').style.display='none';S.processed=false;clearExportPreview();
   // Reset photo tool state
   S.photoImg=null;S.photoCtx=null;S.photoSel=new Set();S.photoFaces=new Set();hidePhotoOverlay();
   $('photoControls').style.display='none';$('photoUploadLabel').textContent='Click to load a JPG or PNG';$('photoFileIn').value='';
@@ -1025,10 +1026,10 @@ function buildAdj(pos,nf){
   // vertices that differ by ~0.0001mm, causing the two triangles of a flat face to appear
   // non-adjacent and breaking the angle-limit fill tool on vertical faces.
   const pr=1e3,vk=(x,y,z)=>`${Math.round(x*pr)},${Math.round(y*pr)},${Math.round(z*pr)}`;const e2f=new Map();for(let fi=0;fi<nf;fi++)for(let e=0;e<3;e++){const a=fi*9+e*3,b=fi*9+((e+1)%3)*3,ka=vk(pos[a],pos[a+1],pos[a+2]),kb=vk(pos[b],pos[b+1],pos[b+2]),ek=ka<kb?ka+'|'+kb:kb+'|'+ka;if(!e2f.has(ek))e2f.set(ek,[]);e2f.get(ek).push(fi);}S.adj=new Map();for(let fi=0;fi<nf;fi++)S.adj.set(fi,new Set());for(const fs of e2f.values())for(let a=0;a<fs.length;a++)for(let b=a+1;b<fs.length;b++){S.adj.get(fs[a]).add(fs[b]);S.adj.get(fs[b]).add(fs[a]);}}
-$('fi').addEventListener('change',e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=ev=>loadFile(ev.target.result,f.name);r.readAsArrayBuffer(f);}});
+$('fi').addEventListener('change',e=>{loadSelectedFiles(e.target.files);});
 document.addEventListener('dragover',e=>{e.preventDefault();$('do').style.display='flex';});
 document.addEventListener('dragleave',e=>{if(!e.relatedTarget)$('do').style.display='none';});
-document.addEventListener('drop',e=>{e.preventDefault();$('do').style.display='none';const f=e.dataTransfer.files[0];if(f&&/\.(stl|3mf)$/i.test(f.name)){const r=new FileReader();r.onload=ev=>loadFile(ev.target.result,f.name);r.readAsArrayBuffer(f);}});
+document.addEventListener('drop',e=>{e.preventDefault();$('do').style.display='none';loadSelectedFiles(e.dataTransfer.files);});
 function showLoading(msg){
   $('loadAnim').style.display='block';$('pbarWrap').style.display='none';
   $('pt').textContent=msg||'Loading...';$('po').classList.add('vis');
@@ -1037,7 +1038,133 @@ function setLoadMsg(msg){$('pt').textContent=msg;}
 function hideLoading(){
   setTimeout(()=>{$('loadAnim').style.display='none';$('pbarWrap').style.display='';$('po').classList.remove('vis');},200);
 }
+async function readFileBundle(fileList){
+  const files=[...fileList].filter(f=>/\.(stl|3mf|obj|mtl|jpe?g|png|tiff?)$/i.test(f.name));
+  const out={};
+  await Promise.all(files.map(f=>new Promise((res,rej)=>{
+    const r=new FileReader();r.onerror=()=>rej(r.error);r.onload=()=>{out[f.name]=r.result;res();};
+    if(/\.(obj|mtl)$/i.test(f.name))r.readAsText(f);else r.readAsArrayBuffer(f);
+  })));
+  return out;
+}
+async function loadSelectedFiles(fileList){
+  const files=[...fileList];if(!files.length)return;
+  const obj=files.find(f=>/\.obj$/i.test(f.name));
+  const single=files.length===1?files[0]:null;
+  try{
+    if(obj){showLoading('Loading OBJ bundle...');const bundle=await readFileBundle(files);await loadOBJBundle(bundle,obj.name);return;}
+    if(single&&/\.(stl|3mf)$/i.test(single.name)){
+      const r=new FileReader();r.onload=ev=>loadFile(ev.target.result,single.name);r.readAsArrayBuffer(single);return;
+    }
+    alert('Please select/drop an STL, 3MF, or an OBJ plus its .MTL and texture images.');
+  }catch(e){hideLoading();alert('Error loading files: '+e.message);console.error(e);}
+}
 function loadFile(buf,name){showLoading('Loading '+name+'...');setTimeout(()=>{if(/\.3mf$/i.test(name))load3MF(buf,name).catch(e=>{hideLoading();alert('Error loading 3MF: '+e.message);console.error(e);});else{try{const d=parseSTL(buf);loadModelData(d.p,d.n,name.replace(/\.stl$/i,''),d.colors,null,null).catch(e=>{hideLoading();alert('Error loading STL: '+e.message);console.error(e);});}catch(e){hideLoading();alert('Error parsing STL: '+e.message);}}},50);}
+
+// === OBJ + MTL + texture importer ===========================================
+function normName(n){return (n||'').split(/[\\/]/).pop().toLowerCase();}
+function parseMTL(txt){
+  const mats={};let cur=null;
+  for(const raw of txt.split(/\r?\n/)){
+    const line=raw.trim();if(!line||line[0]==='#')continue;
+    const sp=line.split(/\s+/),cmd=sp.shift().toLowerCase(),rest=sp.join(' ');
+    if(cmd==='newmtl'){cur={name:rest,kd:[0.8,0.8,0.8],mapKd:null};mats[rest]=cur;}
+    else if(cur&&cmd==='kd'&&sp.length>=3)cur.kd=[+sp[0],+sp[1],+sp[2]].map(v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0.8);
+    else if(cur&&cmd==='map_kd'){
+      const toks=rest.match(/(?:"[^"]+"|'[^']+'|\S+)/g)||[];
+      cur.mapKd=(toks[toks.length-1]||'').replace(/^['"]|['"]$/g,'');
+    }
+  }
+  return mats;
+}
+function parseOBJ(txt){
+  const v=[],vt=[],tris=[];let mat='';const mtllibs=[];
+  const idx=(i,len)=>{const n=parseInt(i,10);return n>0?n-1:len+n;};
+  for(const raw of txt.split(/\r?\n/)){
+    const line=raw.trim();if(!line||line[0]==='#')continue;
+    const sp=line.split(/\s+/),cmd=sp.shift().toLowerCase();
+    if(cmd==='v'&&sp.length>=3)v.push([+sp[0],+sp[1],+sp[2]]);
+    else if(cmd==='vt'&&sp.length>=2)vt.push([+sp[0],+sp[1]]);
+    else if(cmd==='usemtl')mat=sp.join(' ');
+    else if(cmd==='mtllib')mtllibs.push(sp.join(' '));
+    else if(cmd==='f'&&sp.length>=3){
+      const verts=sp.map(tok=>{const p=tok.split('/');return{vi:idx(p[0],v.length),ti:p[1]?idx(p[1],vt.length):-1};});
+      for(let i=1;i<verts.length-1;i++)tris.push([verts[0],verts[i],verts[i+1],mat]);
+    }
+  }
+  return{v,vt,tris,mtllibs};
+}
+function loadBitmapFromBuffer(buf,mime){
+  const blob=new Blob([buf],{type:mime||'image/*'});
+  if(window.createImageBitmap)return createImageBitmap(blob).then(b=>b);
+  return new Promise((res,rej)=>{const url=URL.createObjectURL(blob),img=new Image();img.onload=()=>{URL.revokeObjectURL(url);res(img);};img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('Browser could not decode image'));};img.src=url;});
+}
+async function loadTextureCanvas(buf,name){
+  const ext=(name.match(/\.([^.]+)$/)||[])[1]?.toLowerCase();
+  const mime=ext==='jpg'||ext==='jpeg'?'image/jpeg':ext==='png'?'image/png':ext==='tif'||ext==='tiff'?'image/tiff':'image/*';
+  const bmp=await loadBitmapFromBuffer(buf,mime);
+  const c=document.createElement('canvas');c.width=bmp.width;c.height=bmp.height;
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(bmp,0,0);
+  return{canvas:c,ctx:x,w:c.width,h:c.height};
+}
+function sampleTex(tex,u,v){
+  if(!tex)return null;
+  u=((u%1)+1)%1;v=((v%1)+1)%1;
+  const x=Math.max(0,Math.min(tex.w-1,Math.floor(u*tex.w)));
+  const y=Math.max(0,Math.min(tex.h-1,Math.floor((1-v)*tex.h)));
+  const d=tex.ctx.getImageData(x,y,1,1).data;
+  return[d[0]/255,d[1]/255,d[2]/255,d[3]/255];
+}
+async function loadOBJBundle(bundle,objName){
+  try{
+    setLoadMsg('Parsing OBJ...');await sl(0);
+    const obj=parseOBJ(bundle[objName]);
+    if(!obj.tris.length)throw new Error('No faces found in OBJ.');
+
+    setLoadMsg('Parsing materials...');await sl(0);
+    let mats={};
+    for(const mtlRef of obj.mtllibs){
+      const key=Object.keys(bundle).find(k=>normName(k)===normName(mtlRef));
+      if(key)Object.assign(mats,parseMTL(bundle[key]));
+    }
+
+    const texCache={};
+    for(const m of Object.values(mats))if(m.mapKd){
+      const key=Object.keys(bundle).find(k=>normName(k)===normName(m.mapKd));
+      if(key){
+        try{setLoadMsg('Loading texture '+key+'...');await sl(0);texCache[m.mapKd]=await loadTextureCanvas(bundle[key],key);}
+        catch(e){console.warn('Texture skipped:',key,e);}
+      }
+    }
+
+    setLoadMsg('Building OBJ mesh...');await sl(0);
+    const pos=new Float32Array(obj.tris.length*9),fc=new Float32Array(obj.tris.length*3);
+    const src={kind:'obj-texture',tris:[],hasTexture:false};
+    for(let fi=0;fi<obj.tris.length;fi++){
+      const tri=obj.tris[fi],mat=mats[tri[3]]||null;
+      const srcTri={p:[],uv:[],tex:null,flatColor:null};
+      for(let j=0;j<3;j++){
+        const p=obj.v[tri[j].vi]||[0,0,0];
+        pos[fi*9+j*3]=p[0];pos[fi*9+j*3+1]=p[1];pos[fi*9+j*3+2]=p[2];
+        srcTri.p.push([p[0],p[1],p[2]]);
+        const uv=obj.vt[tri[j].ti];srcTri.uv.push(uv?[uv[0],uv[1]]:null);
+      }
+      let col=mat?mat.kd:[S.base.r,S.base.g,S.base.b];
+      const tex=mat&&mat.mapKd?texCache[mat.mapKd]:null;
+      if(tex){
+        src.hasTexture=true;srcTri.tex=tex;
+        let r=0,g=0,b=0,n=0;
+        for(let j=0;j<3;j++){const uv=srcTri.uv[j];if(!uv)continue;const smp=sampleTex(tex,uv[0],uv[1]);if(smp&&smp[3]>0.02){r+=smp[0];g+=smp[1];b+=smp[2];n++;}}
+        if(n)col=[r/n,g/n,b/n];
+      }
+      srcTri.flatColor=[col[0],col[1],col[2]];
+      src.tris.push(srcTri);
+      fc[fi*3]=col[0];fc[fi*3+1]=col[1];fc[fi*3+2]=col[2];
+    }
+    await loadModelData(pos,obj.tris.length,objName.replace(/\.obj$/i,''),fc,null,null,src.hasTexture?src:null);
+  }catch(e){hideLoading();alert('Error loading OBJ: '+e.message);console.error(e);}
+}
+
 function setBH(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return;S.base.set(hex);$('bsw').style.background=hex;$('bhx').value=hex;$('bnp').value=hex;applyB();}
 function applyB(){if(!S.geo)return;const nf=S.fc.length/3,r=S.base.r,g=S.base.g,b=S.base.b;for(let fi=0;fi<nf;fi++)if(!S.painted.has(fi)){S.fc[fi*3]=r;S.fc[fi*3+1]=g;S.fc[fi*3+2]=b;}rebuildTexCanvas();}
 function resetBase(){if(!S.geo)return;const nf=S.fc.length/3;
@@ -1647,11 +1774,33 @@ function getBrushPxApprox(ev){
   const my=-((ev.clientY-rect.top)/rect.height)*2+1;
   syncCam();
   const r2=new THREE.Raycaster();r2.setFromCamera(new THREE.Vector2(mx,my),cam);
-  const h=S.mesh?r2.intersectObject(S.mesh):[];
+  const target=(S.exportPreview&&S.exportPreviewMesh)?S.exportPreviewMesh:S.mesh;
+  const h=target?r2.intersectObject(target):[];
   if(h.length) return getBrushPxAt(h[0].point);
   return getBrushPxAt(O.t);
 }
-function paint(ev){if(!S.mesh)return;const rect=vp.getBoundingClientRect();mo.x=((ev.clientX-rect.left)/rect.width)*2-1;mo.y=-((ev.clientY-rect.top)/rect.height)*2+1;rc.setFromCamera(mo,cam);const hits=rc.intersectObject(S.mesh);if(!hits.length)return;const fi=gfi(hits[0]);if(fi<0||fi>=S.fc.length/3)return;
+function paint(ev){if(!S.mesh)return;const rect=vp.getBoundingClientRect();mo.x=((ev.clientX-rect.left)/rect.width)*2-1;mo.y=-((ev.clientY-rect.top)/rect.height)*2+1;rc.setFromCamera(mo,cam);
+const isPreviewRecolor=S.exportPreview&&(S.tool==='recolor-brush'||S.tool==='recolor-sphere');
+const target=isPreviewRecolor?S.exportPreviewMesh:S.mesh;
+const hits=target?rc.intersectObject(target):[];if(!hits.length)return;const fi=gfi(hits[0]);
+
+// Export Preview tools operate only on the processed/export mesh.
+if(isPreviewRecolor){
+  if(!S.exportPreviewMesh||!S.exportSolid){showToast('Process a solid-colour export first.','👁️');S.painting=false;return;}
+  if(fi<0||fi>=S.exportSolid.triData.length)return;
+  if(S.tool==='recolor-brush')bRecolorPreview(hits[0].point,fi);
+  else bRecolorPreviewSphere(hits[0].point);
+  return;
+}
+
+// In Export Preview mode, do not allow standard paint tools to modify the base model.
+if(S.exportPreview){
+  S.painting=false;
+  showToast('Switch off Export Preview to use the normal paint tools, or use Recolour Brush/Sphere here.','👁️');
+  return;
+}
+
+if(fi<0||fi>=S.fc.length/3)return;
 if(S.tool==='eyedropper'){S.col.setRGB(S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]);updCD();const hsv=r2h(S.col.r*255,S.col.g*255,S.col.b*255);S.hue=hsv[0]*360;S.sat=hsv[1];S.val=hsv[2];$('hs').value=S.hue;drawPk();S.painting=false;return;}
 if(S.tool==='orient'){orientToFace(fi);S.painting=false;return;}
 if(S.tool==='gradient'){
@@ -1705,8 +1854,23 @@ function bSph(pt){
   }
   if(S.tex)S.tex.needsUpdate=true; // was missing — sphere brush appeared to do nothing
 }
+function bRecolor(pt,cfi){
+  const pa=S.geo.getAttribute('position').array,r=S.brushR,vis=new Set([cfi]),q=[cfi];mfRecolor(cfi);
+  const snx=S.fn2[cfi*3],sny=S.fn2[cfi*3+1],snz=S.fn2[cfi*3+2];
+  while(q.length){
+    const fi=q.shift(),nb=S.adj.get(fi);if(!nb)continue;
+    for(const n of nb){
+      if(vis.has(n))continue;vis.add(n);
+      if(S.fn2[n*3]*snx+S.fn2[n*3+1]*sny+S.fn2[n*3+2]*snz<0)continue;
+      const i9=n*9;
+      const cx=(pa[i9]+pa[i9+3]+pa[i9+6])/3,cy=(pa[i9+1]+pa[i9+4]+pa[i9+7])/3,cz=(pa[i9+2]+pa[i9+5]+pa[i9+8])/3;
+      if(Math.sqrt((cx-pt.x)**2+(cy-pt.y)**2+(cz-pt.z)**2)<=r){mfRecolor(n);q.push(n);}
+    }
+  }
+  if(S.tex)S.tex.needsUpdate=true;
+}
 function fillF(sfi){if(S.fillMode==='connected'){const sr=S.fc[sfi*3],sg=S.fc[sfi*3+1],sb=S.fc[sfi*3+2],vis=new Set([sfi]),q=[sfi];while(q.length){const fi=q.shift();if(Math.abs(S.fc[fi*3]-sr)<.01&&Math.abs(S.fc[fi*3+1]-sg)<.01&&Math.abs(S.fc[fi*3+2]-sb)<.01){mf(fi);const nb=S.adj.get(fi);if(nb)for(const n of nb)if(!vis.has(n)){vis.add(n);q.push(n);}}}}else{for(const fi of computeAngleFill(sfi))mf(fi);}}
-function commitU(){if(!pend.size)return;const e={ch:new Map()};for(const[fi,info]of pend)e.ch.set(fi,{oc:info.oc,nc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:info.wp,ip:S.painted.has(fi)});S.us.push(e);if(S.us.length>40)S.us.shift();S.rs=[];pend.clear();updUB();if(S.processed){S.processed=false;$('dl-overlay').style.display='none';$('reprocess-overlay').style.display='block';}}
+function commitU(){if(!pend.size)return;const e={ch:new Map()};for(const[fi,info]of pend)e.ch.set(fi,{oc:info.oc,nc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:info.wp,ip:S.painted.has(fi)});S.us.push(e);if(S.us.length>40)S.us.shift();S.rs=[];pend.clear();updUB();if(S.processed){S.processed=false;$('dl-overlay').style.display='none';$('reprocess-overlay').style.display='block';clearExportPreview();}}
 function applyUR(e,rev){const br=S.base.r,bg=S.base.g,bb=S.base.b;for(const[fi,info]of e.ch){const c=rev?info.oc:info.nc,p=rev?info.wp:info.ip;if(p){S.fc[fi*3]=c[0];S.fc[fi*3+1]=c[1];S.fc[fi*3+2]=c[2];S.painted.add(fi);}else{S.painted.delete(fi);S.fc[fi*3]=br;S.fc[fi*3+1]=bg;S.fc[fi*3+2]=bb;}}rebuildTexCanvas();}
 function undo(){
   if(!S.us.length)return;
@@ -1753,9 +1917,61 @@ function redo(){
 }
 function updUB(){$('ub').disabled=!S.us.length;$('rb').disabled=!S.rs.length;}
 document.addEventListener('keydown',e=>{const mod=e.metaKey||e.ctrlKey;if(mod&&e.key==='z'){e.preventDefault();undo();}if(mod&&e.key==='y'){e.preventDefault();redo();}if(mod&&e.key>='1'&&e.key<='6'){e.preventDefault();setView(['front','back','left','right','top','bottom'][+e.key-1]);}});
-document.querySelectorAll('.tb').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));btn.classList.add('a');$('orientBtn').classList.remove('a');$('scaleBtn').classList.remove('a');hideScaleUI();S.tool=btn.dataset.tool;const names={brush:'Brush','sphere-brush':'Sphere Brush',fill:'Fill',eyedropper:'Colour Picker',gradient:'Gradient',photo:'Photo'};$('st').textContent='Tool: '+(names[S.tool]||S.tool);if(S.tool==='gradient'){$('fo').style.display='none';$('br-wrap').style.display='none';$('gradPanel').style.display='block';$('cs').style.display='none';$('photoPanel').style.display='none';clearPhotoSel();hidePhotoOverlay();updGradSubTools();updGradArrow();}else if(S.tool==='photo'){$('fo').style.display='none';$('br-wrap').style.display='none';$('gradPanel').style.display='none';$('cs').style.display='none';$('photoPanel').style.display='';clearGradSel();clearGradArrow();updPhotoSubTools();if(S.photoImg)showPhotoOverlay();}else{const _bs=$('bs');if(_bs){_bs.appendChild($('br-wrap'));_bs.appendChild($('fo'));}$('fo').style.display=S.tool==='fill'?'':'none';$('br-wrap').style.display=(S.tool==='brush'||S.tool==='sphere-brush')?'':'none';$('gradPanel').style.display='none';$('photoPanel').style.display='none';$('cs').style.display='';clearGradSel();clearPhotoSel();clearGradArrow();hidePhotoOverlay();}}));
+function isExportTool(t){return t==='recolor-brush'||t==='recolor-sphere';}
+function setActiveTool(tool){
+  // Keep normal paint tools and export-preview recolour tools in their own modes.
+  if(S.exportPreview&&!isExportTool(tool))tool='recolor-brush';
+  if(!S.exportPreview&&isExportTool(tool))tool='brush';
+
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));
+  const btn=document.querySelector('.tb[data-tool="'+tool+'"]');
+  if(btn)btn.classList.add('a');
+  if($('orientBtn'))$('orientBtn').classList.remove('a');
+  if($('scaleBtn'))$('scaleBtn').classList.remove('a');
+  hideScaleUI();
+
+  S.tool=tool;
+  const names={brush:'Brush','sphere-brush':'Sphere Brush',fill:'Fill',eyedropper:'Colour Picker',gradient:'Gradient',photo:'Photo','recolor-brush':'Recolour Brush','recolor-sphere':'Recolour Sphere'};
+  $('st').textContent='Tool: '+(names[S.tool]||S.tool);
+
+  if(S.tool==='gradient'){
+    $('fo').style.display='none';$('br-wrap').style.display='none';$('recolorPanel').style.display='none';
+    $('gradPanel').style.display='block';$('cs').style.display='none';$('photoPanel').style.display='none';
+    clearPhotoSel();hidePhotoOverlay();updGradSubTools();updGradArrow();
+  }else if(S.tool==='photo'){
+    $('fo').style.display='none';$('br-wrap').style.display='none';$('recolorPanel').style.display='none';
+    $('gradPanel').style.display='none';$('cs').style.display='none';$('photoPanel').style.display='';
+    clearGradSel();clearGradArrow();updPhotoSubTools();if(S.photoImg)showPhotoOverlay();
+  }else{
+    const _bs=$('bs');if(_bs){_bs.appendChild($('br-wrap'));_bs.appendChild($('fo'));_bs.appendChild($('recolorPanel'));}
+    $('fo').style.display=S.tool==='fill'?'':'none';
+    $('br-wrap').style.display=(S.tool==='brush'||S.tool==='sphere-brush'||S.tool==='recolor-brush'||S.tool==='recolor-sphere')?'':'none';
+    $('recolorPanel').style.display=isExportTool(S.tool)?'':'none';
+    $('gradPanel').style.display='none';$('photoPanel').style.display='none';
+    $('cs').style.display='';clearGradSel();clearPhotoSel();clearGradArrow();hidePhotoOverlay();
+  }
+}
+function syncToolsForPreview(){
+  if($('toolsTitle'))$('toolsTitle').textContent=S.exportPreview?'Export Preview Tools':'Paint Tools';
+  if($('paintTools'))$('paintTools').style.display=S.exportPreview?'none':'grid';
+  if($('exportTools'))$('exportTools').style.display=S.exportPreview?'grid':'none';
+  setActiveTool(S.exportPreview?(isExportTool(S.tool)?S.tool:'recolor-brush'):(isExportTool(S.tool)?'brush':S.tool));
+}
+document.querySelectorAll('.tb').forEach(btn=>btn.addEventListener('click',()=>setActiveTool(btn.dataset.tool)));
+
+function normHex(h){h=(h||'').trim();if(!h.startsWith('#'))h='#'+h;if(/^#[0-9a-fA-F]{3}$/.test(h))h='#'+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];return /^#[0-9a-fA-F]{6}$/.test(h)?h.toUpperCase():null;}
+function hexToRgbArr(h){h=normHex(h)||'#000000';return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function renderCustomPalette(){const box=$('paletteColors');if(!box)return;box.innerHTML='';S.customPalette=S.customPalette.map(normHex).filter(Boolean);if(!S.customPalette.length)S.customPalette=['#000000'];S.customPalette.forEach((col,i)=>{const row=document.createElement('div');row.className='palette-row';row.innerHTML=`<input type="color" value="${col}" oninput="updatePaletteColor(${i},this.value)"><input type="text" class="hf2" value="${col}" onchange="updatePaletteColor(${i},this.value)"><button class="pal-del" onclick="removePaletteColor(${i})">✕</button>`;box.appendChild(row);});}
+function setSolidPaletteMode(mode){S.solidPaletteMode=mode==='custom'?'custom':'auto';$('solidPalAuto')?.classList.toggle('a',S.solidPaletteMode==='auto');$('solidPalCustom')?.classList.toggle('a',S.solidPaletteMode==='custom');if($('customPalettePanel'))$('customPalettePanel').style.display=S.solidPaletteMode==='custom'?'block':'none';renderCustomPalette();}
+function setSolidGeometryMode(mode){S.solidGeometryMode=mode==='texture'?'texture':'faces';$('solidGeomFaces')?.classList.toggle('a',S.solidGeometryMode==='faces');$('solidGeomTexture')?.classList.toggle('a',S.solidGeometryMode==='texture');if($('solidTexturePanel'))$('solidTexturePanel').style.display=S.solidGeometryMode==='texture'?'block':'none';}
+function setSolidSubdivDepth(v){S.solidSubdivDepth=Math.max(1,Math.min(5,parseInt(v)||3));const names=['','Low','Medium-Low','Medium','High','Ultra'];if($('solidSubdivV'))$('solidSubdivV').textContent=names[S.solidSubdivDepth]||('Depth '+S.solidSubdivDepth);}
+function addPaletteColor(){S.customPalette.push('#0066FF');renderCustomPalette();}
+function removePaletteColor(i){if(S.customPalette.length<=1){showToast('Keep at least one palette colour');return;}S.customPalette.splice(i,1);renderCustomPalette();}
+function updatePaletteColor(i,val){const h=normHex(val);if(!h){showToast('Invalid hex colour');renderCustomPalette();return;}S.customPalette[i]=h;renderCustomPalette();}
+function autoPaletteToCustom(){showToast('Add/edit colours manually here.');setSolidPaletteMode('custom');}
+
 $('fmode').addEventListener('change',function(){const descs={cmy:'Standard subtractive colour mixing. Best for vibrant colours with a white base filament in the printer.',wcmy:'Adds white filament for cleaner pastels and highlights. Use when your base isn\'t white, or for better light colour accuracy. Requires 4 filament slots.',kcmy:'Adds black filament for richer darks and shadows. Avoids muddy dark tones from CMY overlap. Requires 4 filament slots.',wkcmy:'Full spectrum — white for highlights, black for shadows, CMY for colours. Best colour accuracy but requires 5 filament slots.','2c':'Dual nozzle mode. Pick two filament colours — painted surfaces are dithered between them. Great for gradients and two-tone effects.',solid:'Exports each painted face as a solid flat colour — no dithering, no CMY filaments. Use this to paint a model for normal multi-colour printing (e.g. in Bambu Studio with a multi-filament printer). Not for colour blending.'};$('fmDesc').textContent=descs[this.value]||'';$('twoColorPanel').style.display=this.value==='2c'?'block':'none';$('solidColPanel').style.display=this.value==='solid'?'block':'none';});
-function togWF(){S.wf=!S.wf;if(S.wfm)S.wfm.visible=S.wf;$('wfb').classList.toggle('a',S.wf);}
+function togWF(){S.wf=!S.wf;if(S.wfm)S.wfm.visible=S.wf&&!S.exportPreview;if(S.exportPreviewWfm)S.exportPreviewWfm.visible=S.wf&&S.exportPreview;$('wfb').classList.toggle('a',S.wf);}
 function togGrid(){gridH.visible=!gridH.visible;$('grb').classList.toggle('a',gridH.visible);}
 
 function orientToFace(fi){
@@ -1917,7 +2133,13 @@ function drawPk(){const w=pkC.width,h=pkC.height,img=pkX.createImageData(w,h);fo
 function updMk(){const m=$('cpMarker');if(m){m.style.left=(S.sat*pkC.width)+'px';m.style.top=((1-S.val)*pkC.height)+'px';}const h=$('hsMarker');if(h)h.style.left=(S.hue/360*100)+'%';}
 function pickC(e){const r=pkC.getBoundingClientRect();S.sat=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));S.val=Math.max(0,Math.min(1,1-(e.clientY-r.top)/r.height));const rgb=h2r(S.hue/360,S.sat,S.val);S.col.setRGB(rgb[0]/255,rgb[1]/255,rgb[2]/255);updCD();updMk();}
 function uHue(v){S.hue=v;drawPk();const rgb=h2r(S.hue/360,S.sat,S.val);S.col.setRGB(rgb[0]/255,rgb[1]/255,rgb[2]/255);updCD();}
-function updCD(){const hex='#'+S.col.getHexString();$('cc').style.background=hex;$('hi').value=hex;}
+function updCD(){const hex='#'+S.col.getHexString().toUpperCase();$('cc').style.background=hex;$('hi').value=hex;if($('recolorToHex'))$('recolorToHex').textContent=hex;}
+function setRecolorFrom(v){const h=normHex(v)||'#000000';S.recolorFrom=h;$('recolorFromHex').value=h;$('recolorFromPick').value=h;$('recolorFromSw').style.background=h;}
+function useCurrentAsRecolorFrom(){setRecolorFrom('#'+S.col.getHexString().toUpperCase());}
+function swapRecolorColors(){const from=normHex(S.recolorFrom)||'#000000';const to='#'+S.col.getHexString().toUpperCase();setRecolorFrom(to);sCH(from);}
+function recolorMatchFace(fi){const rgb=hexToRgbArr(S.recolorFrom).map(x=>x/255);const dr=S.fc[fi*3]-rgb[0],dg=S.fc[fi*3+1]-rgb[1],db=S.fc[fi*3+2]-rgb[2];return Math.sqrt(dr*dr+dg*dg+db*db)<=S.recolorTol*Math.sqrt(3);}
+function mfRecolor(fi){if(!recolorMatchFace(fi))return false;mf(fi);return true;}
+function recolorAllMatching(){if(!S.exportPreview||!S.exportSolid||!S.exportPreviewMesh){showToast('Recolour all works on the Export Preview only. Process, then enable Export Preview.','👁️');return;}const target=[Math.round(S.col.r*255),Math.round(S.col.g*255),Math.round(S.col.b*255)],palIdx=ensurePreviewPaletteColor(target);let n=0;for(let fi=0;fi<S.exportSolid.triData.length;fi++)if(previewRecolorMatch(fi)){setPreviewFaceColor(fi,palIdx);n++;}if(n)updateSolid3MF();showToast('Recoloured '+n.toLocaleString()+' export-preview faces','🔁');}
 function sCH(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return;S.col.set(hex);updCD();const hsv=r2h(S.col.r*255,S.col.g*255,S.col.b*255);S.hue=hsv[0]*360;S.sat=hsv[1];S.val=hsv[2];$('hs').value=S.hue;drawPk();}
 function h2r(h,s,v){let r,g,b;const i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)];}
 function r2h(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h,s=mx===0?0:d/mx,v=mx;if(mx===mn)h=0;else{switch(mx){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}h/=6;}return[h,s,v];}
@@ -1998,8 +2220,94 @@ function makeDecompose(filRGB){
   };
 }
 
+function nearestPaletteIndexRGB8(r,g,b,palette){let minD=Infinity,best=0;for(let i=0;i<palette.length;i++){const d=(r-palette[i][0])**2+(g-palette[i][1])**2+(b-palette[i][2])**2;if(d<minD){minD=d;best=i;}}return best;}
+function sampleTexRGB8(tex,uv){if(!tex||!uv)return null;const smp=sampleTex(tex,uv[0],uv[1]);if(!smp||smp[3]<=0.02)return null;return [Math.round(smp[0]*255),Math.round(smp[1]*255),Math.round(smp[2]*255)];}
+function mix3(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
+function mix2(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
+function makeSubTri(p0,p1,p2,uv0,uv1,uv2,tex,flatColor){return {p:[p0,p1,p2],uv:[uv0,uv1,uv2],tex,flatColor};}
+function subdivideTri4(t){const p=t.p,uv=t.uv;const p01=mix3(p[0],p[1],0.5),p12=mix3(p[1],p[2],0.5),p20=mix3(p[2],p[0],0.5);const uv01=uv[0]&&uv[1]?mix2(uv[0],uv[1],0.5):null,uv12=uv[1]&&uv[2]?mix2(uv[1],uv[2],0.5):null,uv20=uv[2]&&uv[0]?mix2(uv[2],uv[0],0.5):null;return [makeSubTri(p[0],p01,p20,uv[0],uv01,uv20,t.tex,t.flatColor),makeSubTri(p01,p[1],p12,uv01,uv[1],uv12,t.tex,t.flatColor),makeSubTri(p20,p12,p[2],uv20,uv12,uv[2],t.tex,t.flatColor),makeSubTri(p01,p12,p20,uv01,uv12,uv20,t.tex,t.flatColor)];}
+function classifyTexturedTri(t,palette){if(!t.tex||!t.uv[0]||!t.uv[1]||!t.uv[2]){const c=t.flatColor||[S.base.r,S.base.g,S.base.b];return nearestPaletteIndexRGB8(Math.round(c[0]*255),Math.round(c[1]*255),Math.round(c[2]*255),palette);}const uvC=[(t.uv[0][0]+t.uv[1][0]+t.uv[2][0])/3,(t.uv[0][1]+t.uv[1][1]+t.uv[2][1])/3];const samples=[t.uv[0],t.uv[1],t.uv[2],uvC].map(uv=>sampleTexRGB8(t.tex,uv));const fallback=t.flatColor||[S.base.r,S.base.g,S.base.b];const fb=nearestPaletteIndexRGB8(Math.round(fallback[0]*255),Math.round(fallback[1]*255),Math.round(fallback[2]*255),palette);const ids=samples.map(c=>c?nearestPaletteIndexRGB8(c[0],c[1],c[2],palette):fb);for(let i=1;i<ids.length;i++)if(ids[i]!==ids[0])return -1;return ids[0];}
+async function buildTextureBoundarySolidTriangles(src,palette,maxDepth,progressCb){const out=[];let processed=0;for(const base of src.tris){const stack=[{t:base,d:0}];while(stack.length){const item=stack.pop();const id=classifyTexturedTri(item.t,palette);if(id>=0||item.d>=maxDepth){let mat=id;if(mat<0){const uvC=item.t.uv[0]&&item.t.uv[1]&&item.t.uv[2]?[(item.t.uv[0][0]+item.t.uv[1][0]+item.t.uv[2][0])/3,(item.t.uv[0][1]+item.t.uv[1][1]+item.t.uv[2][1])/3]:null;const c=uvC?sampleTexRGB8(item.t.tex,uvC):null;const fb=item.t.flatColor||[S.base.r,S.base.g,S.base.b];mat=c?nearestPaletteIndexRGB8(c[0],c[1],c[2],palette):nearestPaletteIndexRGB8(Math.round(fb[0]*255),Math.round(fb[1]*255),Math.round(fb[2]*255),palette);}out.push({p:item.t.p,m:mat});}else{for(const st of subdivideTri4(item.t))stack.push({t:st,d:item.d+1});}}processed++;if(processed%250===0){if(progressCb)progressCb(processed/src.tris.length,out.length);await sl(0);}}return out;}
+
+// Return an OBJ texture source whose triangle positions are taken from the current
+// editable BufferGeometry. Orient/Scale mutate S.geo, while S.objSource stores
+// the original OBJ positions. Texture-boundary export must reuse original UVs
+// and texture handles, but current transformed vertex positions.
+function objSourceWithCurrentPositions(src,pos){
+  if(!src||!pos)return src;
+  return {
+    kind:src.kind,
+    hasTexture:src.hasTexture,
+    tris:src.tris.map((t,fi)=>({
+      p:[[pos[fi*9],pos[fi*9+1],pos[fi*9+2]],[pos[fi*9+3],pos[fi*9+4],pos[fi*9+5]],[pos[fi*9+6],pos[fi*9+7],pos[fi*9+8]]],
+      uv:t.uv,
+      tex:t.tex,
+      flatColor:t.flatColor
+    }))
+  };
+}
+
+function buildAdjMapFromPos(pos,nf){
+  const pr=1e3,vk=(x,y,z)=>String(Math.round(x*pr))+','+String(Math.round(y*pr))+','+String(Math.round(z*pr));
+  const e2f=new Map(),adj=new Map();
+  for(let fi=0;fi<nf;fi++){adj.set(fi,new Set());for(let e=0;e<3;e++){const a=fi*9+e*3,b=fi*9+((e+1)%3)*3,ka=vk(pos[a],pos[a+1],pos[a+2]),kb=vk(pos[b],pos[b+1],pos[b+2]),ek=ka<kb?ka+'|'+kb:kb+'|'+ka;if(!e2f.has(ek))e2f.set(ek,[]);e2f.get(ek).push(fi);}}
+  for(const fs of e2f.values())for(let a=0;a<fs.length;a++)for(let b=a+1;b<fs.length;b++){adj.get(fs[a]).add(fs[b]);adj.get(fs[b]).add(fs[a]);}
+  return adj;
+}
+function faceNormalsFromPos(pos,nf){const fn=new Float32Array(nf*3);for(let fi=0;fi<nf;fi++){const i9=fi*9;const e1x=pos[i9+3]-pos[i9],e1y=pos[i9+4]-pos[i9+1],e1z=pos[i9+5]-pos[i9+2];const e2x=pos[i9+6]-pos[i9],e2y=pos[i9+7]-pos[i9+1],e2z=pos[i9+8]-pos[i9+2];let nx=e1y*e2z-e1z*e2y,ny=e1z*e2x-e1x*e2z,nz=e1x*e2y-e1y*e2x;const l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;fn[fi*3]=nx/l;fn[fi*3+1]=ny/l;fn[fi*3+2]=nz/l;}return fn;}
+function ensurePreviewPaletteColor(rgb8){if(!S.exportSolid)return 0;for(let i=0;i<S.exportSolid.palette.length;i++){const c=S.exportSolid.palette[i];if(c[0]===rgb8[0]&&c[1]===rgb8[1]&&c[2]===rgb8[2])return i;}S.exportSolid.palette.push(rgb8.slice());return S.exportSolid.palette.length-1;}
+function previewFaceRGB(fi){if(!S.exportSolid||!S.exportSolid.triData[fi])return [0,0,0];return S.exportSolid.palette[S.exportSolid.triData[fi].m]||[0,0,0];}
+function previewRecolorMatch(fi){const c=previewFaceRGB(fi),src=hexToRgbArr(S.recolorFrom);const dr=(c[0]-src[0])/255,dg=(c[1]-src[1])/255,db=(c[2]-src[2])/255;return Math.sqrt(dr*dr+dg*dg+db*db)<=S.recolorTol*Math.sqrt(3);}
+function setPreviewFaceColor(fi,palIdx){if(!S.exportPreviewMesh||!S.exportSolid||!S.exportSolid.triData[fi])return false;S.exportSolid.triData[fi].m=palIdx;const c=S.exportSolid.palette[palIdx],ca=S.exportPreviewMesh.geometry.getAttribute('color').array;for(let v=0;v<3;v++){const o=fi*9+v*3;ca[o]=c[0]/255;ca[o+1]=c[1]/255;ca[o+2]=c[2]/255;}S.exportPreviewMesh.geometry.getAttribute('color').needsUpdate=true;return true;}
+function bRecolorPreview(pt,cfi){if(!S.exportPreviewMesh||!S.exportSolid)return;const target=[Math.round(S.col.r*255),Math.round(S.col.g*255),Math.round(S.col.b*255)],palIdx=ensurePreviewPaletteColor(target);const pa=S.exportPreviewMesh.geometry.getAttribute('position').array,r=S.brushR,vis=new Set([cfi]),q=[cfi];let changed=0;const fn=S.exportPreviewFn,adj=S.exportPreviewAdj;const tryFace=fi=>{if(previewRecolorMatch(fi)){if(setPreviewFaceColor(fi,palIdx))changed++;return true;}return false;};tryFace(cfi);const snx=fn[cfi*3],sny=fn[cfi*3+1],snz=fn[cfi*3+2];while(q.length){const fi=q.shift(),nb=adj&&adj.get(fi);if(!nb)continue;for(const n of nb){if(vis.has(n))continue;vis.add(n);if(fn[n*3]*snx+fn[n*3+1]*sny+fn[n*3+2]*snz<0)continue;const i9=n*9;const cx=(pa[i9]+pa[i9+3]+pa[i9+6])/3,cy=(pa[i9+1]+pa[i9+4]+pa[i9+7])/3,cz=(pa[i9+2]+pa[i9+5]+pa[i9+8])/3;if(Math.sqrt((cx-pt.x)**2+(cy-pt.y)**2+(cz-pt.z)**2)<=r){tryFace(n);q.push(n);}}}if(changed)updateSolid3MF();}
+
+function bRecolorPreviewSphere(pt){
+  if(!S.exportPreviewMesh||!S.exportSolid)return;
+  const target=[Math.round(S.col.r*255),Math.round(S.col.g*255),Math.round(S.col.b*255)];
+  const palIdx=ensurePreviewPaletteColor(target);
+  const pa=S.exportPreviewMesh.geometry.getAttribute('position').array,r2=S.brushR*S.brushR,nf=S.exportSolid.triData.length;
+  let changed=0;
+  for(let fi=0;fi<nf;fi++){
+    const i9=fi*9;
+    const cx=(pa[i9]+pa[i9+3]+pa[i9+6])/3,cy=(pa[i9+1]+pa[i9+4]+pa[i9+7])/3,cz=(pa[i9+2]+pa[i9+5]+pa[i9+8])/3;
+    if((cx-pt.x)*(cx-pt.x)+(cy-pt.y)*(cy-pt.y)+(cz-pt.z)*(cz-pt.z)<=r2){
+      if(previewRecolorMatch(fi)&&setPreviewFaceColor(fi,palIdx))changed++;
+    }
+  }
+  if(changed)updateSolid3MF();
+}
+function updateSolid3MF(){if(!S.exportSolid)return;const d=S.exportSolid,uPos=d.uPos,triData=d.triData,palette=d.palette,uid=uPos.length/3;let cgXml='<m:colorgroup id="1">\n';for(const c of palette){const r=c[0],g=c[1],b=c[2];cgXml+='<m:color color="#'+r.toString(16).padStart(2,'0').toUpperCase()+g.toString(16).padStart(2,'0').toUpperCase()+b.toString(16).padStart(2,'0').toUpperCase()+'FF"/>\n';}cgXml+='</m:colorgroup>\n';const xp=['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02">\n<resources>\n'+cgXml+'<object id="2" type="model">\n<mesh>\n<vertices>\n'];for(let i=0;i<uid;i++)xp.push('<vertex x="'+uPos[i*3]+'" y="'+uPos[i*3+1]+'" z="'+uPos[i*3+2]+'"/>\n');xp.push('</vertices>\n<triangles>\n');for(const t of triData)xp.push('<triangle v1="'+t.v1+'" v2="'+t.v2+'" v3="'+t.v3+'" pid="1" p1="'+t.m+'"/>\n');xp.push('</triangles>\n</mesh>\n</object>\n</resources>\n<build>\n<item objectid="2"/>\n</build>\n</model>');const enc2=new TextEncoder();const ctypes='<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n</Types>';const rels2='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';S.mdl3mf=makeZip([{name:'[Content_Types].xml',data:enc2.encode(ctypes).buffer},{name:'_rels/.rels',data:enc2.encode(rels2).buffer},{name:'3D/3dmodel.model',data:enc2.encode(xp.join('')).buffer}]);if($('linf'))$('linf').innerHTML='Solid · <span>'+palette.length+'</span> colours · <span>'+triData.length.toLocaleString()+'</span> tris';}
+
+function clearExportPreview(){
+  if(S.exportPreviewMesh){sc.remove(S.exportPreviewMesh);S.exportPreviewMesh.geometry.dispose();S.exportPreviewMesh.material.dispose();S.exportPreviewMesh=null;}
+  if(S.exportPreviewWfm){sc.remove(S.exportPreviewWfm);S.exportPreviewWfm.geometry.dispose();S.exportPreviewWfm.material.dispose();S.exportPreviewWfm=null;}
+  S.exportPreview=false;S.exportPreviewAdj=null;S.exportPreviewFn=null;S.exportSolid=null;if($('epb')){$('epb').classList.remove('a');$('epb').disabled=true;}
+  if(S.mesh)S.mesh.visible=true;if(S.wfm)S.wfm.visible=S.wf; if(typeof syncToolsForPreview==='function')syncToolsForPreview();
+}
+function setExportPreviewFromSolid(uPos,triData,palette){
+  if(S.exportPreviewMesh){sc.remove(S.exportPreviewMesh);S.exportPreviewMesh.geometry.dispose();S.exportPreviewMesh.material.dispose();S.exportPreviewMesh=null;}
+  if(S.exportPreviewWfm){sc.remove(S.exportPreviewWfm);S.exportPreviewWfm.geometry.dispose();S.exportPreviewWfm.material.dispose();S.exportPreviewWfm=null;}
+  S.exportSolid={uPos:Array.from(uPos),triData:triData.map(t=>({v1:t.v1,v2:t.v2,v3:t.v3,m:t.m})),palette:palette.map(c=>c.slice())};
+  const verts=new Float32Array(triData.length*9),cols=new Float32Array(triData.length*9);
+  for(let i=0;i<triData.length;i++){const t=triData[i],ids=[t.v1,t.v2,t.v3],c=palette[t.m]||[200,200,200];for(let j=0;j<3;j++){verts[i*9+j*3]=uPos[ids[j]*3];verts[i*9+j*3+1]=uPos[ids[j]*3+1];verts[i*9+j*3+2]=uPos[ids[j]*3+2];cols[i*9+j*3]=c[0]/255;cols[i*9+j*3+1]=c[1]/255;cols[i*9+j*3+2]=c[2]/255;}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(verts,3));g.setAttribute('color',new THREE.BufferAttribute(cols,3));g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();
+  S.exportPreviewAdj=buildAdjMapFromPos(verts,triData.length);S.exportPreviewFn=faceNormalsFromPos(verts,triData.length);
+  S.exportPreviewMesh=new THREE.Mesh(g,new THREE.MeshPhongMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide,shininess:20}));if(S.mesh){S.exportPreviewMesh.position.copy(S.mesh.position);S.exportPreviewMesh.rotation.copy(S.mesh.rotation);S.exportPreviewMesh.scale.copy(S.mesh.scale);}S.exportPreviewMesh.visible=S.exportPreview;sc.add(S.exportPreviewMesh);
+  S.exportPreviewWfm=new THREE.LineSegments(new THREE.WireframeGeometry(g),new THREE.LineBasicMaterial({color:0x222244,opacity:.25,transparent:true}));if(S.mesh){S.exportPreviewWfm.position.copy(S.mesh.position);S.exportPreviewWfm.rotation.copy(S.mesh.rotation);S.exportPreviewWfm.scale.copy(S.mesh.scale);}S.exportPreviewWfm.visible=S.exportPreview&&S.wf;sc.add(S.exportPreviewWfm);
+  if($('epb'))$('epb').disabled=false;
+}
+function toggleExportPreview(force){
+  if(!S.exportPreviewMesh){showToast('Process the model first to create an export preview.','👁️');return;}
+  S.exportPreview=(typeof force==='boolean')?force:!S.exportPreview;
+  S.exportPreviewMesh.visible=S.exportPreview;if(S.exportPreviewWfm)S.exportPreviewWfm.visible=S.exportPreview&&S.wf;
+  if(S.mesh)S.mesh.visible=!S.exportPreview;if(S.wfm)S.wfm.visible=!S.exportPreview&&S.wf;
+  if($('epb'))$('epb').classList.toggle('a',S.exportPreview);
+  if(typeof syncToolsForPreview==='function')syncToolsForPreview();
+  $('st').textContent=S.exportPreview?'Tool: '+(S.tool==='recolor-sphere'?'Recolour Sphere':'Recolour Brush'):'Tool: '+(S.tool||'Brush');
+}
 async function processModel(){
   if(!S.mesh)return;
+  clearExportPreview();
   const ov=$('po');ov.classList.add('vis');const fe=$('pf'),te=$('pt');
   te.textContent='Analyzing...';fe.style.width='5%';await sl(30);
   const pos=S.geo.getAttribute('position').array,nf=S.fc.length/3;
@@ -2024,69 +2332,136 @@ async function processModel(){
     const uniqueColors=[...uniqueMap.values()]; // [r,g,b,weight]
     let palette=[]; // final [r,g,b] entries
 
-    if(kTarget>0&&kTarget<uniqueColors.length){
-      // k-means++ weighted colour clustering
-      te.textContent='Clustering to '+kTarget+' colours ('+uniqueColors.length+' → '+kTarget+')...';fe.style.width='30%';await sl(30);
+    if(S.solidPaletteMode==='custom'){
+      palette=S.customPalette.map(hexToRgbArr);
+      const seen=new Set();
+      palette=palette.filter(c=>{const key=c.join(',');if(seen.has(key))return false;seen.add(key);return true;});
+      if(!palette.length)palette=[[0,0,0]];
+      te.textContent='Using custom palette ('+palette.length+' colours)...';fe.style.width='30%';await sl(30);
+    }else if(kTarget>0&&kTarget<uniqueColors.length){
+      // Perceptual, diversity-aware colour clustering.
+      // Raw weighted k-means tends to spend multiple centroids on tiny shade changes
+      // inside a dominant colour family (e.g. many blacks) and can miss smaller but
+      // distinct coloured regions (e.g. blue markings).  We seed with compressed
+      // weights in Lab space so distinct colours get represented, then refine.
+      te.textContent='Finding distinct '+kTarget+' colour groups ('+uniqueColors.length+' → '+kTarget+')...';fe.style.width='30%';await sl(30);
       const k=Math.min(kTarget,uniqueColors.length);
-      // k-means++ init: pick first centroid as highest-weight colour, then successively
-      // pick the colour furthest (weighted by weight) from existing centroids
-      uniqueColors.sort((a,b2)=>b2[3]-a[3]);
-      const cents=[[uniqueColors[0][0],uniqueColors[0][1],uniqueColors[0][2]]];
-      for(let i=1;i<k;i++){
-        let maxScore=-1,maxIdx=0;
-        for(let j=0;j<uniqueColors.length;j++){
-          let minD2=Infinity;
-          for(const c of cents){const d=(uniqueColors[j][0]-c[0])**2+(uniqueColors[j][1]-c[1])**2+(uniqueColors[j][2]-c[2])**2;if(d<minD2)minD2=d;}
-          const score=minD2*uniqueColors[j][3];
-          if(score>maxScore){maxScore=score;maxIdx=j;}
-        }
-        cents.push([uniqueColors[maxIdx][0],uniqueColors[maxIdx][1],uniqueColors[maxIdx][2]]);
+      function rgbToLab(r,g,b){
+        r/=255;g/=255;b/=255;
+        r=r<=0.04045?r/12.92:Math.pow((r+0.055)/1.055,2.4);
+        g=g<=0.04045?g/12.92:Math.pow((g+0.055)/1.055,2.4);
+        b=b<=0.04045?b/12.92:Math.pow((b+0.055)/1.055,2.4);
+        let x=(r*0.4124564+g*0.3575761+b*0.1804375)/0.95047;
+        let y=(r*0.2126729+g*0.7151522+b*0.0721750);
+        let z=(r*0.0193339+g*0.1191920+b*0.9503041)/1.08883;
+        const f=t=>t>0.008856?Math.cbrt(t):(7.787*t+16/116);
+        const fx=f(x),fy=f(y),fz=f(z);
+        return [116*fy-16,500*(fx-fy),200*(fy-fz)];
       }
-      // Iterate k-means (weighted)
-      for(let iter=0;iter<40;iter++){
-        const sums=Array.from({length:k},()=>[0,0,0,0]);
-        for(const [r,g,b,w] of uniqueColors){
+      const labColors=uniqueColors.map(c=>{
+        const lab=rgbToLab(c[0],c[1],c[2]);
+        const chroma=Math.sqrt(lab[1]*lab[1]+lab[2]*lab[2]);
+        // Compress area dominance but still respect genuinely large regions.
+        const sal=Math.pow(Math.max(1,c[3]),0.38)*(1+Math.min(2.0,chroma/55));
+        return {rgb:[c[0],c[1],c[2]],lab,w:c[3],sal};
+      });
+      function labD2(a,b){const dl=a[0]-b[0],da=a[1]-b[1],db=a[2]-b[2];return dl*dl+da*da+db*db;}
+      labColors.sort((a,b)=>b.w-a.w);
+      const cents=[{rgb:labColors[0].rgb.slice(),lab:labColors[0].lab.slice()}];
+      const used=new Set([0]);
+      for(let i=1;i<k;i++){
+        let bestScore=-1,bestIdx=-1;
+        for(let j=0;j<labColors.length;j++){
+          if(used.has(j))continue;
+          let minD2=Infinity;
+          for(const c of cents){const d=labD2(labColors[j].lab,c.lab);if(d<minD2)minD2=d;}
+          // Sublinear weight prevents one dominant hue from consuming the palette;
+          // perceptual distance makes a small blue patch beat another near-black shade.
+          const score=minD2*labColors[j].sal;
+          if(score>bestScore){bestScore=score;bestIdx=j;}
+        }
+        if(bestIdx<0)break;
+        used.add(bestIdx);
+        cents.push({rgb:labColors[bestIdx].rgb.slice(),lab:labColors[bestIdx].lab.slice()});
+      }
+      for(let iter=0;iter<36;iter++){
+        const sums=Array.from({length:cents.length},()=>[0,0,0,0]);
+        for(const c of labColors){
           let minD=Infinity,best=0;
-          for(let i=0;i<k;i++){const d=(r-cents[i][0])**2+(g-cents[i][1])**2+(b-cents[i][2])**2;if(d<minD){minD=d;best=i;}}
-          sums[best][0]+=r*w;sums[best][1]+=g*w;sums[best][2]+=b*w;sums[best][3]+=w;
+          for(let i=0;i<cents.length;i++){const d=labD2(c.lab,cents[i].lab);if(d<minD){minD=d;best=i;}}
+          // Refine with compressed weights so rare colour families remain stable.
+          const ww=Math.pow(Math.max(1,c.w),0.55);
+          sums[best][0]+=c.rgb[0]*ww;sums[best][1]+=c.rgb[1]*ww;sums[best][2]+=c.rgb[2]*ww;sums[best][3]+=ww;
         }
         let moved=false;
-        for(let i=0;i<k;i++){
+        for(let i=0;i<cents.length;i++){
           if(sums[i][3]===0)continue;
           const nr=sums[i][0]/sums[i][3],ng=sums[i][1]/sums[i][3],nb=sums[i][2]/sums[i][3];
-          if(Math.abs(nr-cents[i][0])>0.4||Math.abs(ng-cents[i][1])>0.4||Math.abs(nb-cents[i][2])>0.4)moved=true;
-          cents[i]=[nr,ng,nb];
+          const nlab=rgbToLab(nr,ng,nb);
+          if(labD2(nlab,cents[i].lab)>0.25)moved=true;
+          cents[i]={rgb:[nr,ng,nb],lab:nlab};
         }
         if(!moved)break;
-        if(iter%10===9){await sl(0);}
+        if(iter%10===9)await sl(0);
       }
-      palette=cents.map(c=>[Math.round(c[0]),Math.round(c[1]),Math.round(c[2])]);
+      palette=cents.map(c=>[Math.round(c.rgb[0]),Math.round(c.rgb[1]),Math.round(c.rgb[2])]);
+      // Keep exported material order useful: largest assigned colour groups first.
+      const counts=new Array(palette.length).fill(0);
+      for(const [r,g,b,w] of uniqueColors){
+        const lab=rgbToLab(r,g,b);let minD=Infinity,best=0;
+        for(let i=0;i<palette.length;i++){const d=labD2(lab,rgbToLab(palette[i][0],palette[i][1],palette[i][2]));if(d<minD){minD=d;best=i;}}
+        counts[best]+=w;
+      }
+      palette=palette.map((c,i)=>({c,w:counts[i]})).sort((a,b)=>b.w-a.w).map(x=>x.c);
     }else{
       // Full spectrum — one entry per unique quantized colour
       for(const [r,g,b] of uniqueColors)palette.push([r,g,b]);
     }
 
-    // Assign each face to nearest palette entry
-    te.textContent='Assigning '+nf.toLocaleString()+' faces to palette...';fe.style.width='50%';await sl(30);
-    const faceMat=new Int32Array(nf);
-    for(let fi=0;fi<nf;fi++){
-      const r=Math.min(255,Math.round(S.fc[fi*3]*255/Q8)*Q8);
-      const g=Math.min(255,Math.round(S.fc[fi*3+1]*255/Q8)*Q8);
-      const b=Math.min(255,Math.round(S.fc[fi*3+2]*255/Q8)*Q8);
-      let minD=Infinity,best=0;
-      for(let i=0;i<palette.length;i++){const d=(r-palette[i][0])**2+(g-palette[i][1])**2+(b-palette[i][2])**2;if(d<minD){minD=d;best=i;}}
-      faceMat[fi]=best;
-      if(fi%100000===0)await sl(0);
-    }
+    // Assign geometry to palette. In Texture Boundaries mode, textured OBJ triangles
+    // are adaptively subdivided in UV space so the new mesh follows recoloured
+    // texture regions instead of forcing each original triangle to one colour.
+    let triData2=[],uPos=[],uid=0;
+    const PR=1e6;
+    const weldTris=async (sourceTris,label)=>{
+      const vMap=new Map();uPos=[];uid=0;triData2=[];
+      for(let ti=0;ti<sourceTris.length;ti++){
+        const t=sourceTris[ti],vis=[];
+        for(let v=0;v<3;v++){
+          const pp=t.p?t.p[v]:[pos[ti*9+v*3],pos[ti*9+v*3+1],pos[ti*9+v*3+2]];
+          const x=pp[0],y=pp[1],z=pp[2];
+          const kk=Math.round(x*PR)+','+Math.round(y*PR)+','+Math.round(z*PR);
+          if(!vMap.has(kk)){vMap.set(kk,uid);uPos.push(x,y,z);uid++;}
+          vis.push(vMap.get(kk));
+        }
+        if(vis[0]!==vis[1]&&vis[1]!==vis[2]&&vis[0]!==vis[2])triData2.push({v1:vis[0],v2:vis[1],v3:vis[2],m:t.m});
+        if(ti%50000===0&&ti>0){te.textContent=label+' '+Math.round(ti/sourceTris.length*100)+'%...';await sl(0);}
+      }
+    };
 
-    // Weld vertices and build triangle list
-    te.textContent='Welding vertices...';fe.style.width='62%';await sl(30);
-    const PR=1e6;const vMap=new Map();const uPos=[];let uid=0;const triData2=[];
-    for(let fi=0;fi<nf;fi++){
-      const i9=fi*9;const vis=[];
-      for(let v=0;v<3;v++){const x=pos[i9+v*3],y=pos[i9+v*3+1],z=pos[i9+v*3+2];const kk=Math.round(x*PR)+','+Math.round(y*PR)+','+Math.round(z*PR);if(!vMap.has(kk)){vMap.set(kk,uid);uPos.push(x,y,z);uid++;}vis.push(vMap.get(kk));}
-      if(vis[0]!==vis[1]&&vis[1]!==vis[2]&&vis[0]!==vis[2])triData2.push({v1:vis[0],v2:vis[1],v3:vis[2],m:faceMat[fi]});
-      if(fi%50000===0&&fi>0){te.textContent='Welding '+Math.round(fi/nf*100)+'%...';await sl(0);}
+    if(S.solidGeometryMode==='texture'&&S.objSource&&S.objSource.hasTexture){
+      te.textContent='Recolouring texture + subdividing boundaries...';fe.style.width='50%';await sl(30);
+      const currentTextureSource=objSourceWithCurrentPositions(S.objSource,pos);
+      const subTris=await buildTextureBoundarySolidTriangles(currentTextureSource,palette,S.solidSubdivDepth,(pct,count)=>{
+        te.textContent='Subdividing texture boundaries '+Math.round(pct*100)+'% · '+count.toLocaleString()+' tris';
+      });
+      te.textContent='Welding subdivided geometry...';fe.style.width='66%';await sl(30);
+      await weldTris(subTris,'Welding subdivided geometry');
+    }else{
+      if(S.solidGeometryMode==='texture'&&(!S.objSource||!S.objSource.hasTexture))showToast('Texture boundary mode needs a textured OBJ; using existing faces instead.','⚠️');
+      te.textContent='Assigning '+nf.toLocaleString()+' faces to palette...';fe.style.width='50%';await sl(30);
+      const sourceTris=[];
+      for(let fi=0;fi<nf;fi++){
+        const r=Math.min(255,Math.round(S.fc[fi*3]*255/Q8)*Q8);
+        const g=Math.min(255,Math.round(S.fc[fi*3+1]*255/Q8)*Q8);
+        const b=Math.min(255,Math.round(S.fc[fi*3+2]*255/Q8)*Q8);
+        const best=nearestPaletteIndexRGB8(r,g,b,palette);
+        const i9=fi*9;
+        sourceTris.push({p:[[pos[i9],pos[i9+1],pos[i9+2]],[pos[i9+3],pos[i9+4],pos[i9+5]],[pos[i9+6],pos[i9+7],pos[i9+8]]],m:best});
+        if(fi%100000===0)await sl(0);
+      }
+      te.textContent='Welding vertices...';fe.style.width='62%';await sl(30);
+      await weldTris(sourceTris,'Welding');
     }
 
     // Build 3MF XML
@@ -2105,6 +2480,8 @@ async function processModel(){
     const ctypes='<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n</Types>';
     const rels2='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';
     S.mdl3mf=makeZip([{name:'[Content_Types].xml',data:enc2.encode(ctypes).buffer},{name:'_rels/.rels',data:enc2.encode(rels2).buffer},{name:'3D/3dmodel.model',data:enc2.encode(xp.join('')).buffer}]);
+    setExportPreviewFromSolid(uPos,triData2,palette);
+    toggleExportPreview(true);
     fe.style.width='100%';te.textContent='Done — '+palette.length+' colours, '+uid.toLocaleString()+' verts';await sl(400);
     ov.classList.remove('vis');$('dl-overlay').style.display='block';$('reprocess-overlay').style.display='none';S.processed=true;
     $('linf').style.display='';$('linf').innerHTML='Solid · <span>'+palette.length+'</span> colours · <span>'+triData2.length.toLocaleString()+'</span> tris';
