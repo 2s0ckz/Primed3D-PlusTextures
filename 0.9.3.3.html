@@ -415,7 +415,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <div id="dl-overlay" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"><button onclick="event.stopPropagation();dl3MF()">📦 Download .3mf</button></div>
   <div id="reprocess-overlay" style="display:none" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()"><button onclick="event.stopPropagation();processModel()">🔄 Re-Process CMY</button></div>
   <div class="vnav" id="vnav"><div class="vnav-title">Camera Views</div><div class="vnav-grid"><button class="vnav-btn" onclick="setView('front')">Front<kbd>1</kbd></button><button class="vnav-btn" onclick="setView('back')">Back<kbd>2</kbd></button><button class="vnav-btn" onclick="setView('left')">Left<kbd>3</kbd></button><button class="vnav-btn" onclick="setView('right')">Right<kbd>4</kbd></button><button class="vnav-btn" onclick="setView('top')">Top<kbd>5</kbd></button><button class="vnav-btn" onclick="setView('bottom')">Bottom<kbd>6</kbd></button></div></div>
-  <div class="hh" id="hh" style="display:none"><kbd>Left click</kbd> Paint <kbd>Right drag</kbd> Orbit <kbd>Middle</kbd> Pan <kbd>Scroll</kbd> Zoom<br><kbd>Ctrl+Z/Y</kbd> Undo/Redo <kbd>Ctrl+1‑6</kbd> Camera views</div>
+  <div class="hh" id="hh" style="display:none"><kbd>Left click</kbd> Paint <kbd>Right drag</kbd> Orbit <kbd>Middle</kbd> Pan <kbd>Scroll</kbd> Zoom<br><kbd>Ctrl+Z/Y</kbd> Undo/Redo <kbd>Ctrl+Shift+Z</kbd> Redo <kbd>Ctrl+1‑6</kbd> Camera views</div>
   <div id="sb2"><span id="sf">No model loaded</span><span style="opacity:.4"><a href="https://primed3d.3drevolution.net/UpdatesLog" target="_blank" title="Version History" style="color:inherit;text-decoration:underline;cursor:pointer">v0.9.3.3</a> · <a href="#" onclick="event.preventDefault();$('termsModal').classList.add('vis')" style="color:inherit;text-decoration:underline;cursor:pointer">Terms of Use</a></span><span style="display:flex;align-items:center;gap:5px"><span id="st" style="display:none"></span><span onclick="toggleTheme()" title="Toggle light/dark mode" style="display:flex;align-items:center;gap:5px;cursor:pointer;opacity:.7;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><span id="themeLabel" style="font-size:10px;font-weight:500;letter-spacing:.5px">Dark Mode</span><svg id="themeIcon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 18a8 8 0 0 1 0-16v4a4 4 0 0 0 0 8v4z"/><circle cx="12" cy="8" r="1.5" opacity=".4"/><circle cx="12" cy="16" r="1.5"/></svg></span></span></div>
 </div>
 </div>
@@ -458,7 +458,7 @@ function toggleTheme(){
   $('themeLabel').textContent=light?'Lite Mode':'Dark Mode';
 }
 const S={fn:'',tool:'brush',brushR:5,fillMode:'connected',hue:0,sat:1,val:1,col:new THREE.Color(1,0,0),base:new THREE.Color(.78,.78,.78),painting:false,mesh:null,geo:null,fc:null,painted:null,adj:null,fn2:null,us:[],rs:[],wf:false,wfm:null,mdl3mf:null,msz:1,processed:false,tex:null,uvs:null,texCtx:null,texW:0,texH:0,gradA:'#ff0000',gradB:'#0000ff',gradAxis:'z',gradPick:'A',fil2A:'#ffffff',fil2B:'#000000',gradMode:'all',gradSubTool:'brush',gradSel:new Set(),gradPtA:null,gradPtB:null,gradYaw:0,gradPitch:0,gradCenter:0.5,
-filHex:{c:'#00FFFF',m:'#FF00FF',y:'#FFFF00',k:'#000000',w:'#FFFFFF'},solidPaletteMode:'auto',solidGeometryMode:'faces',solidSubdivDepth:3,customPalette:['#000000','#FFFFFF','#0066FF','#FF0000'],recolorFrom:'#000000',recolorTol:0.08,exportPreview:false,exportPreviewMesh:null,exportPreviewWfm:null,exportPreviewAdj:null,exportPreviewFn:null,exportSolid:null,photoProjection:null,objSource:null};
+filHex:{c:'#00FFFF',m:'#FF00FF',y:'#FFFF00',k:'#000000',w:'#FFFFFF'},solidPaletteMode:'auto',solidGeometryMode:'faces',solidSubdivDepth:3,customPalette:['#000000','#FFFFFF','#0066FF','#FF0000'],recolorFrom:'#000000',recolorTol:0.08,exportPreview:false,exportPreviewMesh:null,exportPreviewWfm:null,exportPreviewAdj:null,exportPreviewFn:null,exportSolid:null,exportUndo:[],exportRedo:[],exportPend:null,photoProjection:null,objSource:null};
 let pend=new Map();
 let selPend=new Set(); // tracks faces added to grad/photo sel during current brush stroke
 let fillHoverFi=-1; // last face index the fill-angle preview was computed for
@@ -536,7 +536,7 @@ $('toolbar').addEventListener('mouseenter',()=>{mouseOverUI=true;bcu.style.displ
 $('toolbar').addEventListener('mouseleave',()=>{mouseOverUI=false;});
 $('dl-overlay').addEventListener('mouseenter',()=>{mouseOverUI=true;bcu.style.display='none';});
 $('dl-overlay').addEventListener('mouseleave',()=>{mouseOverUI=false;});
-vp.addEventListener('mousedown',e=>{if(e.button===2||(e.button===0&&e.altKey)){O.rot=true;O.lx=e.clientX;O.ly=e.clientY;e.preventDefault();}else if(e.button===1||(e.button===0&&e.shiftKey)){O.pan=true;O.lx=e.clientX;O.ly=e.clientY;e.preventDefault();}else if(e.button===0&&S.mesh&&!e.altKey&&!e.shiftKey){clearFillHover();S.painting=true;pend.clear();paint(e);}});
+vp.addEventListener('mousedown',e=>{if(e.button===2||(e.button===0&&e.altKey)){O.rot=true;O.lx=e.clientX;O.ly=e.clientY;e.preventDefault();}else if(e.button===1||(e.button===0&&e.shiftKey)){O.pan=true;O.lx=e.clientX;O.ly=e.clientY;e.preventDefault();}else if(e.button===0&&S.mesh&&!e.altKey&&!e.shiftKey){clearFillHover();S.painting=true;pend.clear();if(S.exportPreview&&(S.tool==='recolor-brush'||S.tool==='recolor-sphere'))beginExportUndo();paint(e);}});
 let lastMx=0,lastMy=0;
 vp.addEventListener('mousemove',e=>{lastMx=e.clientX;lastMy=e.clientY;
 const wantCursor=S.mesh&&!mouseOverUI&&(
@@ -594,6 +594,8 @@ window.addEventListener('mouseup',()=>{
         if(S.us.length>40)S.us.shift();
         S.rs=[];selPend.clear();updUB();
       }
+    }else if(S.exportPreview&&(S.tool==='recolor-brush'||S.tool==='recolor-sphere')){
+      commitExportUndo();
     }else{
       commitU();
     }
@@ -1084,7 +1086,7 @@ function parseOBJ(txt){
     const line=raw.trim();if(!line||line[0]==='#')continue;
     const sp=line.split(/\s+/),cmd=sp.shift().toLowerCase();
     if(cmd==='v'&&sp.length>=3)v.push([+sp[0],+sp[1],+sp[2]]);
-    else if(cmd==='vt'&&sp.length>=2)vt.push([+sp[0],+sp[1]]);
+    else if(cmd==='vt'&&sp.length>=2){const tu=Number(sp[0]),tv=Number(sp[1]);vt.push([Number.isFinite(tu)?tu:0,Number.isFinite(tv)?tv:0]);}
     else if(cmd==='usemtl')mat=sp.join(' ');
     else if(cmd==='mtllib')mtllibs.push(sp.join(' '));
     else if(cmd==='f'&&sp.length>=3){
@@ -1108,10 +1110,17 @@ async function loadTextureCanvas(buf,name){
   return{canvas:c,ctx:x,w:c.width,h:c.height};
 }
 function sampleTex(tex,u,v){
-  if(!tex)return null;
+  if(!tex||!tex.ctx)return null;
+  const w=Math.floor(Number(tex.w||(tex.canvas&&tex.canvas.width)||0));
+  const h=Math.floor(Number(tex.h||(tex.canvas&&tex.canvas.height)||0));
+  if(!Number.isFinite(w)||!Number.isFinite(h)||w<1||h<1)return null;
+  u=Number(u);v=Number(v);
+  if(!Number.isFinite(u)||!Number.isFinite(v))return null;
+  // OBJ UVs can be outside 0..1; wrap them, then clamp to valid integer pixels.
   u=((u%1)+1)%1;v=((v%1)+1)%1;
-  const x=Math.max(0,Math.min(tex.w-1,Math.floor(u*tex.w)));
-  const y=Math.max(0,Math.min(tex.h-1,Math.floor((1-v)*tex.h)));
+  const x=Math.max(0,Math.min(w-1,Math.trunc(u*w)));
+  const y=Math.max(0,Math.min(h-1,Math.trunc((1-v)*h)));
+  if(!Number.isFinite(x)||!Number.isFinite(y))return null;
   const d=tex.ctx.getImageData(x,y,1,1).data;
   return[d[0]/255,d[1]/255,d[2]/255,d[3]/255];
 }
@@ -1872,11 +1881,50 @@ function bRecolor(pt,cfi){
 function fillF(sfi){if(S.fillMode==='connected'){const sr=S.fc[sfi*3],sg=S.fc[sfi*3+1],sb=S.fc[sfi*3+2],vis=new Set([sfi]),q=[sfi];while(q.length){const fi=q.shift();if(Math.abs(S.fc[fi*3]-sr)<.01&&Math.abs(S.fc[fi*3+1]-sg)<.01&&Math.abs(S.fc[fi*3+2]-sb)<.01){mf(fi);const nb=S.adj.get(fi);if(nb)for(const n of nb)if(!vis.has(n)){vis.add(n);q.push(n);}}}}else{for(const fi of computeAngleFill(sfi))mf(fi);}}
 function commitU(){if(!pend.size)return;const e={ch:new Map()};for(const[fi,info]of pend)e.ch.set(fi,{oc:info.oc,nc:[S.fc[fi*3],S.fc[fi*3+1],S.fc[fi*3+2]],wp:info.wp,ip:S.painted.has(fi)});S.us.push(e);if(S.us.length>40)S.us.shift();S.rs=[];pend.clear();updUB();if(S.processed){S.processed=false;$('dl-overlay').style.display='none';$('reprocess-overlay').style.display='block';clearExportPreview();}}
 function applyUR(e,rev){const br=S.base.r,bg=S.base.g,bb=S.base.b;for(const[fi,info]of e.ch){const c=rev?info.oc:info.nc,p=rev?info.wp:info.ip;if(p){S.fc[fi*3]=c[0];S.fc[fi*3+1]=c[1];S.fc[fi*3+2]=c[2];S.painted.add(fi);}else{S.painted.delete(fi);S.fc[fi*3]=br;S.fc[fi*3+1]=bg;S.fc[fi*3+2]=bb;}}rebuildTexCanvas();}
+function beginExportUndo(){
+  if(!S.exportPreview||!S.exportSolid)return;
+  S.exportPend={ch:new Map()};
+}
+function recordExportChange(fi,oldM,newM){
+  if(!S.exportPend||oldM===newM)return;
+  const rec=S.exportPend.ch.get(fi);
+  if(rec)rec.nm=newM;
+  else S.exportPend.ch.set(fi,{om:oldM,nm:newM});
+}
+function commitExportUndo(){
+  if(!S.exportPend)return;
+  const e=S.exportPend;S.exportPend=null;
+  for(const [fi,info] of Array.from(e.ch.entries()))if(info.om===info.nm)e.ch.delete(fi);
+  if(!e.ch.size){updUB();return;}
+  S.exportUndo.push(e);if(S.exportUndo.length>40)S.exportUndo.shift();
+  S.exportRedo=[];updUB();
+}
+function applyExportUR(e,rev){
+  if(!S.exportSolid||!S.exportPreviewMesh)return;
+  for(const [fi,info] of e.ch){
+    const m=rev?info.om:info.nm;
+    setPreviewFaceColor(fi,m,false);
+  }
+  updateSolid3MF();updUB();
+}
+function undoExport(){
+  commitExportUndo();
+  if(!S.exportUndo.length)return;
+  const e=S.exportUndo.pop();
+  applyExportUR(e,true);
+  S.exportRedo.push(e);updUB();
+}
+function redoExport(){
+  if(!S.exportRedo.length)return;
+  const e=S.exportRedo.pop();
+  applyExportUR(e,false);
+  S.exportUndo.push(e);updUB();
+}
 function undo(){
+  if(S.exportPreview){undoExport();return;}
   if(!S.us.length)return;
   const e=S.us.pop();
   if(e.selType){
-    // Selection undo: remove the added faces from the selection set and restore their canvas colour
     const sel=e.selType==='grad'?S.gradSel:S.photoSel;
     for(const fi of e.added){
       sel.delete(fi);
@@ -1895,10 +1943,10 @@ function undo(){
   S.rs.push(e);updUB();
 }
 function redo(){
+  if(S.exportPreview){redoExport();return;}
   if(!S.rs.length)return;
   const e=S.rs.pop();
   if(e.selType){
-    // Selection redo: re-add the faces to the selection set with highlight colour
     const sel=e.selType==='grad'?S.gradSel:S.photoSel;
     for(const fi of e.added){
       sel.add(fi);
@@ -1915,8 +1963,22 @@ function redo(){
   }
   S.us.push(e);updUB();
 }
-function updUB(){$('ub').disabled=!S.us.length;$('rb').disabled=!S.rs.length;}
-document.addEventListener('keydown',e=>{const mod=e.metaKey||e.ctrlKey;if(mod&&e.key==='z'){e.preventDefault();undo();}if(mod&&e.key==='y'){e.preventDefault();redo();}if(mod&&e.key>='1'&&e.key<='6'){e.preventDefault();setView(['front','back','left','right','top','bottom'][+e.key-1]);}});
+function updUB(){
+  const u=S.exportPreview?S.exportUndo:S.us;
+  const r=S.exportPreview?S.exportRedo:S.rs;
+  $('ub').disabled=!u.length;$('rb').disabled=!r.length;
+}
+document.addEventListener('keydown',e=>{
+  const mod=e.metaKey||e.ctrlKey;
+  if(mod&&e.key.toLowerCase()==='z'){
+    e.preventDefault();
+    if(e.shiftKey)redo();else undo();
+  }else if(mod&&e.key.toLowerCase()==='y'){
+    e.preventDefault();redo();
+  }else if(mod&&e.key>='1'&&e.key<='6'){
+    e.preventDefault();setView(['front','back','left','right','top','bottom'][+e.key-1]);
+  }
+});
 function isExportTool(t){return t==='recolor-brush'||t==='recolor-sphere';}
 function setActiveTool(tool){
   // Keep normal paint tools and export-preview recolour tools in their own modes.
@@ -2139,7 +2201,7 @@ function useCurrentAsRecolorFrom(){setRecolorFrom('#'+S.col.getHexString().toUpp
 function swapRecolorColors(){const from=normHex(S.recolorFrom)||'#000000';const to='#'+S.col.getHexString().toUpperCase();setRecolorFrom(to);sCH(from);}
 function recolorMatchFace(fi){const rgb=hexToRgbArr(S.recolorFrom).map(x=>x/255);const dr=S.fc[fi*3]-rgb[0],dg=S.fc[fi*3+1]-rgb[1],db=S.fc[fi*3+2]-rgb[2];return Math.sqrt(dr*dr+dg*dg+db*db)<=S.recolorTol*Math.sqrt(3);}
 function mfRecolor(fi){if(!recolorMatchFace(fi))return false;mf(fi);return true;}
-function recolorAllMatching(){if(!S.exportPreview||!S.exportSolid||!S.exportPreviewMesh){showToast('Recolour all works on the Export Preview only. Process, then enable Export Preview.','👁️');return;}const target=[Math.round(S.col.r*255),Math.round(S.col.g*255),Math.round(S.col.b*255)],palIdx=ensurePreviewPaletteColor(target);let n=0;for(let fi=0;fi<S.exportSolid.triData.length;fi++)if(previewRecolorMatch(fi)){setPreviewFaceColor(fi,palIdx);n++;}if(n)updateSolid3MF();showToast('Recoloured '+n.toLocaleString()+' export-preview faces','🔁');}
+function recolorAllMatching(){if(!S.exportPreview||!S.exportSolid||!S.exportPreviewMesh){showToast('Recolour all works on the Export Preview only. Process, then enable Export Preview.','👁️');return;}beginExportUndo();const target=[Math.round(S.col.r*255),Math.round(S.col.g*255),Math.round(S.col.b*255)],palIdx=ensurePreviewPaletteColor(target);let n=0;for(let fi=0;fi<S.exportSolid.triData.length;fi++)if(previewRecolorMatch(fi)){if(setPreviewFaceColor(fi,palIdx,true))n++;}if(n){updateSolid3MF();commitExportUndo();}else{S.exportPend=null;updUB();}showToast('Recoloured '+n.toLocaleString()+' export-preview faces','🔁');}
 function sCH(hex){if(!/^#[0-9a-f]{6}$/i.test(hex))return;S.col.set(hex);updCD();const hsv=r2h(S.col.r*255,S.col.g*255,S.col.b*255);S.hue=hsv[0]*360;S.sat=hsv[1];S.val=hsv[2];$('hs').value=S.hue;drawPk();}
 function h2r(h,s,v){let r,g,b;const i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);switch(i%6){case 0:r=v;g=t;b=p;break;case 1:r=q;g=v;b=p;break;case 2:r=p;g=v;b=t;break;case 3:r=p;g=q;b=v;break;case 4:r=t;g=p;b=v;break;case 5:r=v;g=p;b=q;break;}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)];}
 function r2h(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h,s=mx===0?0:d/mx,v=mx;if(mx===mn)h=0;else{switch(mx){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}h/=6;}return[h,s,v];}
@@ -2258,7 +2320,7 @@ function faceNormalsFromPos(pos,nf){const fn=new Float32Array(nf*3);for(let fi=0
 function ensurePreviewPaletteColor(rgb8){if(!S.exportSolid)return 0;for(let i=0;i<S.exportSolid.palette.length;i++){const c=S.exportSolid.palette[i];if(c[0]===rgb8[0]&&c[1]===rgb8[1]&&c[2]===rgb8[2])return i;}S.exportSolid.palette.push(rgb8.slice());return S.exportSolid.palette.length-1;}
 function previewFaceRGB(fi){if(!S.exportSolid||!S.exportSolid.triData[fi])return [0,0,0];return S.exportSolid.palette[S.exportSolid.triData[fi].m]||[0,0,0];}
 function previewRecolorMatch(fi){const c=previewFaceRGB(fi),src=hexToRgbArr(S.recolorFrom);const dr=(c[0]-src[0])/255,dg=(c[1]-src[1])/255,db=(c[2]-src[2])/255;return Math.sqrt(dr*dr+dg*dg+db*db)<=S.recolorTol*Math.sqrt(3);}
-function setPreviewFaceColor(fi,palIdx){if(!S.exportPreviewMesh||!S.exportSolid||!S.exportSolid.triData[fi])return false;S.exportSolid.triData[fi].m=palIdx;const c=S.exportSolid.palette[palIdx],ca=S.exportPreviewMesh.geometry.getAttribute('color').array;for(let v=0;v<3;v++){const o=fi*9+v*3;ca[o]=c[0]/255;ca[o+1]=c[1]/255;ca[o+2]=c[2]/255;}S.exportPreviewMesh.geometry.getAttribute('color').needsUpdate=true;return true;}
+function setPreviewFaceColor(fi,palIdx,track=true){if(!S.exportPreviewMesh||!S.exportSolid||!S.exportSolid.triData[fi])return false;const oldM=S.exportSolid.triData[fi].m;if(oldM===palIdx)return false;if(track)recordExportChange(fi,oldM,palIdx);S.exportSolid.triData[fi].m=palIdx;const c=S.exportSolid.palette[palIdx],ca=S.exportPreviewMesh.geometry.getAttribute('color').array;for(let v=0;v<3;v++){const o=fi*9+v*3;ca[o]=c[0]/255;ca[o+1]=c[1]/255;ca[o+2]=c[2]/255;}S.exportPreviewMesh.geometry.getAttribute('color').needsUpdate=true;return true;}
 function bRecolorPreview(pt,cfi){if(!S.exportPreviewMesh||!S.exportSolid)return;const target=[Math.round(S.col.r*255),Math.round(S.col.g*255),Math.round(S.col.b*255)],palIdx=ensurePreviewPaletteColor(target);const pa=S.exportPreviewMesh.geometry.getAttribute('position').array,r=S.brushR,vis=new Set([cfi]),q=[cfi];let changed=0;const fn=S.exportPreviewFn,adj=S.exportPreviewAdj;const tryFace=fi=>{if(previewRecolorMatch(fi)){if(setPreviewFaceColor(fi,palIdx))changed++;return true;}return false;};tryFace(cfi);const snx=fn[cfi*3],sny=fn[cfi*3+1],snz=fn[cfi*3+2];while(q.length){const fi=q.shift(),nb=adj&&adj.get(fi);if(!nb)continue;for(const n of nb){if(vis.has(n))continue;vis.add(n);if(fn[n*3]*snx+fn[n*3+1]*sny+fn[n*3+2]*snz<0)continue;const i9=n*9;const cx=(pa[i9]+pa[i9+3]+pa[i9+6])/3,cy=(pa[i9+1]+pa[i9+4]+pa[i9+7])/3,cz=(pa[i9+2]+pa[i9+5]+pa[i9+8])/3;if(Math.sqrt((cx-pt.x)**2+(cy-pt.y)**2+(cz-pt.z)**2)<=r){tryFace(n);q.push(n);}}}if(changed)updateSolid3MF();}
 
 function bRecolorPreviewSphere(pt){
@@ -2281,13 +2343,13 @@ function updateSolid3MF(){if(!S.exportSolid)return;const d=S.exportSolid,uPos=d.
 function clearExportPreview(){
   if(S.exportPreviewMesh){sc.remove(S.exportPreviewMesh);S.exportPreviewMesh.geometry.dispose();S.exportPreviewMesh.material.dispose();S.exportPreviewMesh=null;}
   if(S.exportPreviewWfm){sc.remove(S.exportPreviewWfm);S.exportPreviewWfm.geometry.dispose();S.exportPreviewWfm.material.dispose();S.exportPreviewWfm=null;}
-  S.exportPreview=false;S.exportPreviewAdj=null;S.exportPreviewFn=null;S.exportSolid=null;if($('epb')){$('epb').classList.remove('a');$('epb').disabled=true;}
+  S.exportPreview=false;S.exportPreviewAdj=null;S.exportPreviewFn=null;S.exportSolid=null;S.exportPreviewKind=null;S.exportUndo=[];S.exportRedo=[];S.exportPend=null;if($('epb')){$('epb').classList.remove('a');$('epb').disabled=true;}
   if(S.mesh)S.mesh.visible=true;if(S.wfm)S.wfm.visible=S.wf; if(typeof syncToolsForPreview==='function')syncToolsForPreview();
 }
 function setExportPreviewFromSolid(uPos,triData,palette){
   if(S.exportPreviewMesh){sc.remove(S.exportPreviewMesh);S.exportPreviewMesh.geometry.dispose();S.exportPreviewMesh.material.dispose();S.exportPreviewMesh=null;}
   if(S.exportPreviewWfm){sc.remove(S.exportPreviewWfm);S.exportPreviewWfm.geometry.dispose();S.exportPreviewWfm.material.dispose();S.exportPreviewWfm=null;}
-  S.exportSolid={uPos:Array.from(uPos),triData:triData.map(t=>({v1:t.v1,v2:t.v2,v3:t.v3,m:t.m})),palette:palette.map(c=>c.slice())};
+  S.exportSolid={uPos:Array.from(uPos),triData:triData.map(t=>({v1:t.v1,v2:t.v2,v3:t.v3,m:t.m})),palette:palette.map(c=>c.slice())};S.exportUndo=[];S.exportRedo=[];S.exportPend=null;updUB();
   const verts=new Float32Array(triData.length*9),cols=new Float32Array(triData.length*9);
   for(let i=0;i<triData.length;i++){const t=triData[i],ids=[t.v1,t.v2,t.v3],c=palette[t.m]||[200,200,200];for(let j=0;j<3;j++){verts[i*9+j*3]=uPos[ids[j]*3];verts[i*9+j*3+1]=uPos[ids[j]*3+1];verts[i*9+j*3+2]=uPos[ids[j]*3+2];cols[i*9+j*3]=c[0]/255;cols[i*9+j*3+1]=c[1]/255;cols[i*9+j*3+2]=c[2]/255;}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(verts,3));g.setAttribute('color',new THREE.BufferAttribute(cols,3));g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();
@@ -2296,13 +2358,23 @@ function setExportPreviewFromSolid(uPos,triData,palette){
   S.exportPreviewWfm=new THREE.LineSegments(new THREE.WireframeGeometry(g),new THREE.LineBasicMaterial({color:0x222244,opacity:.25,transparent:true}));if(S.mesh){S.exportPreviewWfm.position.copy(S.mesh.position);S.exportPreviewWfm.rotation.copy(S.mesh.rotation);S.exportPreviewWfm.scale.copy(S.mesh.scale);}S.exportPreviewWfm.visible=S.exportPreview&&S.wf;sc.add(S.exportPreviewWfm);
   if($('epb'))$('epb').disabled=false;
 }
+function channelPreviewPaletteFromMode(M){
+  return M.ch.map(ch=>{
+    let h=(ch.hex||'#CCCCCC').replace('#','');
+    if(h.length>=6)h=h.slice(0,6);
+    if(h.length<6)h='CCCCCC';
+    const n=parseInt(h,16);
+    return [(n>>16)&255,(n>>8)&255,n&255];
+  });
+}
+
 function toggleExportPreview(force){
   if(!S.exportPreviewMesh){showToast('Process the model first to create an export preview.','👁️');return;}
   S.exportPreview=(typeof force==='boolean')?force:!S.exportPreview;
   S.exportPreviewMesh.visible=S.exportPreview;if(S.exportPreviewWfm)S.exportPreviewWfm.visible=S.exportPreview&&S.wf;
   if(S.mesh)S.mesh.visible=!S.exportPreview;if(S.wfm)S.wfm.visible=!S.exportPreview&&S.wf;
   if($('epb'))$('epb').classList.toggle('a',S.exportPreview);
-  if(typeof syncToolsForPreview==='function')syncToolsForPreview();
+  if(typeof syncToolsForPreview==='function')syncToolsForPreview();updUB();
   $('st').textContent=S.exportPreview?'Tool: '+(S.tool==='recolor-sphere'?'Recolour Sphere':'Recolour Brush'):'Tool: '+(S.tool||'Brush');
 }
 async function processModel(){
@@ -2481,6 +2553,7 @@ async function processModel(){
     const rels2='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';
     S.mdl3mf=makeZip([{name:'[Content_Types].xml',data:enc2.encode(ctypes).buffer},{name:'_rels/.rels',data:enc2.encode(rels2).buffer},{name:'3D/3dmodel.model',data:enc2.encode(xp.join('')).buffer}]);
     setExportPreviewFromSolid(uPos,triData2,palette);
+    S.exportPreviewKind='solid';
     toggleExportPreview(true);
     fe.style.width='100%';te.textContent='Done — '+palette.length+' colours, '+uid.toLocaleString()+' verts';await sl(400);
     ov.classList.remove('vis');$('dl-overlay').style.display='block';$('reprocess-overlay').style.display='none';S.processed=true;
@@ -2558,13 +2631,14 @@ async function processModel(){
   const M=MODES[mode];
   const nCh=M.ch.length;
 
-  // Export colour sampling: always use per-face S.fc colours.
-  // Photo-projected faces have S.fc set to the centroid-average of the projected pixels
-  // (written by applyPhotoProjection). UV texture sampling was removed because the
-  // Export colour: non-photo faces use exact S.fc. Photo faces use the saved camera
-  // projection to re-sample the photo at each sub-triangle centroid — this gives
-  // per-layer colour variation on any mesh (including low-poly ones like a cube)
-  // without any UV texture UV↔screen mismatch.
+  // Export colour sampling for non-solid filament modes:
+  // 1) Photo-projected faces still use the saved camera projection, so photo edits
+  //    preserve per-sub-triangle detail.
+  // 2) Textured OBJ faces sample the original texture directly at the sub-triangle
+  //    centroid UV instead of using the pre-averaged per-face colour. This makes
+  //    CMY/WCMY/KCMY/WKCMY/2C exports follow the texture image itself.
+  // 3) Fallback is the current per-face S.fc colour for STL/3MF, painted-only, or
+  //    untextured/material-only geometry.
   const pp=S.photoProjection; // may be null if no photo was applied
   const hasPhoto=pp&&S.photoFaces&&S.photoFaces.size>0;
   // Pre-flatten saved camera matrices to plain arrays for fast inline math (no Three.js calls)
@@ -2599,12 +2673,37 @@ async function processModel(){
   }
 
   const Q=8;
+  const hasObjTexture=!!(S.objSource&&S.objSource.hasTexture&&S.objSource.tris);
+  function quantRGB8(c){return[Math.min(255,Math.round(c[0]/Q)*Q),Math.min(255,Math.round(c[1]/Q)*Q),Math.min(255,Math.round(c[2]/Q)*Q)];}
+  function baryUVForFacePoint(fi,cx,cy,cz){
+    const t=S.objSource&&S.objSource.tris&&S.objSource.tris[fi];
+    if(!t||!t.tex||!t.uv||!t.uv[0]||!t.uv[1]||!t.uv[2])return null;
+    const i=fi*9;
+    const ax=pos[i],ay=pos[i+1],az=pos[i+2],bx=pos[i+3],by=pos[i+4],bz=pos[i+5],cx2=pos[i+6],cy2=pos[i+7],cz2=pos[i+8];
+    const v0x=bx-ax,v0y=by-ay,v0z=bz-az,v1x=cx2-ax,v1y=cy2-ay,v1z=cz2-az,v2x=cx-ax,v2y=cy-ay,v2z=cz-az;
+    const d00=v0x*v0x+v0y*v0y+v0z*v0z,d01=v0x*v1x+v0y*v1y+v0z*v1z,d11=v1x*v1x+v1y*v1y+v1z*v1z,d20=v2x*v0x+v2y*v0y+v2z*v0z,d21=v2x*v1x+v2y*v1y+v2z*v1z;
+    const den=d00*d11-d01*d01;if(Math.abs(den)<1e-12)return null;
+    let v=(d11*d20-d01*d21)/den,w=(d00*d21-d01*d20)/den,u=1-v-w;
+    u=Math.max(0,Math.min(1,u));v=Math.max(0,Math.min(1,v));w=Math.max(0,Math.min(1,w));
+    const sum=u+v+w||1;u/=sum;v/=sum;w/=sum;
+    return [t.uv[0][0]*u+t.uv[1][0]*v+t.uv[2][0]*w,t.uv[0][1]*u+t.uv[1][1]*v+t.uv[2][1]*w,t.tex];
+  }
+  function sampleObjTextureAt(fi,cx,cy,cz){
+    if(!hasObjTexture)return null;
+    const uvTex=baryUVForFacePoint(fi,cx,cy,cz);if(!uvTex)return null;
+    const smp=sampleTex(uvTex[2],uvTex[0],uvTex[1]);
+    if(!smp||smp[3]<=0.02)return null;
+    const a=smp[3],fr=S.fc[fi*3],fg=S.fc[fi*3+1],fb=S.fc[fi*3+2];
+    return [Math.round((smp[0]*a+fr*(1-a))*255),Math.round((smp[1]*a+fg*(1-a))*255),Math.round((smp[2]*a+fb*(1-a))*255)];
+  }
   function getColor(fi,cx,cy,cz){
     if(hasPhoto&&pp.faces.has(fi)){
       const tc=sampleSavedPhoto(cx,cy,cz);
-      if(tc)return[Math.min(255,Math.round(tc[0]/Q)*Q),Math.min(255,Math.round(tc[1]/Q)*Q),Math.min(255,Math.round(tc[2]/Q)*Q)];
+      if(tc)return quantRGB8(tc);
     }
-    return[Math.min(255,Math.round(S.fc[fi*3]*255/Q)*Q),Math.min(255,Math.round(S.fc[fi*3+1]*255/Q)*Q),Math.min(255,Math.round(S.fc[fi*3+2]*255/Q)*Q)];
+    const texC=sampleObjTextureAt(fi,cx,cy,cz);
+    if(texC)return quantRGB8(texC);
+    return quantRGB8([S.fc[fi*3]*255,S.fc[fi*3+1]*255,S.fc[fi*3+2]*255]);
   }
 
   // Lazy dither sequence cache
@@ -2826,6 +2925,15 @@ async function processModel(){
     {name:'Metadata/Slic3r_PE_model.config',data:enc.encode(prusaModelConfig).buffer},
     {name:'Metadata/project_settings.config',data:enc.encode(orcaProjectSettings).buffer}
   ]);
+
+
+  // Export Preview always represents the actual exported triangle/material data.
+  // For CMY/WCMY/KCMY/WKCMY/2C, show the clipped layer sub-triangles
+  // coloured by their assigned exported filament/material slot.
+  te.textContent='Building export preview...';fe.style.width='96%';await sl(30);
+  setExportPreviewFromSolid(uPos,triData,channelPreviewPaletteFromMode(M));
+  S.exportPreviewKind=mode;
+  toggleExportPreview(true);
 
   fe.style.width='100%';te.textContent='Done!';await sl(400);
   ov.classList.remove('vis');
