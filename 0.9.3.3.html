@@ -937,6 +937,72 @@ async function load3MF(buf,name){
   await loadModelData(finalPos,nf,name.replace(/\.3mf$/i,''),hasColors&&cc>0?finalFC:null,null,null);
   }catch(e){alert('Error loading 3MF: '+e.message);console.error(e);}
 }
+async function paintInitialTextureCanvas(texW,texH,nf,canTex){
+  if(!S.texCtx)throw new Error('Could not create texture canvas. Try a browser/device with a larger canvas limit.');
+  const br8=Math.round(S.base.r*255),bg8=Math.round(S.base.g*255),bb8=Math.round(S.base.b*255);
+  if(!S.painted||S.painted.size===0){
+    S.texCtx.fillStyle=`rgb(${br8},${bg8},${bb8})`;
+    S.texCtx.fillRect(0,0,texW,texH);
+    canTex.needsUpdate=true;
+    return;
+  }
+
+  // Textured OBJ imports often have hundreds of thousands of unique face colours.
+  // Avoid building one huge array per colour; paint directly into an ImageData buffer.
+  if(S.painted.size>50000){
+    const img=S.texCtx.createImageData(texW,texH),data=img.data;
+    for(let i=0;i<data.length;i+=4){data[i]=br8;data[i+1]=bg8;data[i+2]=bb8;data[i+3]=255;}
+    let done=0;
+    for(const fi of S.painted){
+      const u6=fi*6;
+      const u0=S.uvs[u6]*texW,v0=S.uvs[u6+1]*texH;
+      const u1=S.uvs[u6+2]*texW,v1=S.uvs[u6+3]*texH;
+      const u2=S.uvs[u6+4]*texW,v2=S.uvs[u6+5]*texH;
+      const minU=Math.max(0,Math.floor(Math.min(u0,u1,u2)));
+      const minV=Math.max(0,Math.floor(Math.min(v0,v1,v2)));
+      const maxU=Math.min(texW,Math.ceil(Math.max(u0,u1,u2)));
+      const maxV=Math.min(texH,Math.ceil(Math.max(v0,v1,v2)));
+      const r=Math.round(S.fc[fi*3]*255),g=Math.round(S.fc[fi*3+1]*255),b=Math.round(S.fc[fi*3+2]*255);
+      for(let y=minV;y<maxV;y++){
+        let o=(y*texW+minU)*4;
+        for(let x=minU;x<maxU;x++){data[o]=r;data[o+1]=g;data[o+2]=b;data[o+3]=255;o+=4;}
+      }
+      done++;
+      if(done%60000===0){setLoadMsg(`Painting texture... ${Math.round(done/S.painted.size*100)}%`);await sl(0);}
+    }
+    S.texCtx.putImageData(img,0,0);
+    canTex.needsUpdate=true;
+    return;
+  }
+
+  S.texCtx.fillStyle=`rgb(${br8},${bg8},${bb8})`;
+  S.texCtx.fillRect(0,0,texW,texH);
+  const cg2=new Map();
+  for(const fi of S.painted){
+    const rr=S.fc[fi*3],gg=S.fc[fi*3+1],bb3=S.fc[fi*3+2];
+    const ck=`${Math.round(rr*255)},${Math.round(gg*255)},${Math.round(bb3*255)}`;
+    if(!cg2.has(ck))cg2.set(ck,{r:rr,g:gg,b:bb3,faces:[]});
+    cg2.get(ck).faces.push(fi);
+  }
+  let cgN=0;
+  for(const[,{r:cr,g:cg3,b:cb,faces}] of cg2){
+    S.texCtx.fillStyle=`rgb(${Math.round(cr*255)},${Math.round(cg3*255)},${Math.round(cb*255)})`;
+    for(let j=0;j<faces.length;j++){
+      const fi=faces[j],u6=fi*6;
+      const u0=S.uvs[u6]*texW,v0=S.uvs[u6+1]*texH;
+      const u1=S.uvs[u6+2]*texW,v1=S.uvs[u6+3]*texH;
+      const u2=S.uvs[u6+4]*texW,v2=S.uvs[u6+5]*texH;
+      const minU=Math.max(0,Math.floor(Math.min(u0,u1,u2)));
+      const minV=Math.max(0,Math.floor(Math.min(v0,v1,v2)));
+      const maxU=Math.min(texW,Math.ceil(Math.max(u0,u1,u2)));
+      const maxV=Math.min(texH,Math.ceil(Math.max(v0,v1,v2)));
+      S.texCtx.fillRect(minU,minV,maxU-minU,maxV-minV);
+    }
+    cgN++;if(cgN%20===0){canTex.needsUpdate=true;setLoadMsg(`Painting texture... ${Math.round(cgN/cg2.size*100)}%`);await sl(0);}
+  }
+  canTex.needsUpdate=true;
+}
+
 async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas,_objSource){
   S.fn=name;if(S.mesh){sc.remove(S.mesh);if(S.wfm)sc.remove(S.wfm);}
   S.tex=null;S.uvs=null;S.texCtx=null;S.texW=0;S.texH=0;S.uvScale=1;S.objSource=_objSource||null;
@@ -971,40 +1037,8 @@ async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas,_objSourc
   canTex.magFilter=THREE.NearestFilter;
   S.tex=canTex;
 
-  // Paint initial face colors to canvas — use fillRect per patch (same as drawFaceOnCanvas)
-  {
-    const br2=S.base.r,bg2=S.base.g,bb2=S.base.b;
-    S.texCtx.fillStyle=`rgb(${Math.round(br2*255)},${Math.round(bg2*255)},${Math.round(bb2*255)})`;
-    S.texCtx.fillRect(0,0,texW,texH);
-    if(S.painted.size>0){
-      setLoadMsg('Painting texture...');await sl(0);
-      // Batch by color for fillRect — group same-color faces to minimize fillStyle changes
-      const cg2=new Map();
-      for(const fi of S.painted){
-        const rr=S.fc[fi*3],gg=S.fc[fi*3+1],bb3=S.fc[fi*3+2];
-        const ck=`${Math.round(rr*255)},${Math.round(gg*255)},${Math.round(bb3*255)}`;
-        if(!cg2.has(ck))cg2.set(ck,{r:rr,g:gg,b:bb3,faces:[]});
-        cg2.get(ck).faces.push(fi);
-      }
-      let cgN=0;
-      for(const[,{r:cr,g:cg3,b:cb,faces}] of cg2){
-        S.texCtx.fillStyle=`rgb(${Math.round(cr*255)},${Math.round(cg3*255)},${Math.round(cb*255)})`;
-        for(let j=0;j<faces.length;j++){
-          const fi=faces[j],u6=fi*6;
-          const u0=S.uvs[u6]*texW,v0=S.uvs[u6+1]*texH;
-          const u1=S.uvs[u6+2]*texW,v1=S.uvs[u6+3]*texH;
-          const u2=S.uvs[u6+4]*texW,v2=S.uvs[u6+5]*texH;
-          const minU=Math.floor(Math.min(u0,u1,u2));
-          const minV=Math.floor(Math.min(v0,v1,v2));
-          const maxU=Math.ceil(Math.max(u0,u1,u2));
-          const maxV=Math.ceil(Math.max(v0,v1,v2));
-          S.texCtx.fillRect(minU,minV,maxU-minU,maxV-minV);
-        }
-        cgN++;if(cgN%20===0){canTex.needsUpdate=true;setLoadMsg(`Painting texture... ${Math.round(cgN/cg2.size*100)}%`);await sl(0);}
-      }
-    }
-    canTex.needsUpdate=true;
-  }
+  setLoadMsg('Painting texture...');await sl(0);
+  await paintInitialTextureCanvas(texW,texH,nf,canTex);
 
   // Add UV attribute so raycaster returns hit.uv
   geo.setAttribute('uv',new THREE.BufferAttribute(S.uvs,2));
