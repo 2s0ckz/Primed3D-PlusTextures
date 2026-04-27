@@ -937,6 +937,59 @@ async function load3MF(buf,name){
   await loadModelData(finalPos,nf,name.replace(/\.3mf$/i,''),hasColors&&cc>0?finalFC:null,null,null);
   }catch(e){alert('Error loading 3MF: '+e.message);console.error(e);}
 }
+async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas){
+  S.fn=name;if(S.mesh){sc.remove(S.mesh);if(S.wfm)sc.remove(S.wfm);}
+  S.tex=null;S.uvs=null;S.texCtx=null;S.texW=0;S.texH=0;S.uvScale=1;
+
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(posArr,3));geo.computeVertexNormals();
+  const br=S.base.r,bg=S.base.g,bb=S.base.b;
+  S.fc=new Float32Array(nf*3);S.painted=new Set();
+  for(let i=0;i<nf;i++){
+    let r=br,g=bg,b=bb;
+    if(faceColors){r=faceColors[i*3];g=faceColors[i*3+1];b=faceColors[i*3+2];S.painted.add(i);}
+    S.fc[i*3]=r;S.fc[i*3+1]=g;S.fc[i*3+2]=b;
+  }
+
+  // Compute face normals
+  S.fn2=new Float32Array(nf*3);
+  for(let i=0;i<nf;i++){const i9=i*9,e1x=posArr[i9+3]-posArr[i9],e1y=posArr[i9+4]-posArr[i9+1],e1z=posArr[i9+5]-posArr[i9+2],e2x=posArr[i9+6]-posArr[i9],e2y=posArr[i9+7]-posArr[i9+1],e2z=posArr[i9+8]-posArr[i9+2];let nx=e1y*e2z-e1z*e2y,ny=e1z*e2x-e1x*e2z,nz=e1x*e2y-e1y*e2x;const l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;S.fn2[i*3]=nx/l;S.fn2[i*3+1]=ny/l;S.fn2[i*3+2]=nz/l;}
+  buildAdj(posArr,nf);
+
+  // UV unwrap
+  const {uvs:genUvs,texW,texH,uvScale}=await unwrapMesh(posArr,nf);
+  S.uvs=genUvs;S.texW=texW;S.texH=texH;S.uvScale=uvScale;
+
+  setLoadMsg('Building texture canvas...');await sl(0);
+  const texCv=document.createElement('canvas');texCv.width=texW;texCv.height=texH;
+  S.texCtx=texCv.getContext('2d',{willReadFrequently:true,alpha:false});
+  const canTex=new THREE.CanvasTexture(texCv);
+  canTex.flipY=false; // UV Y-down matches canvas native
+  // NearestFilter: per-face solid-colour atlas must not blur across patch boundaries.
+  // Bilinear (default) samples PAD pixels from neighbouring patches → scattered colour artifacts.
+  canTex.minFilter=THREE.NearestFilter;
+  canTex.magFilter=THREE.NearestFilter;
+  S.tex=canTex;
+
+  setLoadMsg('Painting texture...');await sl(0);
+  await paintInitialTextureCanvas(texW,texH,nf,canTex);
+
+  // Add UV attribute so raycaster returns hit.uv
+  geo.setAttribute('uv',new THREE.BufferAttribute(S.uvs,2));
+
+  S.mesh=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({map:canTex,flatShading:true,side:THREE.DoubleSide,shininess:25}));
+  sc.add(S.mesh);S.geo=geo;
+
+  S.wfm=new THREE.LineSegments(new THREE.WireframeGeometry(geo),new THREE.LineBasicMaterial({color:0x444466,opacity:.2,transparent:true}));S.wfm.visible=S.wf;sc.add(S.wfm);
+  resetCamera();['bcs','ts','bs','cs','ps','orientSec'].forEach(id=>$(id).style.display='');
+  $('hh').style.display='';$('vpUndo').style.display='';$('ua').classList.add('hf');$('ua').querySelector('p').textContent=name;
+  $('sf').textContent=nf.toLocaleString()+' faces'+(faceColors?' (colored)':'');
+  $('dl-overlay').style.display='none';$('reprocess-overlay').style.display='none';$('linf').style.display='none';S.processed=false;
+  // Reset photo tool state
+  S.photoImg=null;S.photoCtx=null;S.photoSel=new Set();S.photoFaces=new Set();hidePhotoOverlay();
+  $('photoControls').style.display='none';$('photoUploadLabel').textContent='Click to load a JPG or PNG';$('photoFileIn').value='';
+  S.us=[];S.rs=[];pend.clear();updUB();initPk();hideLoading();
+}
 async function paintInitialTextureCanvas(texW,texH,nf,canTex){
   if(!S.texCtx)throw new Error('Could not create texture canvas. Try a browser/device with a larger canvas limit.');
   const br8=Math.round(S.base.r*255),bg8=Math.round(S.base.g*255),bb8=Math.round(S.base.b*255);
@@ -1002,60 +1055,6 @@ async function paintInitialTextureCanvas(texW,texH,nf,canTex){
   }
   canTex.needsUpdate=true;
 }
-
-async function loadModelData(posArr,nf,name,faceColors,_uvs,_texCanvas,_objSource){
-  S.fn=name;if(S.mesh){sc.remove(S.mesh);if(S.wfm)sc.remove(S.wfm);}
-  S.tex=null;S.uvs=null;S.texCtx=null;S.texW=0;S.texH=0;S.uvScale=1;S.objSource=_objSource||null;
-
-  const geo=new THREE.BufferGeometry();
-  geo.setAttribute('position',new THREE.BufferAttribute(posArr,3));geo.computeVertexNormals();
-  const br=S.base.r,bg=S.base.g,bb=S.base.b;
-  S.fc=new Float32Array(nf*3);S.painted=new Set();
-  for(let i=0;i<nf;i++){
-    let r=br,g=bg,b=bb;
-    if(faceColors){r=faceColors[i*3];g=faceColors[i*3+1];b=faceColors[i*3+2];S.painted.add(i);}
-    S.fc[i*3]=r;S.fc[i*3+1]=g;S.fc[i*3+2]=b;
-  }
-
-  // Compute face normals
-  S.fn2=new Float32Array(nf*3);
-  for(let i=0;i<nf;i++){const i9=i*9,e1x=posArr[i9+3]-posArr[i9],e1y=posArr[i9+4]-posArr[i9+1],e1z=posArr[i9+5]-posArr[i9+2],e2x=posArr[i9+6]-posArr[i9],e2y=posArr[i9+7]-posArr[i9+1],e2z=posArr[i9+8]-posArr[i9+2];let nx=e1y*e2z-e1z*e2y,ny=e1z*e2x-e1x*e2z,nz=e1x*e2y-e1y*e2x;const l=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;S.fn2[i*3]=nx/l;S.fn2[i*3+1]=ny/l;S.fn2[i*3+2]=nz/l;}
-  buildAdj(posArr,nf);
-
-  // UV unwrap
-  const {uvs:genUvs,texW,texH,uvScale}=await unwrapMesh(posArr,nf);
-  S.uvs=genUvs;S.texW=texW;S.texH=texH;S.uvScale=uvScale;
-
-  setLoadMsg('Building texture canvas...');await sl(0);
-  const texCv=document.createElement('canvas');texCv.width=texW;texCv.height=texH;
-  S.texCtx=texCv.getContext('2d',{willReadFrequently:true,alpha:false});
-  const canTex=new THREE.CanvasTexture(texCv);
-  canTex.flipY=false; // UV Y-down matches canvas native
-  // NearestFilter: per-face solid-colour atlas must not blur across patch boundaries.
-  // Bilinear (default) samples PAD pixels from neighbouring patches → scattered colour artifacts.
-  canTex.minFilter=THREE.NearestFilter;
-  canTex.magFilter=THREE.NearestFilter;
-  S.tex=canTex;
-
-  setLoadMsg('Painting texture...');await sl(0);
-  await paintInitialTextureCanvas(texW,texH,nf,canTex);
-
-  // Add UV attribute so raycaster returns hit.uv
-  geo.setAttribute('uv',new THREE.BufferAttribute(S.uvs,2));
-
-  S.mesh=new THREE.Mesh(geo,new THREE.MeshPhongMaterial({map:canTex,flatShading:true,side:THREE.DoubleSide,shininess:25}));
-  sc.add(S.mesh);S.geo=geo;
-
-  S.wfm=new THREE.LineSegments(new THREE.WireframeGeometry(geo),new THREE.LineBasicMaterial({color:0x444466,opacity:.2,transparent:true}));S.wfm.visible=S.wf;sc.add(S.wfm);
-  resetCamera();['bcs','ts','bs','cs','ps','orientSec'].forEach(id=>$(id).style.display='');
-  $('hh').style.display='';$('vpUndo').style.display='';$('ua').classList.add('hf');$('ua').querySelector('p').textContent=name;
-  $('sf').textContent=nf.toLocaleString()+' faces'+(faceColors?' (colored)':'');
-  $('dl-overlay').style.display='none';$('reprocess-overlay').style.display='none';$('linf').style.display='none';S.processed=false;clearExportPreview();
-  // Reset photo tool state
-  S.photoImg=null;S.photoCtx=null;S.photoSel=new Set();S.photoFaces=new Set();hidePhotoOverlay();
-  $('photoControls').style.display='none';$('photoUploadLabel').textContent='Click to load a JPG or PNG';$('photoFileIn').value='';
-  S.us=[];S.rs=[];pend.clear();updUB();initPk();hideLoading();
-}
 function buildAdj(pos,nf){
   // pr=1e3: rounds to 3 decimal places (0.001mm tolerance).
   // 1e4 (0.0001mm) was too tight — some STL exporters produce cube-face internal-diagonal
@@ -1076,6 +1075,7 @@ function setLoadMsg(msg){$('pt').textContent=msg;}
 function hideLoading(){
   setTimeout(()=>{$('loadAnim').style.display='none';$('pbarWrap').style.display='';$('po').classList.remove('vis');},200);
 }
+function loadFile(buf,name){showLoading('Loading '+name+'...');setTimeout(()=>{if(/\.3mf$/i.test(name)){S.objProject=null;updateObjAssetUI();load3MF(buf,name).catch(e=>{hideLoading();alert('Error loading 3MF: '+e.message);console.error(e);});}else if(/\.obj$/i.test(name)){const fileMap=new Map([[normFileName(name),buf]]);S.objProject={objName:name,fileMap};updateObjAssetUI();loadOBJProject(name,buf,fileMap).then(updateObjAssetUI).catch(e=>{S.objProject=null;updateObjAssetUI();hideLoading();alert('Error loading OBJ: '+e.message);console.error(e);});}else{S.objProject=null;updateObjAssetUI();try{const d=parseSTL(buf);loadModelData(d.p,d.n,name.replace(/\.stl$/i,''),d.colors,null,null).catch(e=>{hideLoading();alert('Error loading STL: '+e.message);console.error(e);});}catch(e){hideLoading();alert('Error parsing STL: '+e.message);}}},50);}
 function normFileName(name){return name.split(/[\\/]/).pop().toLowerCase();}
 function objIdx(raw,len){const n=parseInt(raw,10);return n<0?len+n:n-1;}
 function normColor3(n){const s=n.some(v=>v>1)?255:1;return[Math.max(0,Math.min(1,n[0]/s)),Math.max(0,Math.min(1,n[1]/s)),Math.max(0,Math.min(1,n[2]/s))];}
@@ -1165,23 +1165,18 @@ async function loadOBJProject(objName,objBuf,fileMap){
 
   setLoadMsg('Converting OBJ colors...');
   const posArr=new Float32Array(faces.length*9),fcArr=new Float32Array(faces.length*3);
-  const objSource={kind:'obj-texture',tris:[],hasTexture:false};
   let hasColor=false;
   for(let fi=0;fi<faces.length;fi++){
     const f=faces[fi];
-    const srcTri={p:[],uv:[],tex:null,flatColor:null};
     for(let j=0;j<3;j++){
       const v=verts[f.c[j].vi],o=fi*9+j*3;
       posArr[o]=v[0];posArr[o+1]=v[1];posArr[o+2]=v[2];
-      srcTri.p.push([v[0],v[1],v[2]]);
-      const uv=f.c[j].ti>=0?uvs[f.c[j].ti]:null;srcTri.uv.push(uv?[uv[0],uv[1]]:null);
     }
     let col=null;
     const mat=f.mat?mats.get(f.mat):null;
     if(mat&&mat.mapKd&&samplers.has(mat.mapKd)&&f.c.every(c=>c.ti>=0&&uvs[c.ti])){
       const uv0=uvs[f.c[0].ti],uv1=uvs[f.c[1].ti],uv2=uvs[f.c[2].ti];
-      srcTri.tex=samplers.get(mat.mapKd);objSource.hasTexture=true;
-      col=srcTri.tex.sample(wrappedAvg3(uv0[0],uv1[0],uv2[0]),wrappedAvg3(uv0[1],uv1[1],uv2[1]));
+      col=samplers.get(mat.mapKd).sample(wrappedAvg3(uv0[0],uv1[0],uv2[0]),wrappedAvg3(uv0[1],uv1[1],uv2[1]));
     }else if(mat&&mat.kd){
       col=mat.kd;
     }else if(f.c.every(c=>vcols[c.vi])){
@@ -1190,10 +1185,27 @@ async function loadOBJProject(objName,objBuf,fileMap){
     }
     if(col){fcArr[fi*3]=col[0];fcArr[fi*3+1]=col[1];fcArr[fi*3+2]=col[2];hasColor=true;}
     else{fcArr[fi*3]=S.base.r;fcArr[fi*3+1]=S.base.g;fcArr[fi*3+2]=S.base.b;}
-    srcTri.flatColor=[fcArr[fi*3],fcArr[fi*3+1],fcArr[fi*3+2]];objSource.tris.push(srcTri);
     if(fi%100000===0)await sl(0);
   }
-  await loadModelData(posArr,faces.length,objName.replace(/\.obj$/i,''),hasColor?fcArr:null,null,null,objSource.hasTexture?objSource:null);
+  // Preserve file29's display/load output above, but also expose the original
+  // OBJ UV + texture source that file28's Solid Colours > Texture Boundaries
+  // exporter needs. This does not affect viewport loading.
+  const objTris=[];let objHasTexture=false;
+  for(let fi=0;fi<faces.length;fi++){
+    const f=faces[fi],i9=fi*9,mat=f.mat?mats.get(f.mat):null;
+    const tex=(mat&&mat.mapKd&&samplers.has(mat.mapKd))?samplers.get(mat.mapKd):null;
+    const uv=f.c.map(c=>(c.ti>=0&&uvs[c.ti])?[uvs[c.ti][0],uvs[c.ti][1]]:null);
+    const flatColor=[fcArr[fi*3],fcArr[fi*3+1],fcArr[fi*3+2]];
+    if(tex&&uv[0]&&uv[1]&&uv[2])objHasTexture=true;
+    objTris.push({
+      p:[[posArr[i9],posArr[i9+1],posArr[i9+2]],[posArr[i9+3],posArr[i9+4],posArr[i9+5]],[posArr[i9+6],posArr[i9+7],posArr[i9+8]]],
+      uv,
+      tex,
+      flatColor
+    });
+  }
+  S.objSource={kind:'obj',hasTexture:objHasTexture,tris:objTris};
+  await loadModelData(posArr,faces.length,objName.replace(/\.obj$/i,''),hasColor?fcArr:null,null,null);
 }
 function readFileBuffer(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(r.error);r.readAsArrayBuffer(file);});}
 async function reloadCurrentOBJ(msg){
@@ -1334,19 +1346,27 @@ async function unwrapMesh(posArr,nf){
   //   heightNeeded = PAD + rowsNeeded*(p+PAD)  must be <= texH
   // Solving: p <= (texW-PAD)/sqrt(nf) - PAD
   setLoadMsg('UV mapping...');await sl(0);
-  const texW=nf<8000?1024:nf<100000?2048:4096,texH=texW;
   const PAD=1;
+  const fits=(size,p)=>{
+    const fpRow=Math.floor((size-PAD)/(p+PAD));
+    if(fpRow<=0)return false;
+    const rows=Math.ceil(nf/fpRow);
+    return PAD+rows*(p+PAD)<=size;
+  };
+  const maxTex=Math.max(1024,Math.min(8192,(R&&R.capabilities&&R.capabilities.maxTextureSize)||8192));
+  let texW=nf<8000?1024:nf<100000?2048:4096;
+  while(texW<maxTex&&!fits(texW,1))texW*=2;
+  texW=Math.min(texW,maxTex);
+  const texH=texW;
+  if(!fits(texW,1))throw new Error('Model has too many faces for this browser texture limit.');
   // Binary search for the largest square patch size p such that all nf patches fit
   // within the texH texture height. The old area-formula overestimated p and caused
   // patches for the last faces to overflow texH, producing UV clamping artifacts
   // (wrong colours on unrelated faces when painting, swirling photo distortion).
-  let lo=3,hi=texW-PAD*2;
+  let lo=1,hi=texW-PAD*2;
   while(lo<hi){
     const mid=(lo+hi+1)>>1;
-    const fpRow=Math.floor((texW-PAD)/(mid+PAD));
-    if(fpRow===0){hi=mid-1;continue;}
-    const rows=Math.ceil(nf/fpRow);
-    if(PAD+rows*(mid+PAD)<=texH)lo=mid;else hi=mid-1;
+    if(fits(texW,mid))lo=mid;else hi=mid-1;
   }
   const p=lo,pw=p,ph=p;
   const uvOut=new Float32Array(nf*6);
@@ -2069,12 +2089,10 @@ function setActiveTool(tool){
   }
 }
 function syncToolsForPreview(){
-  const canRecolor=S.exportPreview&&S.exportPreviewKind==='solid'&&!!S.exportSolid;
-  if($('toolsTitle'))$('toolsTitle').textContent=canRecolor?'Export Preview Tools':'Paint Tools';
-  if($('paintTools'))$('paintTools').style.display=canRecolor?'none':'grid';
-  if($('exportTools'))$('exportTools').style.display=canRecolor?'grid':'none';
-  if(canRecolor){setActiveTool(isExportTool(S.tool)?S.tool:'recolor-brush');}
-  else if(isExportTool(S.tool)){setActiveTool('brush');}
+  if($('toolsTitle'))$('toolsTitle').textContent=S.exportPreview?'Export Preview Tools':'Paint Tools';
+  if($('paintTools'))$('paintTools').style.display=S.exportPreview?'none':'grid';
+  if($('exportTools'))$('exportTools').style.display=S.exportPreview?'grid':'none';
+  setActiveTool(S.exportPreview?(isExportTool(S.tool)?S.tool:'recolor-brush'):(isExportTool(S.tool)?'brush':S.tool));
 }
 document.querySelectorAll('.tb').forEach(btn=>btn.addEventListener('click',()=>setActiveTool(btn.dataset.tool)));
 
@@ -2174,17 +2192,6 @@ function updateDims(){
   $('dimX').value=sx.toFixed(2);
   $('dimY').value=sy.toFixed(2);
   $('dimZ').value=sz.toFixed(2);
-}
-function getModelDims(){
-  if(!S.geo)return null;
-  S.geo.computeBoundingBox();
-  const bb=S.geo.boundingBox;
-  return{x:bb.max.x-bb.min.x,y:bb.max.y-bb.min.y,z:bb.max.z-bb.min.z};
-}
-function modelSizeInfoHTML(){
-  const d=getModelDims();
-  if(!d)return'';
-  return 'Size: <span>'+d.x.toFixed(2)+'</span> x <span>'+d.y.toFixed(2)+'</span> x <span>'+d.z.toFixed(2)+'</span> mm';
 }
 function onDimChange(axis,val){
   if(!S.geo)return;
@@ -2351,7 +2358,24 @@ function makeDecompose(filRGB){
 }
 
 function nearestPaletteIndexRGB8(r,g,b,palette){let minD=Infinity,best=0;for(let i=0;i<palette.length;i++){const d=(r-palette[i][0])**2+(g-palette[i][1])**2+(b-palette[i][2])**2;if(d<minD){minD=d;best=i;}}return best;}
-function sampleTexRGB8(tex,uv){if(!tex||!uv)return null;if(typeof tex.sample==='function'){const c=tex.sample(uv[0],uv[1]);return c?[Math.round(c[0]*255),Math.round(c[1]*255),Math.round(c[2]*255)]:null;}if(typeof sampleTex==='function'){const smp=sampleTex(tex,uv[0],uv[1]);if(!smp||smp[3]<=0.02)return null;return [Math.round(smp[0]*255),Math.round(smp[1]*255),Math.round(smp[2]*255)];}if(tex.ctx){const u=((uv[0]%1)+1)%1,v=((uv[1]%1)+1)%1;const x=Math.max(0,Math.min(tex.w-1,Math.trunc(u*tex.w))),y=Math.max(0,Math.min(tex.h-1,Math.trunc((1-v)*tex.h)));const d=tex.ctx.getImageData(x,y,1,1).data;return[d[0],d[1],d[2]];}return null;}
+
+function sampleTex(tex,u,v){
+  if(!tex)return null;
+  if(tex.sample){
+    const c=tex.sample(u,v);
+    if(!c)return null;
+    return [c[0]||0,c[1]||0,c[2]||0,c.length>3?c[3]:1];
+  }
+  if(tex.data&&tex.w&&tex.h){
+    u=Math.max(0,Math.min(1,u));v=Math.max(0,Math.min(1,v));
+    const x=Math.max(0,Math.min(tex.w-1,Math.round(u*(tex.w-1))));
+    const y=Math.max(0,Math.min(tex.h-1,Math.round((1-v)*(tex.h-1))));
+    const i=(y*tex.w+x)*4,d=tex.data;
+    return [d[i]/255,d[i+1]/255,d[i+2]/255,(d[i+3]===undefined?255:d[i+3])/255];
+  }
+  return null;
+}
+function sampleTexRGB8(tex,uv){if(!tex||!uv)return null;const smp=sampleTex(tex,uv[0],uv[1]);if(!smp||smp[3]<=0.02)return null;return [Math.round(smp[0]*255),Math.round(smp[1]*255),Math.round(smp[2]*255)];}
 function mix3(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];}
 function mix2(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];}
 function makeSubTri(p0,p1,p2,uv0,uv1,uv2,tex,flatColor){return {p:[p0,p1,p2],uv:[uv0,uv1,uv2],tex,flatColor};}
@@ -2426,30 +2450,6 @@ function setExportPreviewFromSolid(uPos,triData,palette){
   S.exportPreviewWfm=new THREE.LineSegments(new THREE.WireframeGeometry(g),new THREE.LineBasicMaterial({color:0x222244,opacity:.25,transparent:true}));if(S.mesh){S.exportPreviewWfm.position.copy(S.mesh.position);S.exportPreviewWfm.rotation.copy(S.mesh.rotation);S.exportPreviewWfm.scale.copy(S.mesh.scale);}S.exportPreviewWfm.visible=S.exportPreview&&S.wf;sc.add(S.exportPreviewWfm);
   if($('epb'))$('epb').disabled=false;
 }
-
-function setExportPreviewFromMaterialTriangles(uPos,triData,palette){
-  if(S.exportPreviewMesh){sc.remove(S.exportPreviewMesh);S.exportPreviewMesh.geometry.dispose();S.exportPreviewMesh.material.dispose();S.exportPreviewMesh=null;}
-  if(S.exportPreviewWfm){sc.remove(S.exportPreviewWfm);S.exportPreviewWfm.geometry.dispose();S.exportPreviewWfm.material.dispose();S.exportPreviewWfm=null;}
-  S.exportSolid=null;S.exportUndo=[];S.exportRedo=[];S.exportPend=null;updUB();
-  const verts=new Float32Array(triData.length*9),cols=new Float32Array(triData.length*9);
-  for(let i=0;i<triData.length;i++){
-    const t=triData[i],ids=[t.v1,t.v2,t.v3],c=palette[t.m]||[200,200,200];
-    for(let j=0;j<3;j++){
-      const vi=ids[j]*3,o=i*9+j*3;
-      verts[o]=uPos[vi];verts[o+1]=uPos[vi+1];verts[o+2]=uPos[vi+2];
-      cols[o]=c[0]/255;cols[o+1]=c[1]/255;cols[o+2]=c[2]/255;
-    }
-  }
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(verts,3));g.setAttribute('color',new THREE.BufferAttribute(cols,3));g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();
-  S.exportPreviewAdj=buildAdjMapFromPos(verts,triData.length);S.exportPreviewFn=faceNormalsFromPos(verts,triData.length);
-  S.exportPreviewMesh=new THREE.Mesh(g,new THREE.MeshPhongMaterial({vertexColors:true,flatShading:true,side:THREE.DoubleSide,shininess:20}));
-  if(S.mesh){S.exportPreviewMesh.position.copy(S.mesh.position);S.exportPreviewMesh.rotation.copy(S.mesh.rotation);S.exportPreviewMesh.scale.copy(S.mesh.scale);}
-  S.exportPreviewMesh.visible=S.exportPreview;sc.add(S.exportPreviewMesh);
-  S.exportPreviewWfm=new THREE.LineSegments(new THREE.WireframeGeometry(g),new THREE.LineBasicMaterial({color:0x222244,opacity:.25,transparent:true}));
-  if(S.mesh){S.exportPreviewWfm.position.copy(S.mesh.position);S.exportPreviewWfm.rotation.copy(S.mesh.rotation);S.exportPreviewWfm.scale.copy(S.mesh.scale);}
-  S.exportPreviewWfm.visible=S.exportPreview&&S.wf;sc.add(S.exportPreviewWfm);
-  if($('epb'))$('epb').disabled=false;
-}
 function channelPreviewPaletteFromMode(M){
   return M.ch.map(ch=>{
     let h=(ch.hex||'#CCCCCC').replace('#','');
@@ -2469,7 +2469,7 @@ function toggleExportPreview(force){
   if(typeof syncToolsForPreview==='function')syncToolsForPreview();updUB();
   $('st').textContent=S.exportPreview?'Tool: '+(S.tool==='recolor-sphere'?'Recolour Sphere':'Recolour Brush'):'Tool: '+(S.tool||'Brush');
 }
-async function processModel(){
+async function processModel_file28_solid(){
   if(!S.mesh)return;
   clearExportPreview();
   const ov=$('po');ov.classList.add('vis');const fe=$('pf'),te=$('pt');
@@ -2650,6 +2650,508 @@ async function processModel(){
     fe.style.width='100%';te.textContent='Done — '+palette.length+' colours, '+uid.toLocaleString()+' verts';await sl(400);
     ov.classList.remove('vis');$('dl-overlay').style.display='block';$('reprocess-overlay').style.display='none';S.processed=true;
     $('linf').style.display='';$('linf').innerHTML='Solid · <span>'+palette.length+'</span> colours · <span>'+triData2.length.toLocaleString()+'</span> tris';
+    return;
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  let zMn=Infinity,zMx=-Infinity;
+  for(let i=2;i<pos.length;i+=3){if(pos[i]<zMn)zMn=pos[i];if(pos[i]>zMx)zMx=pos[i];}
+  const LH=0.08;
+  const nL=Math.max(1,Math.ceil((zMx-zMn)/LH));
+
+  // Filament mode configuration
+  // DECOMPOSE uses ideal subtractive CMY theory — this produces the correct layer-dithering
+  // ratios regardless of the exact filament gamut. Real filament colours are used ONLY for
+  // the 3MF colorgroup hex values so the slicer preview displays accurately.
+  const fh=S.filHex;
+  const hex4=h=>(h.replace('#','')).toUpperCase()+'FF';
+  const MODES={
+    cmy:{
+      ch:[{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){return[1-r/255,1-g/255,1-b/255];}
+    },
+    wcmy:{
+      ch:[{n:'White',hex:'#'+hex4(fh.w)},{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){
+        const c=1-r/255,m=1-g/255,y=1-b/255;
+        const k=Math.min(c,m,y);
+        const w=1-Math.max(c,m,y);
+        const k3=k/3;
+        return[w,c-k+k3,m-k+k3,y-k+k3];
+      }
+    },
+    kcmy:{
+      ch:[{n:'Black',hex:'#'+hex4(fh.k)},{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){
+        const c=1-r/255,m=1-g/255,y=1-b/255;
+        const kMax=Math.min(c,m,y);
+        const chroma=Math.max(c,m,y)-kMax;
+        const kThresh=Math.max(0,(kMax-0.35)/0.65);
+        const kScale=(1-chroma*0.7)*kThresh;
+        const k=kMax*kScale;
+        return[k,c-k,m-k,y-k];
+      }
+    },
+    wkcmy:{
+      ch:[{n:'White',hex:'#'+hex4(fh.w)},{n:'Black',hex:'#'+hex4(fh.k)},{n:'Cyan',hex:'#'+hex4(fh.c)},{n:'Magenta',hex:'#'+hex4(fh.m)},{n:'Yellow',hex:'#'+hex4(fh.y)}],
+      decompose(r,g,b){
+        const c=1-r/255,m=1-g/255,y=1-b/255;
+        const kMax=Math.min(c,m,y);
+        const chroma=Math.max(c,m,y)-kMax;
+        const kScale=1-chroma*0.7;
+        const k=kMax*kScale;
+        const w=1-Math.max(c,m,y);
+        return[w,k,c-k,m-k,y-k];
+      }
+    }
+  };
+  // Build 2C mode dynamically from user-selected colors
+  const cA2=new THREE.Color(S.fil2A),cB2=new THREE.Color(S.fil2B);
+  const aR=Math.round(cA2.r*255),aG=Math.round(cA2.g*255),aB=Math.round(cA2.b*255);
+  const bR=Math.round(cB2.r*255),bG=Math.round(cB2.g*255),bB=Math.round(cB2.b*255);
+  MODES['2c']={
+    ch:[{n:'Fil A',hex:S.fil2A+'FF'},{n:'Fil B',hex:S.fil2B+'FF'}],
+    decompose(r,g,b){
+      // Project color onto line A→B
+      const dABr=bR-aR,dABg=bG-aG,dABb=bB-aB;
+      const dot2=dABr*dABr+dABg*dABg+dABb*dABb;
+      if(dot2<1)return[0.5,0.5]; // A≈B, split evenly
+      const t=Math.max(0,Math.min(1,((r-aR)*dABr+(g-aG)*dABg+(b-aB)*dABb)/dot2));
+      return[1-t,t];
+    }
+  };
+  const M=MODES[mode];
+  const nCh=M.ch.length;
+
+  // Export colour sampling for non-solid filament modes:
+  // 1) Photo-projected faces still use the saved camera projection, so photo edits
+  //    preserve per-sub-triangle detail.
+  // 2) Textured OBJ faces sample the original texture directly at the sub-triangle
+  //    centroid UV instead of using the pre-averaged per-face colour. This makes
+  //    CMY/WCMY/KCMY/WKCMY/2C exports follow the texture image itself.
+  // 3) Fallback is the current per-face S.fc colour for STL/3MF, painted-only, or
+  //    untextured/material-only geometry.
+  const pp=S.photoProjection; // may be null if no photo was applied
+  const hasPhoto=pp&&S.photoFaces&&S.photoFaces.size>0;
+  // Pre-flatten saved camera matrices to plain arrays for fast inline math (no Three.js calls)
+  let ppVM=null,ppPM=null;
+  if(hasPhoto){ppVM=pp.viewMat.elements;ppPM=pp.projMat.elements;}
+
+  function sampleSavedPhoto(cx,cy,cz){
+    // Apply view matrix (world → view)
+    const vx=ppVM[0]*cx+ppVM[4]*cy+ppVM[8]*cz+ppVM[12];
+    const vy=ppVM[1]*cx+ppVM[5]*cy+ppVM[9]*cz+ppVM[13];
+    const vz=ppVM[2]*cx+ppVM[6]*cy+ppVM[10]*cz+ppVM[14];
+    const vw=ppVM[3]*cx+ppVM[7]*cy+ppVM[11]*cz+ppVM[15];
+    // Apply projection matrix (view → clip, with perspective divide)
+    const cpx=ppPM[0]*vx+ppPM[4]*vy+ppPM[8]*vz+ppPM[12]*vw;
+    const cpy=ppPM[1]*vx+ppPM[5]*vy+ppPM[9]*vz+ppPM[13]*vw;
+    const cpz=ppPM[2]*vx+ppPM[6]*vy+ppPM[10]*vz+ppPM[14]*vw;
+    const cpw=ppPM[3]*vx+ppPM[7]*vy+ppPM[11]*vz+ppPM[15]*vw;
+    if(Math.abs(cpw)<1e-10||cpz/cpw>1)return null;
+    const sx=(cpx/cpw+1)/2*pp.vpW;
+    const sy=(1-cpy/cpw)/2*pp.vpH;
+    // Map screen → photo coords
+    const dx=sx-pp.ovCx,dy=sy-pp.ovCy;
+    const lx=dx*Math.cos(pp.th)+dy*Math.sin(pp.th)+pp.ovW/2;
+    const ly=-dx*Math.sin(pp.th)+dy*Math.cos(pp.th)+pp.ovH/2;
+    if(lx<0||ly<0||lx>=pp.ovW||ly>=pp.ovH)return null;
+    const ix=Math.max(0,Math.min(pp.imgW-1,Math.round(lx/pp.ovW*pp.imgW)));
+    const iy=Math.max(0,Math.min(pp.imgH-1,Math.round(ly/pp.ovH*pp.imgH)));
+    const pidx=(iy*pp.imgW+ix)*4;
+    const pa=pp.photoData[pidx+3];if(pa<128)return null;
+    const a=pa/255;
+    return[Math.round(pp.photoData[pidx]*a),Math.round(pp.photoData[pidx+1]*a),Math.round(pp.photoData[pidx+2]*a)];
+  }
+
+  const Q=8;
+  const hasObjTexture=!!(S.objSource&&S.objSource.hasTexture&&S.objSource.tris);
+  function quantRGB8(c){return[Math.min(255,Math.round(c[0]/Q)*Q),Math.min(255,Math.round(c[1]/Q)*Q),Math.min(255,Math.round(c[2]/Q)*Q)];}
+  function baryUVForFacePoint(fi,cx,cy,cz){
+    const t=S.objSource&&S.objSource.tris&&S.objSource.tris[fi];
+    if(!t||!t.tex||!t.uv||!t.uv[0]||!t.uv[1]||!t.uv[2])return null;
+    const i=fi*9;
+    const ax=pos[i],ay=pos[i+1],az=pos[i+2],bx=pos[i+3],by=pos[i+4],bz=pos[i+5],cx2=pos[i+6],cy2=pos[i+7],cz2=pos[i+8];
+    const v0x=bx-ax,v0y=by-ay,v0z=bz-az,v1x=cx2-ax,v1y=cy2-ay,v1z=cz2-az,v2x=cx-ax,v2y=cy-ay,v2z=cz-az;
+    const d00=v0x*v0x+v0y*v0y+v0z*v0z,d01=v0x*v1x+v0y*v1y+v0z*v1z,d11=v1x*v1x+v1y*v1y+v1z*v1z,d20=v2x*v0x+v2y*v0y+v2z*v0z,d21=v2x*v1x+v2y*v1y+v2z*v1z;
+    const den=d00*d11-d01*d01;if(Math.abs(den)<1e-12)return null;
+    let v=(d11*d20-d01*d21)/den,w=(d00*d21-d01*d20)/den,u=1-v-w;
+    u=Math.max(0,Math.min(1,u));v=Math.max(0,Math.min(1,v));w=Math.max(0,Math.min(1,w));
+    const sum=u+v+w||1;u/=sum;v/=sum;w/=sum;
+    return [t.uv[0][0]*u+t.uv[1][0]*v+t.uv[2][0]*w,t.uv[0][1]*u+t.uv[1][1]*v+t.uv[2][1]*w,t.tex];
+  }
+  function sampleObjTextureAt(fi,cx,cy,cz){
+    if(!hasObjTexture)return null;
+    const uvTex=baryUVForFacePoint(fi,cx,cy,cz);if(!uvTex)return null;
+    const smp=sampleTex(uvTex[2],uvTex[0],uvTex[1]);
+    if(!smp||smp[3]<=0.02)return null;
+    const a=smp[3],fr=S.fc[fi*3],fg=S.fc[fi*3+1],fb=S.fc[fi*3+2];
+    return [Math.round((smp[0]*a+fr*(1-a))*255),Math.round((smp[1]*a+fg*(1-a))*255),Math.round((smp[2]*a+fb*(1-a))*255)];
+  }
+  function getColor(fi,cx,cy,cz){
+    if(hasPhoto&&pp.faces.has(fi)){
+      const tc=sampleSavedPhoto(cx,cy,cz);
+      if(tc)return quantRGB8(tc);
+    }
+    const texC=sampleObjTextureAt(fi,cx,cy,cz);
+    if(texC)return quantRGB8(texC);
+    return quantRGB8([S.fc[fi*3]*255,S.fc[fi*3+1]*255,S.fc[fi*3+2]*255]);
+  }
+
+  // Lazy dither sequence cache
+  // Uses proportional Bresenham with deterministic tie-breaking
+  // for spatial coherence (similar colors → similar sequences)
+  function getDitherSeq(r,g,b){
+    const key=r+','+g+','+b;
+    if(colorSeqs.has(key))return{key,seq:colorSeqs.get(key)};
+    const demands=M.decompose(r,g,b);
+    const total=demands.reduce((a,v)=>a+Math.max(0,v),0);
+    const seq=new Uint8Array(nL);
+    if(total<0.001){
+      // Decompose yielded no usable demand (e.g. white in a mode with no white channel,
+      // or any colour the formula cancelled to zero).
+      // Cycle C+M+Y channels equally — avoids printing pure Black (KCMY ch0) or pure White (WCMY ch0).
+      const ci=M.ch.findIndex(ch=>ch.n==='Cyan');
+      if(ci>=0){const nc=Math.min(3,nCh-ci);for(let li=0;li<nL;li++)seq[li]=ci+(li%nc);}
+      else{for(let li=0;li<nL;li++)seq[li]=li%nCh;}
+    }
+    else{
+      const frac=demands.map(d=>Math.max(0,d)/total);
+      const placed=new Array(nCh).fill(0);
+      for(let li=0;li<nL;li++){
+        // Pick channel with greatest accumulated under-representation
+        let bestCh=0,bestD=-Infinity;
+        for(let ch=0;ch<nCh;ch++){
+          if(frac[ch]<0.001)continue;
+          const d=frac[ch]*(li+1)-placed[ch];
+          // Deterministic tie-breaking: slight bias by channel index + layer
+          // This ensures similar colors break ties the same way → coherent patterns
+          const tieBreak=d+ch*1e-6+(li%nCh===ch?1e-7:0);
+          if(tieBreak>bestD){bestD=tieBreak;bestCh=ch;}
+        }
+        seq[li]=bestCh;placed[bestCh]++;
+      }
+    }
+    colorSeqs.set(key,seq);
+    return{key,seq};
+  }
+
+  // Step 1: Precompute dither sequences for non-photo faces (one colour per face, exact S.fc).
+  // Photo faces use per-sub-triangle colour sampling (sampleSavedPhoto), so they don't
+  // need a pre-computed sequence — getDitherSeq is called per sub-triangle in Step 2.
+  te.textContent='Computing dither sequences ('+mode.toUpperCase()+')...';fe.style.width='8%';await sl(30);
+  const colorSeqs=new Map();
+  const faceColorKey=new Array(nf);
+
+  for(let fi=0;fi<nf;fi++){
+    if(hasPhoto&&pp.faces.has(fi))continue; // photo faces handled per sub-triangle
+    const [r,g,b]=getColor(fi,0,0,0);
+    const{key}=getDitherSeq(r,g,b);
+    faceColorKey[fi]=key;
+  }
+  te.textContent=colorSeqs.size+' unique colors...';fe.style.width='12%';await sl(30);
+
+  // Step 2: Clip faces at offset layer boundaries
+  const allTris=[];
+  const ZOFF=LH/2;
+
+  for(let fi=0;fi<nf;fi++){
+    const i9=fi*9;
+    const fzMin=Math.min(pos[i9+2],pos[i9+5],pos[i9+8]);
+    const fzMax=Math.max(pos[i9+2],pos[i9+5],pos[i9+8]);
+    const tri=[[pos[i9],pos[i9+1],pos[i9+2]],
+               [pos[i9+3],pos[i9+4],pos[i9+5]],
+               [pos[i9+6],pos[i9+7],pos[i9+8]]];
+
+    const liStart=Math.max(0,Math.floor((fzMin-zMn-ZOFF)/LH));
+    const liEnd=Math.min(nL-1,Math.ceil((fzMax-zMn-ZOFF)/LH));
+
+    const isPhotoFace=hasPhoto&&pp.faces.has(fi);
+    if(!isPhotoFace){
+      // Non-photo face: use pre-computed single dither sequence (fast)
+      const seq=colorSeqs.get(faceColorKey[fi]);
+      if(liStart===liEnd||liStart>=nL){
+        const cz=(fzMin+fzMax)/2;
+        const li2=Math.max(0,Math.min(nL-1,Math.floor((cz-zMn-ZOFF)/LH)));
+        allTris.push({v:tri,m:seq[li2]});
+      }else{
+        for(let li=liStart;li<=liEnd&&li<nL;li++){
+          const zB=zMn+ZOFF+li*LH,zT=zMn+ZOFF+(li+1)*LH;
+          const clipped=cTZ(tri,zB,zT);
+          for(const ct of clipped) allTris.push({v:ct,m:seq[Math.max(0,Math.min(nL-1,li))]});
+        }
+      }
+    }else{
+      // Photo face: sample per sub-triangle centroid → per-layer colour variation
+      const subTris=[];
+      if(liStart===liEnd||liStart>=nL){
+        const li2=Math.max(0,Math.min(nL-1,Math.floor(((fzMin+fzMax)/2-zMn-ZOFF)/LH)));
+        subTris.push({v:tri,li:li2});
+      }else{
+        for(let li=liStart;li<=liEnd&&li<nL;li++){
+          const zB=zMn+ZOFF+li*LH,zT=zMn+ZOFF+(li+1)*LH;
+          const clipped=cTZ(tri,zB,zT);
+          for(const ct of clipped) subTris.push({v:ct,li:Math.max(0,Math.min(nL-1,li))});
+        }
+      }
+      for(const st of subTris){
+        const cx=(st.v[0][0]+st.v[1][0]+st.v[2][0])/3;
+        const cy=(st.v[0][1]+st.v[1][1]+st.v[2][1])/3;
+        const cz=(st.v[0][2]+st.v[1][2]+st.v[2][2])/3;
+        const [r,g,b]=getColor(fi,cx,cy,cz);
+        const{seq}=getDitherSeq(r,g,b);
+        allTris.push({v:st.v,m:seq[st.li]});
+      }
+    }
+
+    if(fi%Math.max(1,Math.min(10000,Math.floor(nf/40)))===0){fe.style.width=12+(fi/nf)*55+'%';te.textContent='Clipping '+Math.round(fi/nf*100)+'% ('+allTris.length.toLocaleString()+' sub-faces)...';await sl(0);}
+  }
+
+  te.textContent=allTris.length.toLocaleString()+' sub-faces, welding...';fe.style.width='70%';await sl(30);
+
+  // Step 3: Weld vertices (with async yields for large models)
+  const PR=1e6;const vMap=new Map();const uPos=[];let uid=0;const triData=[];
+  const weldChunk=50000;
+  for(let ti=0;ti<allTris.length;ti++){
+    const t=allTris[ti];
+    const vis=[];
+    for(let v=0;v<3;v++){
+      const p=t.v[v];
+      const k=Math.round(p[0]*PR)+','+Math.round(p[1]*PR)+','+Math.round(p[2]*PR);
+      if(!vMap.has(k)){vMap.set(k,uid);uPos.push(p[0],p[1],p[2]);uid++;}
+      vis.push(vMap.get(k));
+    }
+    if(vis[0]!==vis[1]&&vis[1]!==vis[2]&&vis[0]!==vis[2])
+      triData.push({v1:vis[0],v2:vis[1],v3:vis[2],m:t.m});
+    if(ti%weldChunk===0){te.textContent='Welding '+Math.round(ti/allTris.length*100)+'%...';fe.style.width=70+(ti/allTris.length)*8+'%';await sl(0);}
+  }
+
+  te.textContent='Building 3MF...';fe.style.width='80%';await sl(30);
+  allTris.length=0; // free memory
+
+  // Step 4: Build 3MF with mode-appropriate colorgroup (chunked for large models)
+  let cgXml='<m:colorgroup id="1">\n';
+  for(const ch of M.ch) cgXml+='<m:color color="'+ch.hex+'"/>\n';
+  cgXml+='</m:colorgroup>\n';
+
+  // Helper: convert filament index to the hex encoding used by paint_color (Orca)
+  // and slic3rpe:mmu_segmentation (PrusaSlicer) — identical encoding, different attribute names.
+  // filament 0 = default, no attribute. filament 1→"8", 2→"0C", 3→"1C", 4→"2C" etc.
+  function filamentToColorHex(fi){
+    if(fi===0)return null;
+    const state=fi<=2?fi+1:7+(fi-3)*4; // matches stateToFilament inverse
+    const val=state*4;
+    const h=val.toString(16).toUpperCase();
+    return(val>=10&&val<16)?'0'+h:h; // "8","0C","1C","2C"... matching Bambu/Orca export convention
+  }
+
+  // Build XML in chunks to avoid blocking on huge string joins.
+  // xmlns:slic3rpe enables PrusaSlicer mmu_segmentation attributes on triangles.
+  // MmPaintingVersion:1 signals PrusaSlicer that this file uses per-face painting.
+  const xmlChunks=['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06">\n<metadata name="slic3rpe:MmPaintingVersion">1</metadata>\n<resources>\n'+cgXml+'<object id="2" name="'+S.fn.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" type="model">\n<mesh>\n<vertices>\n'];
+  const xmlBatch=20000;
+  for(let i=0;i<uid;i++){
+    xmlChunks.push('<vertex x="'+uPos[i*3]+'" y="'+uPos[i*3+1]+'" z="'+uPos[i*3+2]+'"/>\n');
+    if(i%xmlBatch===0&&i>0){await sl(0);te.textContent='Vertices '+Math.round(i/uid*100)+'%...';}
+  }
+  xmlChunks.push('</vertices>\n<triangles>\n');
+  te.textContent='Writing triangles...';await sl(0);
+
+  const counts=new Array(nCh).fill(0);
+  for(let i=0;i<triData.length;i++){
+    const t=triData[i];
+    const colorHex=filamentToColorHex(t.m);
+    // paint_color → Orca/Bambu-fork per-triangle filament assignment
+    // slic3rpe:mmu_segmentation → PrusaSlicer per-triangle extruder assignment
+    // Both use identical hex encoding; each slicer reads its own attribute, ignores the other
+    const extraAttrs=colorHex?' paint_color="'+colorHex+'" slic3rpe:mmu_segmentation="'+colorHex+'"':'';
+    xmlChunks.push('<triangle v1="'+t.v1+'" v2="'+t.v2+'" v3="'+t.v3+'" pid="1" p1="'+t.m+'"'+extraAttrs+'/>\n');
+    counts[t.m]++;
+    if(i%xmlBatch===0&&i>0){await sl(0);te.textContent='Triangles '+Math.round(i/triData.length*100)+'%...';}
+  }
+  xmlChunks.push('</triangles>\n</mesh>\n</object>\n</resources>\n<build>\n<item objectid="2"/>\n</build>\n</model>');
+
+  te.textContent='Encoding XML...';fe.style.width='85%';await sl(30);
+  // Encode XML in chunks to avoid massive string join blocking the thread
+  const tEnc=new TextEncoder();
+  const encodedChunks=[];let totalBytes=0;
+  const joinBatch=5000;
+  for(let i=0;i<xmlChunks.length;i+=joinBatch){
+    const batch=xmlChunks.slice(i,i+joinBatch).join('');
+    const encoded=tEnc.encode(batch);
+    encodedChunks.push(encoded);totalBytes+=encoded.length;
+    if(i%50000===0){te.textContent='Encoding XML '+Math.round(i/xmlChunks.length*100)+'%...';await sl(0);}
+  }
+  xmlChunks.length=0;
+  // Merge encoded chunks into single ArrayBuffer
+  te.textContent='Merging '+Math.round(totalBytes/1048576)+'MB...';fe.style.width='88%';await sl(30);
+  const modelBuf=new Uint8Array(totalBytes);let bOff=0;
+  for(const chunk of encodedChunks){modelBuf.set(chunk,bOff);bOff+=chunk.length;}
+  encodedChunks.length=0;
+  const contentTypes='<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n</Types>';
+  const rels='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';
+
+  te.textContent='Packaging...';fe.style.width='90%';await sl(30);
+  const enc=new TextEncoder();
+
+  // Generate slicer-specific metadata files — added to ZIP alongside the model.
+  // These are ignored by Bambu (which reads its own project_settings format separately),
+  // but tell PrusaSlicer about extruder count/colours, and tell Orca about filament colours.
+  const chColors6=M.ch.map(ch=>ch.hex.slice(0,7)); // #RRGGBB for each channel
+  const prusaExtruderColours=chColors6.join(';');
+  const prusaNozzles=M.ch.map(()=>'0.4').join(',');
+  // Slic3r_PE.config: PrusaSlicer reads this for extruder colour hints and nozzle count.
+  const prusaConfig='; extruder_colour = '+prusaExtruderColours+'\n; filament_colour = '+prusaExtruderColours+'\n; nozzle_diameter = '+prusaNozzles+'\n';
+  // Slic3r_PE_model.config: PrusaSlicer reads this to map the object's triangles to a volume.
+  // The volume covers all triangles (firstid=0, lastid=total-1); extruder="0" is the base slot.
+  const safeN=S.fn.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  const prusaModelConfig='<?xml version="1.0" encoding="UTF-8"?>\n<config>\n <object id="2" instances_count="1">\n  <metadata type="object" key="name" value="'+safeN+'"/>\n  <volume firstid="0" lastid="'+(triData.length-1)+'">\n   <metadata type="volume" key="name" value="'+safeN+'"/>\n   <metadata type="volume" key="volume_type" value="ModelPart"/>\n   <metadata type="volume" key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>\n   <metadata type="volume" key="extruder" value="0"/>\n  </volume>\n </object>\n</config>';
+  // project_settings.config: Orca/Bambu-fork reads filament_colour to name/colour each slot.
+  const orcaProjectSettings=JSON.stringify({filament_colour:chColors6});
+
+  S.mdl3mf=makeZip([
+    {name:'[Content_Types].xml',data:enc.encode(contentTypes).buffer},
+    {name:'_rels/.rels',data:enc.encode(rels).buffer},
+    {name:'3D/3dmodel.model',data:modelBuf.buffer},
+    {name:'Metadata/Slic3r_PE.config',data:enc.encode(prusaConfig).buffer},
+    {name:'Metadata/Slic3r_PE_model.config',data:enc.encode(prusaModelConfig).buffer},
+    {name:'Metadata/project_settings.config',data:enc.encode(orcaProjectSettings).buffer}
+  ]);
+
+
+  // Export Preview always represents the actual exported triangle/material data.
+  // For CMY/WCMY/KCMY/WKCMY/2C, show the clipped layer sub-triangles
+  // coloured by their assigned exported filament/material slot.
+  te.textContent='Building export preview...';fe.style.width='96%';await sl(30);
+  setExportPreviewFromSolid(uPos,triData,channelPreviewPaletteFromMode(M));
+  S.exportPreviewKind=mode;
+  toggleExportPreview(true);
+
+  fe.style.width='100%';te.textContent='Done!';await sl(400);
+  ov.classList.remove('vis');
+  $('dl-overlay').style.display='block';
+  $('reprocess-overlay').style.display='none';
+  S.processed=true;
+  const info=$('linf');info.style.display='';
+  const chColors=['var(--tx)','var(--tx)','var(--cy)','var(--mg)','var(--yl)'];
+  const modeColors={cmy:['var(--cy)','var(--mg)','var(--yl)'],wcmy:['var(--tx)','var(--cy)','var(--mg)','var(--yl)'],kcmy:['var(--txd)','var(--cy)','var(--mg)','var(--yl)'],wkcmy:['var(--tx)','var(--txd)','var(--cy)','var(--mg)','var(--yl)'],'2c':[S.fil2A,S.fil2B]};
+  const cols=modeColors[mode];
+  info.innerHTML='Verts: <span>'+uid.toLocaleString()+'</span> · Tris: <span>'+triData.length.toLocaleString()+'</span><br>'+
+    M.ch.map((ch,i)=>'<span style="color:'+cols[i]+'">'+ch.n[0]+':'+counts[i].toLocaleString()+'</span>').join(' · ')+' · '+nL+' layers';
+}
+
+async function processModel_file29_nonSolid(){
+  if(!S.mesh)return;
+  clearExportPreview();
+  const ov=$('po');ov.classList.add('vis');const fe=$('pf'),te=$('pt');
+  te.textContent='Analyzing...';fe.style.width='5%';await sl(30);
+  const pos=S.geo.getAttribute('position').array,nf=S.fc.length/3;
+  const mode=$('fmode').value;
+
+  // ── SOLID COLOURS EXPORT (no dithering) ─────────────────────────────────
+  if(mode==='solid'){
+    const kTarget=parseInt($('solidColCount').value)||0; // 0 = full spectrum
+    te.textContent='Collecting colours...';fe.style.width='15%';await sl(30);
+
+    // Build weighted unique-colour list from S.fc (all faces)
+    const Q8=8;
+    const uniqueMap=new Map();
+    for(let fi=0;fi<nf;fi++){
+      const r=Math.min(255,Math.round(S.fc[fi*3]*255/Q8)*Q8);
+      const g=Math.min(255,Math.round(S.fc[fi*3+1]*255/Q8)*Q8);
+      const b=Math.min(255,Math.round(S.fc[fi*3+2]*255/Q8)*Q8);
+      const key=(r<<16)|(g<<8)|b;
+      if(!uniqueMap.has(key))uniqueMap.set(key,[r,g,b,0]);
+      uniqueMap.get(key)[3]++;
+    }
+    const uniqueColors=[...uniqueMap.values()]; // [r,g,b,weight]
+    let palette=[]; // final [r,g,b] entries
+
+    if(kTarget>0&&kTarget<uniqueColors.length){
+      // k-means++ weighted colour clustering
+      te.textContent='Clustering to '+kTarget+' colours ('+uniqueColors.length+' → '+kTarget+')...';fe.style.width='30%';await sl(30);
+      const k=Math.min(kTarget,uniqueColors.length);
+      // k-means++ init: pick first centroid as highest-weight colour, then successively
+      // pick the colour furthest (weighted by weight) from existing centroids
+      uniqueColors.sort((a,b2)=>b2[3]-a[3]);
+      const cents=[[uniqueColors[0][0],uniqueColors[0][1],uniqueColors[0][2]]];
+      for(let i=1;i<k;i++){
+        let maxScore=-1,maxIdx=0;
+        for(let j=0;j<uniqueColors.length;j++){
+          let minD2=Infinity;
+          for(const c of cents){const d=(uniqueColors[j][0]-c[0])**2+(uniqueColors[j][1]-c[1])**2+(uniqueColors[j][2]-c[2])**2;if(d<minD2)minD2=d;}
+          const score=minD2*uniqueColors[j][3];
+          if(score>maxScore){maxScore=score;maxIdx=j;}
+        }
+        cents.push([uniqueColors[maxIdx][0],uniqueColors[maxIdx][1],uniqueColors[maxIdx][2]]);
+      }
+      // Iterate k-means (weighted)
+      for(let iter=0;iter<40;iter++){
+        const sums=Array.from({length:k},()=>[0,0,0,0]);
+        for(const [r,g,b,w] of uniqueColors){
+          let minD=Infinity,best=0;
+          for(let i=0;i<k;i++){const d=(r-cents[i][0])**2+(g-cents[i][1])**2+(b-cents[i][2])**2;if(d<minD){minD=d;best=i;}}
+          sums[best][0]+=r*w;sums[best][1]+=g*w;sums[best][2]+=b*w;sums[best][3]+=w;
+        }
+        let moved=false;
+        for(let i=0;i<k;i++){
+          if(sums[i][3]===0)continue;
+          const nr=sums[i][0]/sums[i][3],ng=sums[i][1]/sums[i][3],nb=sums[i][2]/sums[i][3];
+          if(Math.abs(nr-cents[i][0])>0.4||Math.abs(ng-cents[i][1])>0.4||Math.abs(nb-cents[i][2])>0.4)moved=true;
+          cents[i]=[nr,ng,nb];
+        }
+        if(!moved)break;
+        if(iter%10===9){await sl(0);}
+      }
+      palette=cents.map(c=>[Math.round(c[0]),Math.round(c[1]),Math.round(c[2])]);
+    }else{
+      // Full spectrum — one entry per unique quantized colour
+      for(const [r,g,b] of uniqueColors)palette.push([r,g,b]);
+    }
+
+    // Assign each face to nearest palette entry
+    te.textContent='Assigning '+nf.toLocaleString()+' faces to palette...';fe.style.width='50%';await sl(30);
+    const faceMat=new Int32Array(nf);
+    for(let fi=0;fi<nf;fi++){
+      const r=Math.min(255,Math.round(S.fc[fi*3]*255/Q8)*Q8);
+      const g=Math.min(255,Math.round(S.fc[fi*3+1]*255/Q8)*Q8);
+      const b=Math.min(255,Math.round(S.fc[fi*3+2]*255/Q8)*Q8);
+      let minD=Infinity,best=0;
+      for(let i=0;i<palette.length;i++){const d=(r-palette[i][0])**2+(g-palette[i][1])**2+(b-palette[i][2])**2;if(d<minD){minD=d;best=i;}}
+      faceMat[fi]=best;
+      if(fi%100000===0)await sl(0);
+    }
+
+    // Weld vertices and build triangle list
+    te.textContent='Welding vertices...';fe.style.width='62%';await sl(30);
+    const PR=1e6;const vMap=new Map();const uPos=[];let uid=0;const triData2=[];
+    for(let fi=0;fi<nf;fi++){
+      const i9=fi*9;const vis=[];
+      for(let v=0;v<3;v++){const x=pos[i9+v*3],y=pos[i9+v*3+1],z=pos[i9+v*3+2];const kk=Math.round(x*PR)+','+Math.round(y*PR)+','+Math.round(z*PR);if(!vMap.has(kk)){vMap.set(kk,uid);uPos.push(x,y,z);uid++;}vis.push(vMap.get(kk));}
+      if(vis[0]!==vis[1]&&vis[1]!==vis[2]&&vis[0]!==vis[2])triData2.push({v1:vis[0],v2:vis[1],v3:vis[2],m:faceMat[fi]});
+      if(fi%50000===0&&fi>0){te.textContent='Welding '+Math.round(fi/nf*100)+'%...';await sl(0);}
+    }
+
+    // Build 3MF XML
+    te.textContent='Building 3MF...';fe.style.width='78%';await sl(30);
+    let cgXml='<m:colorgroup id="1">\n';
+    for(const [r,g,b] of palette)cgXml+=`<m:color color="#${r.toString(16).padStart(2,'0').toUpperCase()}${g.toString(16).padStart(2,'0').toUpperCase()}${b.toString(16).padStart(2,'0').toUpperCase()}FF"/>\n`;
+    cgXml+='</m:colorgroup>\n';
+    const xp=['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:m="http://schemas.microsoft.com/3dmanufacturing/material/2015/02">\n<resources>\n'+cgXml+'<object id="2" type="model">\n<mesh>\n<vertices>\n'];
+    for(let i=0;i<uid;i++)xp.push(`<vertex x="${uPos[i*3]}" y="${uPos[i*3+1]}" z="${uPos[i*3+2]}"/>\n`);
+    xp.push('</vertices>\n<triangles>\n');
+    for(const t of triData2)xp.push(`<triangle v1="${t.v1}" v2="${t.v2}" v3="${t.v3}" pid="1" p1="${t.m}"/>\n`);
+    xp.push('</triangles>\n</mesh>\n</object>\n</resources>\n<build>\n<item objectid="2"/>\n</build>\n</model>');
+
+    te.textContent='Packaging...';fe.style.width='90%';await sl(30);
+    const enc2=new TextEncoder();
+    const ctypes='<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>\n</Types>';
+    const rels2='<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>';
+    S.mdl3mf=makeZip([{name:'[Content_Types].xml',data:enc2.encode(ctypes).buffer},{name:'_rels/.rels',data:enc2.encode(rels2).buffer},{name:'3D/3dmodel.model',data:enc2.encode(xp.join('')).buffer}]);
+    fe.style.width='100%';te.textContent='Done — '+palette.length+' colours, '+uid.toLocaleString()+' verts';await sl(400);
+    ov.classList.remove('vis');$('dl-overlay').style.display='block';$('reprocess-overlay').style.display='none';S.processed=true;
+    const sizeInfo=modelSizeInfoHTML();
+    $('linf').style.display='';$('linf').innerHTML=(sizeInfo?sizeInfo+'<br>':'')+'Solid · <span>'+palette.length+'</span> colours · <span>'+triData2.length.toLocaleString()+'</span> tris';
     return;
   }
   // ─────────────────────────────────────────────────────────────────────────
@@ -2992,9 +3494,13 @@ async function processModel(){
     {name:'Metadata/project_settings.config',data:enc.encode(orcaProjectSettings).buffer}
   ]);
 
+  // File29 owns the non-solid dither processing path, but file28 owns the
+  // viewport Export Preview UI. Build the preview from the exact welded
+  // triangles/material slots that were just written into the 3MF so CMY/WCMY/
+  // KCMY/WKCMY/2C modes show immediately after processing, just like Solid mode.
   te.textContent='Building export preview...';fe.style.width='96%';await sl(30);
-  setExportPreviewFromMaterialTriangles(uPos,triData,channelPreviewPaletteFromMode(M));
-  S.exportPreviewKind='dither';
+  setExportPreviewFromSolid(uPos,triData,channelPreviewPaletteFromMode(M));
+  S.exportPreviewKind=mode;
   toggleExportPreview(true);
 
   fe.style.width='100%';te.textContent='Done!';await sl(400);
@@ -3009,6 +3515,42 @@ async function processModel(){
   const sizeInfo=modelSizeInfoHTML();
   info.innerHTML=(sizeInfo?sizeInfo+'<br>':'')+'Verts: <span>'+uid.toLocaleString()+'</span> · Tris: <span>'+triData.length.toLocaleString()+'</span><br>'+
     M.ch.map((ch,i)=>'<span style="color:'+cols[i]+'">'+ch.n[0]+':'+counts[i].toLocaleString()+'</span>').join(' · ')+' · '+nL+' layers';
+}
+
+
+function ensureExportPreviewAfterProcess(kind){
+  if(S.exportPreviewMesh)return true;
+  if(!S.geo||!S.fc)return false;
+  const pos=S.geo.getAttribute('position').array,nf=S.fc.length/3;
+  const palette=[],pmap=new Map(),uPos=Array.from(pos),triData=[];
+  for(let fi=0;fi<nf;fi++){
+    const r=Math.max(0,Math.min(255,Math.round(S.fc[fi*3]*255)));
+    const g=Math.max(0,Math.min(255,Math.round(S.fc[fi*3+1]*255)));
+    const b=Math.max(0,Math.min(255,Math.round(S.fc[fi*3+2]*255)));
+    const key=r+','+g+','+b;let m=pmap.get(key);
+    if(m===undefined){m=palette.length;pmap.set(key,m);palette.push([r,g,b]);}
+    triData.push({v1:fi*3,v2:fi*3+1,v3:fi*3+2,m});
+  }
+  setExportPreviewFromSolid(uPos,triData,palette);
+  S.exportPreviewKind=kind||'processed';
+  return true;
+}
+async function processModel(){
+  const mode=$('fmode').value;
+  if(mode==='solid'){
+    const r=await processModel_file28_solid();
+    if(!S.exportPreviewMesh)ensureExportPreviewAfterProcess('solid');
+    if(S.exportPreviewMesh)toggleExportPreview(true);
+    return r;
+  }
+  const r=await processModel_file29_nonSolid();
+  // Keep file28's preview UI aware that a processed non-solid export is available.
+  if(!S.exportPreviewMesh)ensureExportPreviewAfterProcess(mode);
+  if(S.exportPreviewMesh)toggleExportPreview(true);
+  if($('epb'))$('epb').disabled=!S.exportPreviewMesh;
+  if($('dl-overlay'))$('dl-overlay').style.display='block';
+  if($('reprocess-overlay'))$('reprocess-overlay').style.display='none';
+  return r;
 }
 function dl3MF(){
   if(!S.mdl3mf)return;
