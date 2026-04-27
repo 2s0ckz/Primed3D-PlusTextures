@@ -18,13 +18,11 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 :root{--bg:#0f1117;--sf:#1a1d27;--sf2:#252936;--sf3:#2f3344;--bd:#363a4a;--tx:#e4e6ef;--txd:#8b8fa3;--cy:#00d4ff;--mg:#ff2d95;--yl:#ffd600;--ac:#6c5ce7;--ag:rgba(108,92,231,.25);--ok:#2ecc71}
 body.light{--bg:#e8eaf0;--sf:#f4f5f8;--sf2:#eaecf2;--sf3:#dde0ea;--bd:#c4c8d8;--tx:#1a1d27;--txd:#4a5068;--cy:#0088bb;--mg:#c4005e;--yl:#8a7200;--ac:#6c5ce7;--ag:rgba(108,92,231,.15);--ok:#167a3e}
-/* Header always stays dark — text colours identical to dark mode */
 body.light .thdr{background:#1a1d27;border-bottom-color:#363a4a}
 body.light .thdr *{color:#8b8fa3!important}
 body.light .thdr .rev-orange{color:#ffd600!important}
 body.light .thdr a:hover,body.light .thdr button:hover{color:#e4e6ef!important;opacity:1!important}
 body.light #vp{background:var(--bg)}
-/* Viewport overlay buttons: white bg, dark readable text */
 body.light .vb{background:rgba(255,255,255,.9);color:#252d44;border-color:#b0b6cc}
 body.light .vb:hover{color:#1a1d27;border-color:var(--ac)}
 body.light .vb.a{color:#1a1d27;background:var(--ag);border-color:var(--ac)}
@@ -1187,9 +1185,6 @@ async function loadOBJProject(objName,objBuf,fileMap){
     else{fcArr[fi*3]=S.base.r;fcArr[fi*3+1]=S.base.g;fcArr[fi*3+2]=S.base.b;}
     if(fi%100000===0)await sl(0);
   }
-  // Preserve file29's display/load output above, but also expose the original
-  // OBJ UV + texture source that file28's Solid Colours > Texture Boundaries
-  // exporter needs. This does not affect viewport loading.
   const objTris=[];let objHasTexture=false;
   for(let fi=0;fi<faces.length;fi++){
     const f=faces[fi],i9=fi*9,mat=f.mat?mats.get(f.mat):null;
@@ -2469,7 +2464,7 @@ function toggleExportPreview(force){
   if(typeof syncToolsForPreview==='function')syncToolsForPreview();updUB();
   $('st').textContent=S.exportPreview?'Tool: '+(S.tool==='recolor-sphere'?'Recolour Sphere':'Recolour Brush'):'Tool: '+(S.tool||'Brush');
 }
-async function processModel_file28_solid(){
+async function processModelSolid(){
   if(!S.mesh)return;
   clearExportPreview();
   const ov=$('po');ov.classList.add('vis');const fe=$('pf'),te=$('pt');
@@ -3018,7 +3013,6 @@ async function processModel_file28_solid(){
     {name:'Metadata/project_settings.config',data:enc.encode(orcaProjectSettings).buffer}
   ]);
 
-
   // Export Preview always represents the actual exported triangle/material data.
   // For CMY/WCMY/KCMY/WKCMY/2C, show the clipped layer sub-triangles
   // coloured by their assigned exported filament/material slot.
@@ -3040,7 +3034,7 @@ async function processModel_file28_solid(){
     M.ch.map((ch,i)=>'<span style="color:'+cols[i]+'">'+ch.n[0]+':'+counts[i].toLocaleString()+'</span>').join(' · ')+' · '+nL+' layers';
 }
 
-async function processModel_file29_nonSolid(){
+async function processModelNonSolid(){
   if(!S.mesh)return;
   clearExportPreview();
   const ov=$('po');ov.classList.add('vis');const fe=$('pf'),te=$('pt');
@@ -3494,10 +3488,6 @@ async function processModel_file29_nonSolid(){
     {name:'Metadata/project_settings.config',data:enc.encode(orcaProjectSettings).buffer}
   ]);
 
-  // File29 owns the non-solid dither processing path, but file28 owns the
-  // viewport Export Preview UI. Build the preview from the exact welded
-  // triangles/material slots that were just written into the 3MF so CMY/WCMY/
-  // KCMY/WKCMY/2C modes show immediately after processing, just like Solid mode.
   te.textContent='Building export preview...';fe.style.width='96%';await sl(30);
   setExportPreviewFromSolid(uPos,triData,channelPreviewPaletteFromMode(M));
   S.exportPreviewKind=mode;
@@ -3516,7 +3506,6 @@ async function processModel_file29_nonSolid(){
   info.innerHTML=(sizeInfo?sizeInfo+'<br>':'')+'Verts: <span>'+uid.toLocaleString()+'</span> · Tris: <span>'+triData.length.toLocaleString()+'</span><br>'+
     M.ch.map((ch,i)=>'<span style="color:'+cols[i]+'">'+ch.n[0]+':'+counts[i].toLocaleString()+'</span>').join(' · ')+' · '+nL+' layers';
 }
-
 
 function ensureExportPreviewAfterProcess(kind){
   if(S.exportPreviewMesh)return true;
@@ -3538,13 +3527,12 @@ function ensureExportPreviewAfterProcess(kind){
 async function processModel(){
   const mode=$('fmode').value;
   if(mode==='solid'){
-    const r=await processModel_file28_solid();
+    const r=await processModelSolid();
     if(!S.exportPreviewMesh)ensureExportPreviewAfterProcess('solid');
     if(S.exportPreviewMesh)toggleExportPreview(true);
     return r;
   }
-  const r=await processModel_file29_nonSolid();
-  // Keep file28's preview UI aware that a processed non-solid export is available.
+  const r=await processModelNonSolid();
   if(!S.exportPreviewMesh)ensureExportPreviewAfterProcess(mode);
   if(S.exportPreviewMesh)toggleExportPreview(true);
   if($('epb'))$('epb').disabled=!S.exportPreviewMesh;
